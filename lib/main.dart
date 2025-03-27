@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
@@ -60,6 +61,11 @@ final GoRouter _router = GoRouter(
         path: '/admin_dashboard',
         name: 'AdminDashboard',
         builder: (context, state) => const AdminDashboardPage()),
+    GoRoute(
+      path: '/acceso_admin',
+      name: 'AdminAccessPage',
+      builder: (context, state) => const AdminAccessPage(),
+    ),
     GoRoute(
       path: '/signin',
       name: 'Signin',

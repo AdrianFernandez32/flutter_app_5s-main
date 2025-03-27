@@ -104,7 +104,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Widget _buildUserAccessButton() {
     return TextButton(
       onPressed: () {
-        context.go('/login');
+        context.go('/acceso_admin');
       },
       child: const Text.rich(
         TextSpan(
