@@ -21,6 +21,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProv
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_dashboard.dart';
 
 void main() async {
   // await Supabase.initialize(
@@ -55,6 +56,10 @@ final GoRouter _router = GoRouter(
       name: 'AdminLogin',
       builder: (context, state) => const AdminLoginPage(),
     ),
+    GoRoute(
+        path: '/admin_dashboard',
+        name: 'AdminDashboard',
+        builder: (context, state) => const AdminDashboardPage()),
     GoRoute(
       path: '/signin',
       name: 'Signin',
