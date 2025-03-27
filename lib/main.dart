@@ -7,6 +7,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/manage_areas_page.dart';
@@ -65,6 +66,11 @@ final GoRouter _router = GoRouter(
       path: '/acceso_admin',
       name: 'AdminAccessPage',
       builder: (context, state) => const AdminAccessPage(),
+    ),
+    GoRoute(
+      path: '/inicio_admin',
+      name: 'InicioAdmin',
+      builder: (context, state) => const InicioAdminPage(),
     ),
     GoRoute(
       path: '/signin',

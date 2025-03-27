@@ -163,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildAdminAccessButton() {
     return OutlinedButton.icon(
-      onPressed: () => context.go('/admin_login'),
+      onPressed: () => context.go('/inicio_admin'),
       icon: Icon(
         Icons.admin_panel_settings,
         color: Theme.of(context).primaryColor,
