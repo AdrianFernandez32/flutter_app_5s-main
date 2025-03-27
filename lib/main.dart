@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
@@ -43,6 +44,11 @@ final GoRouter _router = GoRouter(
       path: '/login',
       name: 'Login',
       builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
+      path: '/admin_login',
+      name: 'AdminLogin',
+      builder: (context, state) => const AdminLoginPage(),
     ),
     GoRoute(
       path: '/signin',
@@ -135,11 +141,11 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Usuarios',
       builder: (context, state) => const ManageUsersPage(),
     ),
-        GoRoute(
-        name: 'CreateQuestionnairePage',
-        path: '/create_questionnaire',
-        builder: (context, state) => const CreateQuestionnairePage(),
-      ),
+    GoRoute(
+      name: 'CreateQuestionnairePage',
+      path: '/create_questionnaire',
+      builder: (context, state) => const CreateQuestionnairePage(),
+    ),
   ],
 );
 
