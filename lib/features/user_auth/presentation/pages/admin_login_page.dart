@@ -32,7 +32,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 300),
+                const SizedBox(height: 250),
                 const Text(
                   'Crear cuenta',
                   style: TextStyle(
