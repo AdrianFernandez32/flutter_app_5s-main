@@ -185,22 +185,24 @@ class _LoginPageState extends State<LoginPage> {
     final isValid = _formkey.currentState?.validate();
     if (isValid != true) return;
 
-    try {
-      final AuthResponse response = await client.auth.signInWithPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
+    context.goNamed("Menu");
 
-      if (response.session != null) {
-        context.goNamed('Menu');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error en el inicio de sesión'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    }
+    // try {
+    //   final AuthResponse response = await client.auth.signInWithPassword(
+    //     email: _emailController.text,
+    //     password: _passwordController.text,
+    //   );
+
+    //   if (response.session != null) {
+    //     context.goNamed('Menu');
+    //   }
+    // } catch (e) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Error en el inicio de sesión'),
+    //       backgroundColor: Colors.redAccent,
+    //     ),
+    //   );
+    // }
   }
 }
