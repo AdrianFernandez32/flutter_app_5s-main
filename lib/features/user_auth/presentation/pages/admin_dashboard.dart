@@ -21,7 +21,8 @@ class AdminDashboardPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
+                      padding:
+                          const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
                       decoration: const BoxDecoration(
                         color: Colors.blue,
                         borderRadius: BorderRadius.only(
@@ -32,8 +33,8 @@ class AdminDashboardPage extends StatelessWidget {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage:
-                                NetworkImage('https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
+                            backgroundImage: NetworkImage(
+                                'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
                             radius: 30,
                           ),
                           const SizedBox(width: 16),
@@ -42,7 +43,8 @@ class AdminDashboardPage extends StatelessWidget {
                             children: [
                               Text(
                                 'Bienvenido',
-                                style: TextStyle(color: Colors.white, fontSize: 16),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
                               ),
                               Text(
                                 'Carlos Trasviña',
@@ -102,18 +104,30 @@ class AdminDashboardPage extends StatelessWidget {
                 unselectedFontSize: 0,
                 items: const [
                   BottomNavigationBarItem(
-                      icon: Icon(Icons.home, color: Colors.white), label: ''),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.person, color: Colors.white), label: ''),
-                  BottomNavigationBarItem(
-                      icon:
-                          Icon(Icons.add_circle, size: 40, color: Colors.white),
+                      icon: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(Icons.home, color: Colors.white)),
                       label: ''),
                   BottomNavigationBarItem(
-                      icon: Icon(Icons.article, color: Colors.white),
+                      icon: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.person, color: Colors.white)),
                       label: ''),
                   BottomNavigationBarItem(
-                      icon: Icon(Icons.pie_chart, color: Colors.white),
+                      icon: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.add_circle,
+                              size: 40, color: Colors.white)),
+                      label: ''),
+                  BottomNavigationBarItem(
+                      icon: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.article, color: Colors.white)),
+                      label: ''),
+                  BottomNavigationBarItem(
+                      icon: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.pie_chart, color: Colors.white)),
                       label: ''),
                 ],
               ),
