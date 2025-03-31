@@ -93,35 +93,44 @@ class _LoginPageState extends State<LoginPage> {
                         height: 60,
                       ),
                       FilledButton(
-                          onPressed: () async {
-                            final isValid = _formkey.currentState?.validate();
-                            if (isValid != true) {
-                              return;
-                            }
-                            try {
-                              final AuthResponse response =
-                                  await client.auth.signInWithPassword(
-                                email: _emailController.text,
-                                password: _passwordController.text,
-                              );
-                              // if (response.session != null) {
-                              //   context.goNamed('Menu');
-                              // }
-                            } catch (e) {
-                              // ignore: use_build_context_synchronously
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                content: Text('Log-in failed'),
-                                backgroundColor: Colors.redAccent,
-                              ));
-                            }
+                        onPressed: () {
+                          context.goNamed(
+                              'CreateOrganization'); // Redirige directamente a la vista principal
+                        },
+                        child: const Text(
+                          "Iniciar Sesión",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        // onPressed: () async {
+                        //   final isValid = _formkey.currentState?.validate();
+                        //   if (isValid != true) {
+                        //     return;
+                        //   }
+                        //   try {
+                        //     final AuthResponse response =
+                        //         await client.auth.signInWithPassword(
+                        //       email: _emailController.text,
+                        //       password: _passwordController.text,
+                        //     );
+                        //     // if (response.session != null) {
+                        //     //   context.goNamed('Menu');
+                        //     // }
+                        //   } catch (e) {
+                        //     // ignore: use_build_context_synchronously
+                        //     ScaffoldMessenger.of(context)
+                        //         .showSnackBar(const SnackBar(
+                        //       content: Text('Log-in failed'),
+                        //       backgroundColor: Colors.redAccent,
+                        //     ));
+                        //   }
 
-                            //Navigator.of(context).pushReplacementNamed('/menu');
-                          },
-                          child: const Text(
-                            "Iniciar Sesión",
-                            style: TextStyle(fontSize: 16),
-                          )),
+                        //   //Navigator.of(context).pushReplacementNamed('/menu');
+                        // },
+                        // child: const Text(
+                        //   "Iniciar Sesión",
+                        //   style: TextStyle(fontSize: 16),
+                        // )),
+                      ),
                       const SizedBox(
                         height: 20,
                       ),

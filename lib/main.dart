@@ -4,6 +4,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_pag
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_organization_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
@@ -106,6 +107,11 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const ZonesPage(),
     ),
     GoRoute(
+      path: '/create-organization',
+      name: 'CreateOrganization',
+      builder: (context, state) => const CreateOrganizationPage(),
+    ),
+    GoRoute(
       path: '/auditsPage/:zone/:area',
       name: 'Audits Page',
       builder: (context, state) {
@@ -135,11 +141,11 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Usuarios',
       builder: (context, state) => const ManageUsersPage(),
     ),
-        GoRoute(
-        name: 'CreateQuestionnairePage',
-        path: '/create_questionnaire',
-        builder: (context, state) => const CreateQuestionnairePage(),
-      ),
+    GoRoute(
+      name: 'CreateQuestionnairePage',
+      path: '/create_questionnaire',
+      builder: (context, state) => const CreateQuestionnairePage(),
+    ),
   ],
 );
 
