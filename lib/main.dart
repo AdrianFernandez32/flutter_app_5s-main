@@ -6,6 +6,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_organization_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
@@ -132,6 +133,11 @@ final GoRouter _router = GoRouter(
       path: '/zonesPage',
       name: 'Zones Page',
       builder: (context, state) => const ZonesPage(),
+    ),
+    GoRoute(
+      path: '/create-organization',
+      name: 'CreateOrganization',
+      builder: (context, state) => const CreateOrganizationPage(),
     ),
     GoRoute(
       path: '/auditsPage/:zone/:area',
