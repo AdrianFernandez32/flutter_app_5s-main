@@ -85,7 +85,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Widget _buildLoginButton() {
     return FilledButton(
       onPressed: () {
-        context.go('/admin_dashboard');
+        
       },
       style: FilledButton.styleFrom(
         minimumSize: const Size(double.infinity, 50),

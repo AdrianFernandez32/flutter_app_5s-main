@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/color_palette_dropdown.dart';
 
@@ -143,7 +144,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
                 onPressed: () {
-                  // Acción al presionar crear
+                  context.goNamed('Menu');
                 },
                 child: const Text("Crear",
                     style: TextStyle(fontSize: 16, color: Colors.white)),

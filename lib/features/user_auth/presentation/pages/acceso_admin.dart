@@ -75,7 +75,7 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                       width: 200,
                       child: FilledButton(
                         onPressed: () {
-                          context.go('/admin_dashboard');
+                          context.goNamed('CreateOrganization');
                           //Aqui tambien tenmos otro enlace, podriamos iniciar de ahi o poner otro enlace para movernos al acceso
                         },
                         style: FilledButton.styleFrom(
