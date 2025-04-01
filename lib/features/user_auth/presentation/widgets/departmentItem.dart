@@ -45,7 +45,7 @@ class DepartmentItem extends StatelessWidget {
                   const SizedBox(width: 24),
                   Icon(
                     Icons.edit,
-                    color: colorScheme.onSurface.withValues(alpha: .6),
+                    color: colorScheme.onSurface.withOpacity(0.6),
                     size: 20,
                   ),
                   const SizedBox(
