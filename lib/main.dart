@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/add_department.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
@@ -174,6 +175,10 @@ final GoRouter _router = GoRouter(
       path: '/create_questionnaire',
       builder: (context, state) => const CreateQuestionnairePage(),
     ),
+    GoRoute(
+        path: "/departments",
+        name: "AddDepartment",
+        builder: (context, state) => const AddDepartment()),
   ],
 );
 
