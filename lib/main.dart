@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_organization_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/manage_areas_page.dart';
@@ -17,17 +20,23 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/signin_page
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/statistics_audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
-import 'package:flutter_app_5s/utils/common.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import "package:provider/provider.dart";
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_dashboard.dart';
 
 void main() async {
-  await Supabase.initialize(
-    url: 'https://rzbqldwiqhcxgjoufrzs.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6YnFsZHdpcWhjeGdqb3VmcnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNzI1NDIsImV4cCI6MjAyNTk0ODU0Mn0.2vSOwP4wBIv5lwztvsCkr97iyjw9dS0l-BCH0ndbyGI',
-  );
-  runApp(const MyApp());
+  // await Supabase.initialize(
+  //   url: 'https://rzbqldwiqhcxgjoufrzs.supabase.co',
+  //   anonKey:
+  //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6YnFsZHdpcWhjeGdqb3VmcnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNzI1NDIsImV4cCI6MjAyNTk0ODU0Mn0.2vSOwP4wBIv5lwztvsCkr97iyjw9dS0l-BCH0ndbyGI',
+  // );
+  //  Change Notifier Provider for the theme changes
+  runApp(ChangeNotifierProvider(
+    create: (context) => ThemeProvider(),
+    child: const MyApp(),
+  ));
 }
 
 final supabase = Supabase.instance.client;
@@ -44,6 +53,25 @@ final GoRouter _router = GoRouter(
       path: '/login',
       name: 'Login',
       builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
+      path: '/admin_login',
+      name: 'AdminLogin',
+      builder: (context, state) => const AdminLoginPage(),
+    ),
+    GoRoute(
+        path: '/admin_dashboard',
+        name: 'AdminDashboard',
+        builder: (context, state) => const AdminDashboardPage()),
+    GoRoute(
+      path: '/acceso_admin',
+      name: 'AdminAccessPage',
+      builder: (context, state) => const AdminAccessPage(),
+    ),
+    GoRoute(
+      path: '/inicio_admin',
+      name: 'InicioAdmin',
+      builder: (context, state) => const InicioAdminPage(),
     ),
     GoRoute(
       path: '/signin',
@@ -152,59 +180,36 @@ final GoRouter _router = GoRouter(
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: '5s Flutter App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      routerConfig: _router,
-      debugShowCheckedModeBanner: false,
-      /*initialRoute: '/',
-      routes: {
-        '/':(context) => const SplashScreen(),
-        '/login':(context) => const LoginPage(),
-        '/signin':(context) => const SignInPage(),
-        '/account':(context) => const AccountPage(),
-        '/menu':(context) => const MainMenu(),
-      },*/
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp.router(
+          title: '5s Flutter App',
+          theme: ThemeData(
+            colorScheme: ColorScheme.light(
+              primary: themeProvider.colors.primary,
+              secondary: themeProvider.colors.secondary,
+              surface: themeProvider.colors.background,
+            ),
+            scaffoldBackgroundColor: themeProvider.colors.background,
+            appBarTheme: AppBarTheme(
+              backgroundColor: themeProvider.colors.primary,
+              foregroundColor: _getContrastColor(themeProvider.colors.primary),
+            ),
+            floatingActionButtonTheme: FloatingActionButtonThemeData(
+              backgroundColor: themeProvider.colors.accent,
+            ),
+            useMaterial3: true,
+          ),
+          routerConfig: _router,
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
-}
 
-class MyWidget extends StatefulWidget {
-  const MyWidget({super.key});
-
-  @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  User? _user;
-  @override
-  void initState() {
-    _getAuth();
-    super.initState();
-  }
-
-  Future<void> _getAuth() async {
-    setState(() {
-      _user = client.auth.currentUser;
-    });
-    client.auth.onAuthStateChange.listen((event) {
-      setState(() {
-        _user = event.session?.user;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _user == null ? const LoginPage() : const MainMenu(),
-    );
+  Color _getContrastColor(Color color) {
+    return color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
   }
 }

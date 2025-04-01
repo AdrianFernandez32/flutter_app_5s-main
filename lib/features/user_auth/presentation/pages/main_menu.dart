@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/user_basic_info.dart';
+// Removed unused import
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,80 +15,105 @@ class MainMenu extends StatefulWidget {
 class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
-    // Simulando un fetch
-    const Map<String, String> response = {
-      "id": "1",
-      "username": "Carlos Trasviña",
-      "rol": "Jefe de Área",
-      "zone": "Zona Operativa",
-      "area": "Embotellado",
-    };
-
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
+        elevation: 0,
         toolbarHeight: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 42,
-            ),
-            const Center(
-              child: Text(
-                "Bienvenido",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 32),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                padding: EdgeInsets.zero, // Ensure no extra padding
+                child: Column(
+                  children: [
+                    Container(
+                      padding:
+                          const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
+                            radius: 30,
+                          ),
+                          const SizedBox(width: 16),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bienvenido',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
+                              Text(
+                                'Carlos Trasviña',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            UserBasicInfo(
-              username: response["username"]!,
-              area: response["area"]!,
-              rol: response["rol"]!,
-              zone: response["zone"]!,
-            ),
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: const Column(
-                children: [
-                  _Button(
-                    title: 'Auditar',
-                    icon: Icons.library_add_check,
-                    goToNamed: 'Auditar',
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _Button(
-                    title: 'Auditorías',
-                    icon: Icons.file_copy,
-                    goToNamed: 'Zones Page',
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _Button(
-                    title: 'Ajustes',
-                    icon: Icons.settings,
-                    goToNamed: 'Settings',
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _Button(
-                    title: 'Áreas',
-                    icon: Icons.grid_view_rounded,
-                    goToNamed: 'Gestion de Areas',
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.fromLTRB(16.0, 40, 16.0, 16.0),
+                child: const Column(
+                  children: [
+                    _Button(
+                      title: 'Auditar',
+                      icon: Icons.library_add_check,
+                      goToNamed: 'Auditar',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _Button(
+                      title: 'Auditorías',
+                      icon: Icons.file_copy,
+                      goToNamed: 'Zones Page',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _Button(
+                      title: 'Ajustes',
+                      icon: Icons.settings,
+                      goToNamed: 'Settings',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _Button(
+                      title: 'Áreas',
+                      icon: Icons.grid_view_rounded,
+                      goToNamed: 'Gestion de Areas',
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 60,
-            )
-          ],
-        ),
+              const SizedBox(
+                height: 60,
+              )
+            ],
+          ),
+        ],
       ),
-      floatingActionButton: const _SpeedDial(),
     );
   }
 }
@@ -113,21 +138,18 @@ class _Button extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.symmetric(
-          vertical: 5,
+          vertical: 17,
         ),
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: 12,
+          vertical: 15,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            12,
-          ),
-          color: const Color.fromARGB(
-            255,
-            255,
-            220,
-            193,
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          border: Border.all(
+            color: Colors.grey, // Use black87 for a deeper black
+            width: 1, // Adjust thickness
           ),
         ),
         child: Row(
@@ -153,57 +175,6 @@ class _Button extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _SpeedDial extends StatefulWidget {
-  const _SpeedDial({Key? key}) : super(key: key);
-
-  @override
-  _SpeedDialState createState() => _SpeedDialState();
-}
-
-class _SpeedDialState extends State<_SpeedDial> {
-  bool selected = false;
-  @override
-  Widget build(BuildContext context) {
-    return SpeedDial(
-      backgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-      foregroundColor: const Color.fromRGBO(134, 75, 111, 1),
-      spaceBetweenChildren: 12,
-      animatedIcon: AnimatedIcons.menu_close,
-      label: !selected ? const Text("Gestionar") : const SizedBox(),
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
-      children: [
-        SpeedDialChild(
-          label: "Usuarios",
-          labelBackgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          labelStyle: const TextStyle(
-              color: Color.fromRGBO(134, 75, 111, 1),
-              fontWeight: FontWeight.w600),
-          backgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          foregroundColor: const Color.fromRGBO(134, 75, 111, 1),
-          child: const Icon(Icons.person_outline_rounded),
-          onTap: () {
-            context.goNamed("Gestion de Usuarios");
-          },
-        ),
-        SpeedDialChild(
-          label: "Cuestionarios",
-          labelBackgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          labelStyle: const TextStyle(
-              color: Color.fromRGBO(134, 75, 111, 1),
-              fontWeight: FontWeight.w600),
-          backgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          foregroundColor: const Color.fromRGBO(134, 75, 111, 1),
-          child: const Icon(Icons.folder),
-          onTap: () {
-            context.goNamed("Gestion de Cuestionarios");
-          },
-        )
-      ],
     );
   }
 }

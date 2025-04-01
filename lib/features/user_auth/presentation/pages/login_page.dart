@@ -94,8 +94,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       FilledButton(
                         onPressed: () {
-                          context.goNamed(
-                              'CreateOrganization'); // Redirige directamente a la vista principal
+                          context
+                              .goNamed('CreateOrganization'); // Redirige aqui
                         },
                         child: const Text(
                           "Iniciar Sesión",
