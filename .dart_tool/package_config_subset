@@ -122,6 +122,10 @@ mime
 3.2
 file:///Users/adrian/.pub-cache/hosted/pub.dev/mime-1.0.5/
 file:///Users/adrian/.pub-cache/hosted/pub.dev/mime-1.0.5/lib/
+nested
+2.12
+file:///Users/adrian/.pub-cache/hosted/pub.dev/nested-1.0.0/
+file:///Users/adrian/.pub-cache/hosted/pub.dev/nested-1.0.0/lib/
 path
 3.4
 file:///Users/adrian/.pub-cache/hosted/pub.dev/path-1.9.1/
@@ -162,6 +166,10 @@ postgrest
 3.0
 file:///Users/adrian/.pub-cache/hosted/pub.dev/postgrest-2.1.2/
 file:///Users/adrian/.pub-cache/hosted/pub.dev/postgrest-2.1.2/lib/
+provider
+2.12
+file:///Users/adrian/.pub-cache/hosted/pub.dev/provider-6.1.2/
+file:///Users/adrian/.pub-cache/hosted/pub.dev/provider-6.1.2/lib/
 realtime_client
 3.0
 file:///Users/adrian/.pub-cache/hosted/pub.dev/realtime_client-2.1.0/
