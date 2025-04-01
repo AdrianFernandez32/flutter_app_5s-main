@@ -66,10 +66,10 @@ class AuditPageState extends State<AuditPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
+        backgroundColor: Colors.blue,
         title: const Text(
           "Auditar",
-          style: TextStyle(color: appBarElementsColor, fontSize: 32),
+          style: TextStyle(color: Colors.white, fontSize: 32),
         ),
         leading: IconButton(
           onPressed: () {
@@ -77,7 +77,7 @@ class AuditPageState extends State<AuditPage> {
           },
           icon: const Icon(
             Icons.arrow_back,
-            color: appBarElementsColor,
+            color: Colors.white,
             size: 33,
           ),
         ),
@@ -91,19 +91,20 @@ class AuditPageState extends State<AuditPage> {
       ),
       body: ListView(
         children: <Widget>[
-          Container(
-            margin: const EdgeInsets.all(20),
-            child: SearchBar(
-              onChanged: (value) {
-                // Falta lógica de búsqueda
-                // Pista: Modificar areasList y solo mostrar los que entren dentro de la búsqueda
-                print(value);
-              },
-              leading: const SizedBox(width: 50, child: Icon(Icons.search)),
-              hintText: "Buscar",
-            ),
-          ),
-        ] + areasList,
+              Container(
+                margin: const EdgeInsets.all(20),
+                child: SearchBar(
+                  onChanged: (value) {
+                    // Falta lógica de búsqueda
+                    // Pista: Modificar areasList y solo mostrar los que entren dentro de la búsqueda
+                    print(value);
+                  },
+                  leading: const SizedBox(width: 50, child: Icon(Icons.search)),
+                  hintText: "Buscar",
+                ),
+              ),
+            ] +
+            areasList,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

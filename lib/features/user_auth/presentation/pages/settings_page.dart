@@ -13,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    const color = Color.fromRGBO(79, 67, 73, 1);
+    const color = Color.fromRGBO(140, 140, 140, 1);
 
     // Datos simulados de un fetch
     const Map<String, String> response = {
@@ -29,45 +29,26 @@ class SettingsPageState extends State<SettingsPage> {
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 80,
-          backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
+          backgroundColor: Colors.blue,
           title: const Text(
             "Ajustes",
-            style: TextStyle(color: color, fontSize: 32),
+            style: TextStyle(color: Colors.white, fontSize: 32),
           ),
           leading: IconButton(
-              onPressed: () {
-                context.goNamed("Menu");
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: color,
-                size: 33,
-              )),
+            onPressed: () {
+              context.goNamed("Menu");
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+              size: 33,
+            ),
+          ),
           bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(50),
+            preferredSize: const Size.fromHeight(10),
             child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    color: const Color.fromRGBO(134, 75, 111, 1),
-                    height: 2,
-                  ),
-                  const TabBar(indicatorSize: TabBarIndicatorSize.tab, tabs: [
-                    Tab(
-                      text: "General",
-                    ),
-                    Tab(
-                      text: "Tutoriales",
-                    ),
-                    Tab(
-                      text: "FAQ",
-                    ),
-                  ]),
-                ],
-              ),
+              color: const Color.fromRGBO(140, 140, 140, 1),
+              height: 2,
             ),
           ),
         ),
@@ -86,6 +67,17 @@ class SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
+              const TabBar(indicatorSize: TabBarIndicatorSize.tab, tabs: [
+                Tab(
+                  text: "General",
+                ),
+                Tab(
+                  text: "Tutoriales",
+                ),
+                Tab(
+                  text: "FAQ",
+                ),
+              ]),
               // Notificaciones y Terminos de Privacidad
               Center(
                 child: Container(
