@@ -1,8 +1,31 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/color_palette_dropdown.dart';
 
-class CreateOrganizationPage extends StatelessWidget {
+class CreateOrganizationPage extends StatefulWidget {
   const CreateOrganizationPage({Key? key}) : super(key: key);
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _CreateOrganizationPageState createState() => _CreateOrganizationPageState();
+}
+
+class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
+  File? _image;
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,23 +44,27 @@ class CreateOrganizationPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      // Acción para agregar foto
-                    },
+                    onTap: _pickImage,
                     child: CircleAvatar(
                       radius: 95,
                       backgroundColor: Colors.blue,
                       child: CircleAvatar(
                         radius: 92,
                         backgroundColor: Colors.grey[200],
-                        child:
-                            const Icon(Icons.add, size: 50, color: Colors.blue),
+                        backgroundImage:
+                            _image != null ? FileImage(_image!) : null,
+                        child: _image == null
+                            ? const Icon(Icons.add,
+                                size: 50, color: Colors.blue)
+                            : null,
                       ),
                     ),
                   ),
                   const SizedBox(height: 15),
-                  const Text("Agregar foto",
-                      style: TextStyle(color: Colors.blue)),
+                  Text(
+                    _image == null ? "Agregar foto" : "Cambiar foto",
+                    style: const TextStyle(color: Colors.blue),
+                  ),
                 ],
               ),
             ),

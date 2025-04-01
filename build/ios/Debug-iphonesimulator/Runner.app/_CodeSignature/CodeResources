@@ -46,7 +46,7 @@
 		</data>
 		<key>Frameworks/App.framework/App</key>
 		<data>
-		DwMVQiIgR3ZfhbidNd1kTB0UMx0=
+		m7IqnyzZCaZGe1kl59zVrjKyKec=
 		</data>
 		<key>Frameworks/App.framework/Info.plist</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>Frameworks/App.framework/_CodeSignature/CodeResources</key>
 		<data>
-		QrHCJ+v57iDuehBZy0fzk4b/4Z0=
+		DmTj+OEDPBLmRloxQeXuSwvRoKU=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/NOTICES.Z</key>
 		<data>
-		/iFL+/G2yZqnp8QZviWldzTZjxs=
+		FHGIWpyw1+Egf/yHIf6X6C554DI=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/NativeAssetsManifest.json</key>
 		<data>
@@ -86,7 +86,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/kernel_blob.bin</key>
 		<data>
-		BxkxTdunvdX2NXaRpYFaLUedXHI=
+		bIK2cqHOyqJzkiYtTZqY2ovCctI=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/lib/assets/images/app_logo.png</key>
 		<data>
@@ -232,6 +232,26 @@
 		<data>
 		W859JDVykxWZ0aYvnTEJCgiAYio=
 		</data>
+		<key>Frameworks/image_picker_ios.framework/Info.plist</key>
+		<data>
+		dkeoSgK31fWbj8GTRhPbB0BnnRc=
+		</data>
+		<key>Frameworks/image_picker_ios.framework/_CodeSignature/CodeResources</key>
+		<data>
+		ebp+ZQ7hapEu1zXcXnRAsZFB5zE=
+		</data>
+		<key>Frameworks/image_picker_ios.framework/image_picker_ios</key>
+		<data>
+		LjT4mC33eegKQI5IBEUUlkKmxO4=
+		</data>
+		<key>Frameworks/image_picker_ios.framework/image_picker_ios_privacy.bundle/Info.plist</key>
+		<data>
+		vKNRJFWsS2QX5R6akPixvBBmpA4=
+		</data>
+		<key>Frameworks/image_picker_ios.framework/image_picker_ios_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<data>
+		/LX0ZlwxwIAIhjZaDB8EiH5KpXA=
+		</data>
 		<key>Frameworks/path_provider_foundation.framework/Info.plist</key>
 		<data>
 		AcMSl4PhTjuZZdIOxNKexEdRtG0=
@@ -302,7 +322,7 @@
 		</data>
 		<key>Runner.debug.dylib</key>
 		<data>
-		oyAr9bEfjY/5gbwfyKN9HMRygok=
+		wS0SPq8mj1t/xOuIwtSZWr5nj9A=
 		</data>
 		<key>__preview.dylib</key>
 		<data>
@@ -385,7 +405,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			D/dgRl/Ty0QpA3po5KPteQ1MU6Ay0rNJ382/X5qVr8U=
+			KfOEba2Y47lY2LLki+5QbspwZ/DnW9J0X5zhiLmQkh4=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/Info.plist</key>
@@ -399,7 +419,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			d+JiDaclU0KRnsOla5XXM5FQe9iYHKT4NN+wRJdB1XY=
+			qrJb4vH4LFirSzmxBjjxPtt1xMUCtKtpLKh840AafaE=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
@@ -427,7 +447,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			+wWswYAXwmmFyU3QzKJlb+amvpCwDifVU3E96WWHfI8=
+			fyBS/ABwicfvv/FEXanrzVwtl2+uTW7ynqMbWhq2xxs=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/NativeAssetsManifest.json</key>
@@ -455,7 +475,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			rxVEEz1tvI1VF/mp+HYD9qiDdsxAbFEBtse9At6CNfM=
+			tFv3pzmRkKjZZfErSrUsty45Jv7l2yrKJB65tmtj3tE=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/lib/assets/images/app_logo.png</key>
@@ -710,6 +730,41 @@
 			3wG/jzEbezUNAdVa/lBZ6tm6KwBpxUIeadm0BffKvqI=
 			</data>
 		</dict>
+		<key>Frameworks/image_picker_ios.framework/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mqM3mgWyiyzeA3KKVNz5MP+aA0t2Cg3Tr4kd/CvlFic=
+			</data>
+		</dict>
+		<key>Frameworks/image_picker_ios.framework/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			H3wxpHhvu/ulCWjX9RKXH/xXu4Cz9LlBVwJxmEOFVnY=
+			</data>
+		</dict>
+		<key>Frameworks/image_picker_ios.framework/image_picker_ios</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			YcKW4SIS57ProVPyhrOPmOaf3t9mu4bHAcwFKSQWcPY=
+			</data>
+		</dict>
+		<key>Frameworks/image_picker_ios.framework/image_picker_ios_privacy.bundle/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			lO7Q177sSfRe0j0IK/sEJzJL2pZ8oBX/Q4bsjxYOrSA=
+			</data>
+		</dict>
+		<key>Frameworks/image_picker_ios.framework/image_picker_ios_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bS2g2NkwIn1CjB2TY7CtbjoS4sm2jFzilxWKdBL8jDE=
+			</data>
+		</dict>
 		<key>Frameworks/path_provider_foundation.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
@@ -819,7 +874,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Z6L0pn+FhvlDetEMh3rkeOL2ItD3qL1iXN6vF5TZzg0=
+			Z6xrCCeh+isRuc1DK6W4tEFzWSU0r5KkzjBQpVHNIP0=
 			</data>
 		</dict>
 		<key>__preview.dylib</key>
