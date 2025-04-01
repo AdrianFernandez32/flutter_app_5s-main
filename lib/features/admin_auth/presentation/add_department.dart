@@ -47,6 +47,16 @@ class AddDepartment extends StatelessWidget {
                   .toList()
             ],
           )),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            print('Department added');
+          },
+          backgroundColor: colorScheme.secondary,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          )),
     );
   }
 }
