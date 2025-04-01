@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       OutlinedButton(
                           onPressed: () async {
-                            context.goNamed("Account");
+                            context.goNamed("InicioAdmin");
                             //Navigator.of(context).pushReplacementNamed('/signin');
                           },
                           child: const Text("Registrarte")),
