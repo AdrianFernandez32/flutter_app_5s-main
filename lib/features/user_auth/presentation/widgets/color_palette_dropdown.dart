@@ -16,26 +16,30 @@ class _ColorPaletteDropdownState extends State<ColorPaletteDropdown> {
       context: context,
       builder: (context) {
         return Container(
-          padding: EdgeInsets.all(20),
-          height: 250,
+          padding: const EdgeInsets.all(20),
+          height: 300,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Selecciona una paleta de color",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
+              const Text(
+                "Selecciona una paleta de color",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
               Expanded(
-                child: ListView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _colorOption(
-                        [Colors.blue[900]!, Colors.blue, Colors.lightBlue]),
+                        [Colors.red[900]!, Colors.red, Colors.redAccent]),
+                    const Divider(thickness: 1, height: 20),
                     _colorOption(
-                        [Colors.teal[900]!, Colors.teal, Colors.tealAccent]),
-                    _colorOption([
-                      Colors.indigo[900]!,
-                      Colors.indigo,
-                      Colors.blueAccent
-                    ]),
+                        [Colors.blue[900]!, Colors.blue, Colors.lightBlue]),
+                    const Divider(thickness: 1, height: 20),
+                    _colorOption(
+                        [Colors.green[900]!, Colors.green, Colors.lightGreen]),
                   ],
                 ),
               ),
@@ -54,23 +58,22 @@ class _ColorPaletteDropdownState extends State<ColorPaletteDropdown> {
         });
         Navigator.pop(context);
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(
-          children: colors.map((color) => _colorBox(color)).toList(),
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: colors.map((color) => _colorBox(color)).toList(),
       ),
     );
   }
 
   Widget _colorBox(Color color) {
     return Container(
-      width: 40,
-      height: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 5),
+      width: 50,
+      height: 50,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.black54, width: 1),
       ),
     );
   }
