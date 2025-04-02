@@ -15,9 +15,10 @@ class MainMenu extends StatefulWidget {
 class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: colorScheme.secondary,
         elevation: 0,
         toolbarHeight: 0,
       ),
@@ -32,8 +33,8 @@ class _MainMenuState extends State<MainMenu> {
                     Container(
                       padding:
                           const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondary,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),

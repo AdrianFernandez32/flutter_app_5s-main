@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/utils/common.dart';
 import 'package:go_router/go_router.dart';
 
 class ZonesPage extends StatefulWidget {
@@ -19,30 +18,35 @@ class _ZonesPageState extends State<ZonesPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
-    final response =
-        await client.from('subarea').select('id, name, area!inner(name)');
-
-    final data = response as List<dynamic>;
-    return data.map((item) {
-      final area = item['area'] as Map<String, dynamic>;
-      return {
-        "id": item['id'].toString(),
-        "area": item['name'],
-        "zona": area['name'],
-      };
-    }).toList();
+    await Future.delayed(
+        const Duration(seconds: 1)); // Simula una carga de datos
+    return [
+      {"id": "1", "area": "Producción", "zona": "Zona Operativa"},
+      {"id": "2", "area": "Mantenimiento", "zona": "Zona Soporte"},
+      {"id": "3", "area": "Administración", "zona": "Zona de Comunes"},
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    const appBarElementsColor = Color.fromRGBO(79, 67, 73, 1);
-
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
+        toolbarHeight: 80,
+        backgroundColor: colorScheme.secondary,
         title: const Text(
-          "Auditorías",
-          style: TextStyle(color: appBarElementsColor, fontSize: 32),
+          "Auditar",
+          style: TextStyle(color: Colors.white, fontSize: 32),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            context.goNamed("Menu");
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 33,
+          ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(10),
@@ -51,42 +55,24 @@ class _ZonesPageState extends State<ZonesPage> {
             height: 2,
           ),
         ),
-        leading: IconButton(
-          onPressed: () {
-            context.goNamed("Menu");
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color.fromRGBO(79, 67, 73, 1),
-            size: 33,
-          ),
-        ),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _areasFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No data found'),
-            );
+            return const Center(child: Text('No data found'));
           }
 
           final responseList = snapshot.data!;
-          List<Widget> areasList = [];
-
-          for (int i = 0; i < responseList.length; i++) {
+          List<Widget> areasList = responseList.map((item) {
             Color color;
             Color textColor;
 
-            switch (responseList[i]["zona"]) {
+            switch (item["zona"]) {
               case "Zona Operativa":
                 color = const Color.fromRGBO(255, 216, 235, 1);
                 textColor = const Color.fromRGBO(55, 7, 41, 1);
@@ -104,17 +90,16 @@ class _ZonesPageState extends State<ZonesPage> {
                 textColor = Colors.black;
             }
 
-            areasList.add(AuditWidget(
-              area: responseList[i]["area"],
-              zone: responseList[i]["zona"],
+            return AuditWidget(
+              area: item["area"],
+              zone: item["zona"],
               color: color,
-              areaID: responseList[i]["id"],
+              areaID: item["id"],
               textColor: textColor,
-            ));
-          }
-          return ListView(
-            children: areasList,
-          );
+            );
+          }).toList();
+
+          return ListView(children: areasList);
         },
       ),
     );
@@ -128,25 +113,17 @@ class AuditWidget extends StatelessWidget {
   final Color textColor;
   final String? areaID;
 
-  const AuditWidget(
-      {Key? key,
-      required this.area,
-      required this.zone,
-      required this.color,
-      required this.areaID,
-      required this.textColor})
-      : super(key: key);
+  const AuditWidget({
+    Key? key,
+    required this.area,
+    required this.zone,
+    required this.color,
+    required this.areaID,
+    required this.textColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color color = this.color;
-    Color textColor = this.textColor;
-    String? area = this.area;
-    String? zone = this.zone;
-    String? areaID = this.areaID;
-    area ??= "";
-    zone ??= "";
-    areaID ??= "";
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: GestureDetector(
@@ -171,16 +148,14 @@ class AuditWidget extends StatelessWidget {
               margin: const EdgeInsets.only(left: 15),
               child: Row(
                 children: [
-                  const SizedBox(
-                    width: 75,
-                  ),
+                  const SizedBox(width: 75),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Expanded(child: SizedBox()),
                         Text(
-                          area,
+                          area ?? "",
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -189,7 +164,7 @@ class AuditWidget extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          zone,
+                          zone ?? "",
                           style: TextStyle(
                             fontSize: 13,
                             color: textColor,

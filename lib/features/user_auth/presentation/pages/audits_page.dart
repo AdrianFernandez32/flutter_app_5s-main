@@ -45,7 +45,6 @@ class _AuditsPageState extends State<AuditsPage> {
     final endDate = DateTime(2024, 5, 22);
 
     for (int i = 0; i < 10; i++) {
-      final zone = this.zone;
       final progress = progressList[random.nextInt(progressList.length)];
       final randomDate = startDate.add(
           Duration(days: random.nextInt(endDate.difference(startDate).inDays)));
@@ -64,15 +63,24 @@ class _AuditsPageState extends State<AuditsPage> {
 
   @override
   Widget build(BuildContext context) {
-    const appBarElementsColor = Color.fromRGBO(79, 67, 73, 1);
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
-        title: Text(
-          area,
-          style: const TextStyle(
-            color: appBarElementsColor,
-            fontSize: 32,
+        toolbarHeight: 80,
+        backgroundColor: colorScheme.secondary,
+        title: const Text(
+          "Auditar",
+          style: TextStyle(color: Colors.white, fontSize: 32),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            context.goNamed("Menu");
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 33,
           ),
         ),
         bottom: PreferredSize(
@@ -82,15 +90,6 @@ class _AuditsPageState extends State<AuditsPage> {
             height: 2,
           ),
         ),
-        leading: IconButton(
-            onPressed: () {
-              context.goNamed("Zones Page");
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: appBarElementsColor,
-              size: 33,
-            )),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

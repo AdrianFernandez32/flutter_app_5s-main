@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/area_info.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AreasPage extends StatefulWidget {
   const AreasPage({Key? key}) : super(key: key);
@@ -24,25 +23,16 @@ class AreasPageState extends State<AreasPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
-    final response = await Supabase.instance.client
-        .from('subarea')
-        .select('id, name, area:area_id(name)');
-
-    final data = response as List<dynamic>;
-    final areas = data.map((item) {
-      final area = item['area'] as Map<String, dynamic>;
-      return {
-        "id": item['id'].toString(),
-        "area": item['name'],
-        "zona": area['name'],
-      };
-    }).toList();
-
+    await Future.delayed(Duration(seconds: 1)); // Simula retraso de carga
+    final areas = [
+      {"id": "1", "area": "Área 1", "zona": "Zona Soporte"},
+      {"id": "2", "area": "Área 2", "zona": "Zona Operativa"},
+      {"id": "3", "area": "Área 3", "zona": "Zona de Comunes"},
+    ];
     setState(() {
       _areasList = areas;
       _filteredAreasList = areas;
     });
-
     return areas;
   }
 
@@ -64,17 +54,14 @@ class AreasPageState extends State<AreasPage> {
   @override
   Widget build(BuildContext context) {
     const appBarElementsColor = Color.fromRGBO(79, 67, 73, 1);
-
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
+        backgroundColor: colorScheme.secondary,
         title: const Text(
           "Áreas",
-          style: TextStyle(
-            color: appBarElementsColor,
-            fontSize: 32,
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 32),
         ),
         leading: IconButton(
           onPressed: () {
@@ -82,14 +69,12 @@ class AreasPageState extends State<AreasPage> {
           },
           icon: const Icon(
             Icons.arrow_back,
-            color: appBarElementsColor,
+            color: Colors.white,
             size: 33,
           ),
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(
-            10,
-          ),
+          preferredSize: const Size.fromHeight(10),
           child: Container(
             color: const Color.fromRGBO(134, 75, 111, 1),
             height: 2,

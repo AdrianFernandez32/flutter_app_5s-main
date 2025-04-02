@@ -24,12 +24,13 @@ class SettingsPageState extends State<SettingsPage> {
       "area": "Embotellado"
     };
 
+    final colorScheme = Theme.of(context).colorScheme;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 80,
-          backgroundColor: Colors.blue,
+          backgroundColor: colorScheme.secondary,
           title: const Text(
             "Ajustes",
             style: TextStyle(color: Colors.white, fontSize: 32),
@@ -147,8 +148,7 @@ class SettingsPageState extends State<SettingsPage> {
                 child: Center(
                   child: TextButton(
                     onPressed: () async {
-                      await Supabase.instance.client.auth.signOut();
-                      context.goNamed("SplashScreen");
+                      context.goNamed("AdminAccessPage");
                     },
                     child: const Text(
                       "Cerrar Sesión",

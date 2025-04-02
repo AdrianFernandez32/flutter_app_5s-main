@@ -63,10 +63,11 @@ class AuditPageState extends State<AuditPage> {
       );
     }
 
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: Colors.blue,
+        backgroundColor: colorScheme.secondary,
         title: const Text(
           "Auditar",
           style: TextStyle(color: Colors.white, fontSize: 32),
