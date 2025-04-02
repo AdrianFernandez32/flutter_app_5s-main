@@ -70,7 +70,7 @@ class InicioAdminPage extends StatelessWidget {
                     width: 220,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () => context.go('/admin_login'),
+                      onPressed: () => context.go('/acceso_admin'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             const Color.fromARGB(255, 49, 136, 235),

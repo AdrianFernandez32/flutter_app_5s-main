@@ -43,7 +43,7 @@ void main() async {
 final supabase = Supabase.instance.client;
 
 final GoRouter _router = GoRouter(
-  initialLocation: '/admin_login',
+  initialLocation: '/inicio_admin',
   routes: [
     GoRoute(
       path: '/',
