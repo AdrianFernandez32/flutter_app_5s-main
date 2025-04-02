@@ -20,17 +20,16 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Fondo blanco asegurado
       body: Column(
         children: [
           const SizedBox(height: 150),
-          //Para hacer que el circulo este mas cerca del correo y contraseña
           const CircleAvatar(
             radius: 90,
             backgroundColor: Colors.blueAccent,
             backgroundImage: AssetImage('assets/profile_placeholder.png'),
           ),
           const SizedBox(height: 15),
-          // Texto de bienvenida se puede hacer mas grande si
           const Text(
             '¡Bienvenido!',
             style: TextStyle(
@@ -38,7 +37,6 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          // Más espacio entre el texto y los campos
           const SizedBox(height: 20),
           Expanded(
             child: Center(
@@ -52,7 +50,7 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                       enabled: false,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Colors.grey[300],
+                        fillColor: Colors.grey[100], // Gris muy claro
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
@@ -76,12 +74,10 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                       child: FilledButton(
                         onPressed: () {
                           context.goNamed('CreateOrganization');
-                          //Aqui tambien tenmos otro enlace, podriamos iniciar de ahi o poner otro enlace para movernos al acceso
                         },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor:
-                              const Color.fromARGB(255, 49, 136, 235),
+                          backgroundColor: const Color.fromARGB(255, 49, 136, 235),
                         ),
                         child: const Text(
                           "Siguiente",
@@ -93,7 +89,6 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Enlace para recuperar contraseña, aun no tenemos el mockup para esta pestaña pero ahi esta el enlace
                     TextButton(
                       onPressed: () {
                         context.go('/forgot_password');
