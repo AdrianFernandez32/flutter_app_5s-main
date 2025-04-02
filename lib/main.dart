@@ -176,8 +176,8 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const CreateQuestionnairePage(),
     ),
     GoRoute(
-        path: "/departments",
         name: "AddDepartment",
+        path: "/departments",
         builder: (context, state) => const AddDepartment()),
   ],
 );
