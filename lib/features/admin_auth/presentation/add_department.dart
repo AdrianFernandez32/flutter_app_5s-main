@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart'
+    show AdminAppBar;
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
 
 class AddDepartment extends StatelessWidget {
@@ -27,40 +30,52 @@ class AddDepartment extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Departamentos",
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
-        backgroundColor: colorScheme.surface,
-        centerTitle: true,
+      appBar: AdminAppBar(
+          title: "Departamentos",
+          onBackPressed: () {
+            //TODO : Agregar funcionalidad
+            print("Go to previous page");
+          }),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Container(
+                color: colorScheme.surface,
+                child: ListView(
+                  children: [
+                    ...mockDepartments
+                        .map((department) => DepartmentItem(
+                              title: department['title'],
+                              onTap: () =>
+                                  _handleDepartmentTap(department['id']),
+                            ))
+                        .toList(),
+                  ],
+                )),
+          ),
+          const AdminNavBar(),
+          Positioned(
+            bottom: 100,
+            right: 20,
+            child: FloatingActionButton(
+                onPressed: () {
+                  print('Department added');
+                },
+                backgroundColor: colorScheme.secondary,
+                shape: const CircleBorder(),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                )),
+          )
+        ],
       ),
-      body: Container(
-          color: colorScheme.surface,
-          child: ListView(
-            children: [
-              ...mockDepartments
-                  .map((department) => DepartmentItem(
-                        title: department['title'],
-                        onTap: () => _handleDepartmentTap(department['id']),
-                      ))
-                  .toList()
-            ],
-          )),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            print('Department added');
-          },
-          backgroundColor: colorScheme.secondary,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          )),
     );
   }
 }
 
+//TODO: Agregar funcionalidad
 void _handleDepartmentTap(String id) {
   print('Department tapped ID: $id');
 }

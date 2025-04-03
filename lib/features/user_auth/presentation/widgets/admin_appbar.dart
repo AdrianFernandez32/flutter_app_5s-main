@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class AdminLayout extends StatelessWidget implements PreferredSizeWidget {
+class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final VoidCallback? onBackPressed;
 
-  const AdminLayout({super.key, this.title, this.onBackPressed});
+  const AdminAppBar({super.key, this.title, this.onBackPressed});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
