@@ -102,26 +102,8 @@ class AreasPageState extends State<AreasPage> {
           List<Widget> areasList = [];
 
           for (int i = 0; i < responseList.length; i++) {
-            Color color;
-            Color textColor;
-
-            switch (responseList[i]["zona"]) {
-              case "Zona Soporte":
-                color = const Color.fromRGBO(255, 216, 235, 1);
-                textColor = const Color.fromRGBO(55, 7, 41, 1);
-                break;
-              case "Zona Operativa":
-                color = const Color.fromRGBO(255, 220, 193, 1);
-                textColor = const Color.fromRGBO(46, 21, 0, 1);
-                break;
-              case "Zona de Comunes":
-                color = const Color.fromRGBO(174, 242, 197, 1);
-                textColor = const Color.fromRGBO(0, 33, 16, 1);
-                break;
-              default:
-                color = Colors.grey; // Default color if no match found
-                textColor = Colors.black;
-            }
+            Color color = Color.fromRGBO(214, 231, 239, 1);
+            Color textColor = Colors.black;
 
             areasList.add(AreaInfo(
               area: responseList[i]["area"],

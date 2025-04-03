@@ -62,28 +62,30 @@ class ManageAreasPage extends StatelessWidget {
             editButtonFuction: goEditArea,
           ));
     }
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
+        backgroundColor: colorScheme.secondary,
         title: const Text(
-          "Editar Áreas",
-          style: TextStyle(color: appBarElementsColor, fontSize: 32),
+          "Editar áreas",
+          style: TextStyle(color: Colors.white, fontSize: 32),
         ),
         leading: IconButton(
-            onPressed: () {
-              context.goNamed("Gestion de Areas");
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: appBarElementsColor,
-              size: 33,
-            )),
+          onPressed: () {
+            context.goNamed("Gestion de Areas");
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 33,
+          ),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(10),
           child: Container(
-            color: const Color.fromRGBO(134, 75, 111, 1),
+            color: const Color.fromRGBO(140, 140, 140, 1),
             height: 2,
           ),
         ),

@@ -35,7 +35,7 @@ class _ZonesPageState extends State<ZonesPage> {
         toolbarHeight: 80,
         backgroundColor: colorScheme.secondary,
         title: const Text(
-          "Auditar",
+          "Auditorías",
           style: TextStyle(color: Colors.white, fontSize: 32),
         ),
         leading: IconButton(
@@ -69,26 +69,8 @@ class _ZonesPageState extends State<ZonesPage> {
 
           final responseList = snapshot.data!;
           List<Widget> areasList = responseList.map((item) {
-            Color color;
-            Color textColor;
-
-            switch (item["zona"]) {
-              case "Zona Operativa":
-                color = const Color.fromRGBO(255, 216, 235, 1);
-                textColor = const Color.fromRGBO(55, 7, 41, 1);
-                break;
-              case "Zona Soporte":
-                color = const Color.fromRGBO(255, 220, 193, 1);
-                textColor = const Color.fromRGBO(46, 21, 0, 1);
-                break;
-              case "Zona de Comunes":
-                color = const Color.fromRGBO(174, 242, 197, 1);
-                textColor = const Color.fromRGBO(0, 33, 16, 1);
-                break;
-              default:
-                color = Colors.grey;
-                textColor = Colors.black;
-            }
+            Color color = const Color.fromRGBO(214, 231, 239, 1);
+            Color textColor = Colors.black;
 
             return AuditWidget(
               area: item["area"],

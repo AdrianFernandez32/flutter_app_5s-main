@@ -77,7 +77,8 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                         },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor: const Color.fromARGB(255, 49, 136, 235),
+                          backgroundColor:
+                              const Color.fromARGB(255, 49, 136, 235),
                         ),
                         child: const Text(
                           "Siguiente",
@@ -90,11 +91,19 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                     ),
                     const SizedBox(height: 20),
                     TextButton(
-                      onPressed: () {
-                        context.go('/forgot_password');
-                      },
+                      onPressed: () {},
                       child: const Text(
                         "¿Olvidaste la contraseña?",
+                        style: TextStyle(color: Colors.blue, fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        context.go('/admin_login');
+                      },
+                      child: const Text(
+                        "¿No tienes cuenta? Crea una aquí",
                         style: TextStyle(color: Colors.blue, fontSize: 14),
                       ),
                     ),

@@ -24,31 +24,9 @@ class AuditPageState extends State<AuditPage> {
     // Asignación dinámica de colores a los elementos de la lista de áreas
     List<Widget> areasList = [];
 
-    int colorIndex = 1;
-
-    // Colores default
-    Color color = const Color.fromRGBO(255, 216, 235, 1);
-    Color textColor = const Color.fromRGBO(55, 7, 41, 1);
-
     for (int i = 0; i < responseList.length; i++) {
-      switch (colorIndex) {
-        case 1:
-          color = const Color.fromRGBO(255, 216, 235, 1);
-          textColor = const Color.fromRGBO(55, 7, 41, 1);
-          colorIndex++;
-          break;
-        case 2:
-          color = const Color.fromRGBO(255, 220, 193, 1);
-          textColor = const Color.fromRGBO(46, 21, 0, 1);
-          colorIndex++;
-          break;
-        case 3:
-          color = const Color.fromRGBO(174, 242, 197, 1);
-          textColor = const Color.fromRGBO(0, 33, 16, 1);
-          colorIndex = 1;
-          break;
-        default:
-      }
+      Color color = Color.fromRGBO(214, 231, 239, 1);
+      Color textColor = Colors.black;
 
       areasList.insert(
         i,
