@@ -8,6 +8,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_organization_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/five_s_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
@@ -179,6 +180,21 @@ final GoRouter _router = GoRouter(
         name: "AddDepartment",
         path: "/departments",
         builder: (context, state) => const AddDepartment()),
+    GoRoute(
+      name: "FiveSMenu",
+      path: '/fiveS/:departmentId',
+      builder: (context, state) {
+        final departmentId = state.pathParameters['departmentId']!;
+        return FiveSMenu(departmentId: departmentId);
+      },
+      // Error with the parameter
+      // redirect: (state) {
+      //   if (state.pathParameters['departmentId'] == null) {
+      //     return '/error'; // Redirige si falta el parámetro
+      //   }
+      //   return null;
+      // }
+    )
   ],
 );
 
@@ -193,10 +209,11 @@ class MyApp extends StatelessWidget {
           title: '5s Flutter App',
           theme: ThemeData(
             colorScheme: ColorScheme.light(
-              primary: themeProvider.colors.primary,
-              secondary: themeProvider.colors.secondary,
-              surface: themeProvider.colors.background,
-            ),
+                primary: themeProvider.colors.primary,
+                secondary: themeProvider.colors.secondary,
+                surface: themeProvider.colors.background,
+                onPrimary: _getContrastColor(themeProvider.colors.primary),
+                onSecondary: _getContrastColor(themeProvider.colors.secondary)),
             scaffoldBackgroundColor: themeProvider.colors.background,
             appBarTheme: AppBarTheme(
               backgroundColor: themeProvider.colors.primary,
@@ -215,6 +232,6 @@ class MyApp extends StatelessWidget {
   }
 
   Color _getContrastColor(Color color) {
-    return color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+    return color.computeLuminance() > 0.4 ? Colors.black : Colors.white;
   }
 }

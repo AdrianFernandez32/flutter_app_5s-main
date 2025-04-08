@@ -40,7 +40,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
                   },
               icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: colorScheme.onSurface,
+                color: colorScheme.onSecondary,
               ),
             ),
             const SizedBox(width: 16),
@@ -49,7 +49,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
                 title!,
                 style: TextStyle(
                   // Necesitas crear un TextStyle
-                  color: colorScheme.onSurface,
+                  color: colorScheme.onSecondary,
                   fontSize: 20, // Tamaño recomendado
                   fontWeight: FontWeight.bold,
                 ),

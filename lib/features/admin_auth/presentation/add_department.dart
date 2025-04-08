@@ -7,6 +7,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_app
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
 class AddDepartment extends StatefulWidget {
@@ -124,9 +125,12 @@ class _AddDepartmentState extends State<AddDepartment> {
       ),
     );
   }
-}
 
 //TODO: Agregar funcionalidad
-void _handleDepartmentTap(String id) {
-  print('Department tapped ID: $id');
+  void _handleDepartmentTap(String id) {
+    context.pushNamed(
+      'FiveSMenu',
+      pathParameters: {'departmentId': id},
+    );
+  }
 }
