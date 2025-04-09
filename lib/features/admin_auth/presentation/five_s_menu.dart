@@ -3,6 +3,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_app
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/five_s_card.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/rounded_button.dart';
+import 'package:go_router/go_router.dart';
 
 class FiveSMenu extends StatelessWidget {
   final String departmentId;
@@ -39,7 +40,7 @@ class FiveSMenu extends StatelessWidget {
                 children: [
                   ...fiveSTitles
                       .map((s) =>
-                          FiveSCard(title: s, onTap: () => _handleSTap(s)))
+                          FiveSCard(title: s, onTap: () => _handleSTap(context,s)))
                       .toList(),
                 ],
               ),
@@ -81,8 +82,11 @@ class FiveSMenu extends StatelessWidget {
     );
   }
 
-  void _handleSTap(String s) {
-    print('Departamento: $departmentId, 5S $s');
+  void _handleSTap(BuildContext context,String s) {
+    context.pushNamed(
+      'QuestionnaireMenu',
+      pathParameters: {'departmentId': departmentId, 'fiveSId': s},
+    );
   }
 
   void _handleEdit() {

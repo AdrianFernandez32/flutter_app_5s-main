@@ -6,6 +6,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_app
     show AdminAppBar;
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -107,19 +108,11 @@ class _AddDepartmentState extends State<AddDepartment> {
                 )),
           ),
           const AdminNavBar(),
-          Positioned(
-            bottom: 100,
-            right: 20,
-            child: FloatingActionButton(
-                onPressed: () {
-                  print('Department added');
-                },
-                backgroundColor: colorScheme.secondary,
-                shape: const CircleBorder(),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                )),
+          FloatingPlusActionButton(
+            onPressed: () {
+              //TODO : Agregar funcionalidad
+              print("AddDepartment");
+            },
           )
         ],
       ),
