@@ -101,7 +101,50 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const ColorPaletteDropdown(),
+                  DropdownMenu<PaletteType>(
+                    width: 400,
+                    initialSelection: selectedPalette,
+                    onSelected: (PaletteType? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedPalette = newValue;
+                        });
+                      }
+                    },
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry(value: PaletteType.blue, label: "Blue"),
+                      DropdownMenuEntry(
+                          value: PaletteType.purple, label: "Purple"),
+                      DropdownMenuEntry(
+                          value: PaletteType.green, label: "Green"),
+                      DropdownMenuEntry(value: PaletteType.wine, label: "Wine"),
+                      DropdownMenuEntry(
+                          value: PaletteType.blue, label: "Default"),
+                    ],
+                    inputDecorationTheme: InputDecorationTheme(
+                      hintStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide:
+                            const BorderSide(color: Colors.blue, width: 2),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   TextField(
                     maxLines: 3,
