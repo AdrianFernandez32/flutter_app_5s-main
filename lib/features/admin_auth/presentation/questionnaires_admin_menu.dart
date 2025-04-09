@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/five_s_card.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
+import 'package:go_router/go_router.dart';
 
 class QuestionnairesAdminMenu extends StatefulWidget {
-  const QuestionnairesAdminMenu({super.key});
+  final String departmentId;
+  const QuestionnairesAdminMenu({super.key, required this.departmentId});
 
   @override
   State<QuestionnairesAdminMenu> createState() =>
@@ -55,8 +58,10 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
               color: colorScheme.surface,
               child: ListView(
                 children: [
-                  ...mockQuestionnaires
-                    .map((questionnarie)=> )
+                  ...mockQuestionnaires.map((questionnaire) => FiveSCard(
+                      title: questionnaire['title'],
+                      onTap: () => _handleQuestionnaireTap(
+                          context, questionnaire['id'])))
                 ],
               ),
             ),
@@ -70,6 +75,13 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
           )
         ],
       ),
+    );
+  }
+
+  void _handleQuestionnaireTap(BuildContext context, String id) {
+    context.pushNamed(
+      'QuestionnaireAdminMenu',
+      pathParameters: {'departmentId': widget.departmentId, 'fiveSId': id},
     );
   }
 }
