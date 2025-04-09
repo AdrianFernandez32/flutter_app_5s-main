@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/utils/color_scheme_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/color_palette_dropdown.dart';
 
 class CreateOrganizationPage extends StatefulWidget {
   const CreateOrganizationPage({Key? key}) : super(key: key);
@@ -16,6 +15,7 @@ class CreateOrganizationPage extends StatefulWidget {
 
 class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   File? _image;
+  PaletteType selectedPalette = PaletteType.blue;
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
