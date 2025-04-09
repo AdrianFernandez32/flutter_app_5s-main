@@ -156,4 +156,4 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
       ),
     );
   }
-}
+} // Checkpoint
