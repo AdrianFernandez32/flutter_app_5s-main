@@ -7,7 +7,10 @@ import 'package:go_router/go_router.dart';
 
 class QuestionnairesAdminMenu extends StatefulWidget {
   final String departmentId;
-  const QuestionnairesAdminMenu({super.key, required this.departmentId});
+  //TODO : change the type depending on what it is
+  final String fiveSId;
+  const QuestionnairesAdminMenu(
+      {super.key, required this.departmentId, required this.fiveSId});
 
   @override
   State<QuestionnairesAdminMenu> createState() =>
@@ -81,7 +84,7 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
   void _handleQuestionnaireTap(BuildContext context, String id) {
     context.pushNamed(
       'QuestionnaireAdminMenu',
-      pathParameters: {'departmentId': widget.departmentId, 'fiveSId': id},
+      queryParameters: {'departmentId': widget.departmentId, 'fiveSId': id},
     );
   }
 }

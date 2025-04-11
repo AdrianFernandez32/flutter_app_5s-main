@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/add_department.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
@@ -198,6 +199,11 @@ final GoRouter _router = GoRouter(
     GoRoute(
       name: "QuestionnaireAdminMenu",
       path: '/departments/:departmentId/5s/:fiveSId',
+      builder: (context, state) {
+        final departmentId = state.pathParameters['departmentId']!;
+        final fiveSId = state.pathParameters['fiveSId']!;
+        return QuestionnairesAdminMenu(departmentId: departmentId, fiveSId: fiveSId);
+      }
     ),
   ],
 );

@@ -39,8 +39,8 @@ class FiveSMenu extends StatelessWidget {
               child: ListView(
                 children: [
                   ...fiveSTitles
-                      .map((s) =>
-                          FiveSCard(title: s, onTap: () => _handleSTap(context,s)))
+                      .map((s) => FiveSCard(
+                          title: s, onTap: () => _handleSTap(context, s)))
                       .toList(),
                 ],
               ),
@@ -82,9 +82,9 @@ class FiveSMenu extends StatelessWidget {
     );
   }
 
-  void _handleSTap(BuildContext context,String s) {
+  void _handleSTap(BuildContext context, String s) {
     context.pushNamed(
-      'QuestionnaireMenu',
+      'QuestionnaireAdminMenu',
       pathParameters: {'departmentId': departmentId, 'fiveSId': s},
     );
   }
