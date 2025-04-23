@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/five_s_card.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/save_button.dart';
 import 'package:go_router/go_router.dart';
 
 class QuestionnairesAdminMenu extends StatefulWidget {
@@ -37,6 +39,8 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
     },
   ];
 
+  final List<String> saveStates = ["Pendiente", "Finalizado"];
+
   //TODO : use this List for the endpoint
   List<Map<String, dynamic>> questionnaires = [];
   bool isLoading = true;
@@ -49,8 +53,10 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
       appBar: AdminAppBar(
         title: "Cuestionarios",
         onBackPressed: () {
-          //TODO : Agregar funcionalidad
-          print("Go to previous page");
+          context.pushNamed(
+            'FiveSMenu',
+            pathParameters: {'departmentId': widget.departmentId},
+          );
         },
       ),
       body: Stack(
@@ -68,6 +74,15 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
                 ],
               ),
             ),
+          ),
+          Positioned(
+            bottom: 100,
+            left: 16,
+            child: SaveButton(
+                saveStates: saveStates,
+                onSave: (String state) {
+                  print("Save: $state");
+                }),
           ),
           const AdminNavBar(),
           FloatingPlusActionButton(

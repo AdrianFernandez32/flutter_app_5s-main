@@ -26,8 +26,9 @@ class FiveSMenu extends StatelessWidget {
       appBar: AdminAppBar(
         title: "5S",
         onBackPressed: () {
-          //TODO : Agregar funcionalidad
-          print("Go to previous page");
+          context.pushNamed(
+            'AddDepartment',
+          );
         },
       ),
       body: Stack(
