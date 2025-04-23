@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/area_info.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AreasPage extends StatefulWidget {
   const AreasPage({Key? key}) : super(key: key);
@@ -23,17 +25,37 @@ class AreasPageState extends State<AreasPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
-    await Future.delayed(Duration(seconds: 1)); // Simula retraso de carga
-    final areas = [
-      {"id": "1", "area": "Área 1", "zona": "Zona Soporte"},
-      {"id": "2", "area": "Área 2", "zona": "Zona Operativa"},
-      {"id": "3", "area": "Área 3", "zona": "Zona de Comunes"},
-    ];
-    setState(() {
-      _areasList = areas;
-      _filteredAreasList = areas;
-    });
-    return areas;
+    try {
+      final orgId = 2; // Cambia este ID según el que necesites
+      final response = await http.get(
+        Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        final areas = data.map((area) {
+          return {
+            "id": area["id"].toString(),
+            "area": area["name"] ?? "",
+            "zona": area["description"] ?? "",
+          };
+        }).toList();
+
+        setState(() {
+          _areasList = List<Map<String, dynamic>>.from(areas);
+          _filteredAreasList = _areasList;
+        });
+
+        return _areasList;
+      } else {
+        throw Exception('Error al cargar áreas: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error de red: $e');
+    }
   }
 
   void _filterAreas(String query) {
@@ -153,57 +175,12 @@ class AreasPageState extends State<AreasPage> {
           );
         },
       ),
-      floatingActionButton: const _SpeedDial(),
+
     );
   }
 }
 
-class _SpeedDial extends StatefulWidget {
-  const _SpeedDial({Key? key}) : super(key: key);
 
-  @override
-  _SpeedDialState createState() => _SpeedDialState();
-}
 
-class _SpeedDialState extends State<_SpeedDial> {
-  @override
-  Widget build(BuildContext context) {
-    return SpeedDial(
-      backgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-      foregroundColor: const Color.fromRGBO(134, 75, 111, 1),
-      spaceBetweenChildren: 12,
-      animatedIcon: AnimatedIcons.menu_close,
-      label: const Text("Editar"),
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16))),
-      children: [
-        SpeedDialChild(
-          label: "Editar Área",
-          labelBackgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          labelStyle: const TextStyle(
-              color: Color.fromRGBO(134, 75, 111, 1),
-              fontWeight: FontWeight.w600),
-          backgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          foregroundColor: const Color.fromRGBO(134, 75, 111, 1),
-          child: const Icon(Icons.edit_rounded),
-          onTap: () {
-            context.goNamed("Editar Areas");
-          },
-        ),
-        SpeedDialChild(
-          label: "Crear Área",
-          labelBackgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          labelStyle: const TextStyle(
-              color: Color.fromRGBO(134, 75, 111, 1),
-              fontWeight: FontWeight.w600),
-          backgroundColor: const Color.fromRGBO(243, 228, 233, 1),
-          foregroundColor: const Color.fromRGBO(134, 75, 111, 1),
-          child: const Icon(Icons.add),
-          onTap: () {
-            print("Crear");
-          },
-        )
-      ],
-    );
-  }
-}
+
+
