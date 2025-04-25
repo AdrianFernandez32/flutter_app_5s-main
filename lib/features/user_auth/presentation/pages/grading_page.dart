@@ -149,17 +149,18 @@ class GradingPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              context.goNamed("Auditar");
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Color.fromRGBO(79, 67, 73, 1),
-              size: 33,
-            )),
-      ),
+          leading: IconButton(
+              onPressed: () {
+                context.goNamed("Auditar");
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+                size: 33,
+              )),
+          backgroundColor: Colors.white),
       body: SingleChildScrollView(
+        
         child: Column(
           children: [
             Stack(
@@ -193,7 +194,7 @@ class GradingPage extends StatelessWidget {
                       strokeCap: StrokeCap.round,
                       strokeWidth: 8,
                       value: progress,
-                      color: Color.fromRGBO(107, 52, 87, 1),
+                      color: Color.fromRGBO(7, 125, 205, 1),
                       backgroundColor: Color.fromRGBO(211, 194, 201, 1),
                     ),
                   ),
@@ -274,9 +275,10 @@ class _QuestionsInfoState extends State<_QuestionsInfo> {
         child: Text(
           widget.description,
           style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color.fromRGBO(134, 75, 111, 1)),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       const SizedBox(
@@ -320,7 +322,7 @@ class _QuestionsInfoState extends State<_QuestionsInfo> {
       for (int i = 0; i < widget.questionaries.length; i++)
         GestureDetector(
           onTap: () {
-            // Actualizar ruta cuando esté 
+            // Actualizar ruta cuando esté
             context.goNamed("Cuestionario");
           },
           child: Container(
@@ -420,7 +422,7 @@ class _QuestionsInfoState extends State<_QuestionsInfo> {
                 alignment: Alignment.centerLeft,
                 child: CircleAvatar(
                   radius: 40,
-                  backgroundColor: const Color.fromRGBO(134, 75, 111, 1),
+                  backgroundColor: const Color.fromRGBO(7, 125, 205, 1),
                   child: Column(
                     children: [
                       const SizedBox(

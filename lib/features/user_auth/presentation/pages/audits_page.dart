@@ -1,6 +1,7 @@
-import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 class FilterSettings {
   int? ratingFilter;
@@ -12,12 +13,14 @@ class AuditsPage extends StatefulWidget {
   final String area;
   final Color color;
 
-  const AuditsPage(
-      {Key? key, required this.zone, required this.color, required this.area})
-      : super(key: key);
+  const AuditsPage({
+    Key? key,
+    required this.zone,
+    required this.color,
+    required this.area,
+  }) : super(key: key);
 
   @override
-  // ignore: no_logic_in_create_state
   State<AuditsPage> createState() => _AuditsPageState(
         zone: zone,
         color: color,
@@ -33,31 +36,42 @@ class _AuditsPageState extends State<AuditsPage> {
   FilterSettings filterSettings = FilterSettings();
   List<AreaWidget> audits = [];
 
-  _AuditsPageState(
-      {required this.zone, required this.color, required this.area});
+  _AuditsPageState({required this.zone, required this.color, required this.area});
 
   @override
   void initState() {
     super.initState();
-    final Random random = Random();
-    final List<double> progressList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    final startDate = DateTime(2024, 1, 1);
-    final endDate = DateTime(2024, 5, 22);
+    _fetchAudits();
+  }
 
-    for (int i = 0; i < 10; i++) {
-      final progress = progressList[random.nextInt(progressList.length)];
-      final randomDate = startDate.add(
-          Duration(days: random.nextInt(endDate.difference(startDate).inDays)));
-      final date =
-          "${randomDate.day.toString().padLeft(2, '0')}/${randomDate.month.toString().padLeft(2, '0')}/${randomDate.year}";
+  Future<void> _fetchAudits() async {
+    final subareaId = 1; // Cambiar si es necesario
+    final response = await http.get(
+      Uri.parse('https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      audits.add(AreaWidget(
-        zone: zone,
-        date: date,
-        progress: progress,
-        color: color,
-        area: area,
-      ));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      final List<dynamic> auditsData = data;
+
+      setState(() {
+        audits = auditsData.map<AreaWidget>((audit) {
+          final progress = (audit['questionsAnswered'] / (audit['totalQuestions'] ?? 1)) * 100;
+          final date = DateTime.now(); // Puedes agregar fecha real si el backend la provee
+          final formattedDate = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+
+          return AreaWidget(
+            zone: zone,
+            date: formattedDate,
+            progress: progress,
+            color: color,
+            area: area,
+          );
+        }).toList();
+      });
+    } else {
+      throw Exception('No se pudieron cargar las auditorías');
     }
   }
 
@@ -171,42 +185,20 @@ class _AuditsPageState extends State<AuditsPage> {
   }
 
   List<Widget> _buildFilteredAreaWidgets() {
-    List<Widget> widgets = [];
-    for (final audit in audits) {
-      if (_filterByRating(audit.progress) && _filterByDate(audit.date)) {
-        widgets.add(
-          Column(
-            children: [
-              AreaWidget(
-                zone: audit.zone,
-                date: audit.date,
-                progress: audit.progress,
-                color: audit.color,
-                area: area,
-              ),
-              const SizedBox(height: 16.0),
-            ],
-          ),
-        );
-      }
-    }
-    return widgets;
+    return audits.where((audit) {
+      return _filterByRating(audit.progress) && _filterByDate(audit.date);
+    }).map((audit) => Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: audit,
+    )).toList();
   }
 
   bool _filterByRating(double progress) {
-    if (filterSettings.ratingFilter == null) {
-      return true;
-    } else {
-      return progress >= filterSettings.ratingFilter!;
-    }
+    return filterSettings.ratingFilter == null || progress >= filterSettings.ratingFilter!;
   }
 
   bool _filterByDate(String date) {
-    if (filterSettings.dateFilter == null) {
-      return true;
-    } else {
-      return date == filterSettings.dateFilter!;
-    }
+    return filterSettings.dateFilter == null || date == filterSettings.dateFilter;
   }
 }
 
@@ -251,9 +243,7 @@ class AreaWidget extends StatelessWidget {
               margin: const EdgeInsets.only(left: 15),
               child: Row(
                 children: [
-                  const SizedBox(
-                    width: 75,
-                  ),
+                  const SizedBox(width: 75),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,9 +281,7 @@ class AreaWidget extends StatelessWidget {
                   ),
                   Center(
                     child: Container(
-                      padding: const EdgeInsets.all(
-                        8.0,
-                      ),
+                      padding: const EdgeInsets.all(8.0),
                       child: _buildProgressIcon(progress),
                     ),
                   ),
@@ -328,7 +316,7 @@ class AreaWidget extends StatelessWidget {
           ),
         ),
         Text(
-          (progress).toInt().toString(),
+          progress.toInt().toString(),
           style: const TextStyle(
             fontSize: 30.0,
             color: Colors.black54,

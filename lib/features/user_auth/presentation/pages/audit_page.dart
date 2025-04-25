@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/area_info.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AuditPage extends StatefulWidget {
   const AuditPage({Key? key}) : super(key: key);
@@ -10,38 +12,32 @@ class AuditPage extends StatefulWidget {
 }
 
 class AuditPageState extends State<AuditPage> {
+  Future<List<Map<String, dynamic>>> fetchAreas() async {
+    final orgId = 2; // Cambia esto si el orgId es dinámico
+    final response = await http.get(
+      Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) {
+        return {
+          "id": item["id"].toString(),
+          "area": item["name"] ?? "",
+          "zona": item["description"] ?? ""
+        };
+      }).toList();
+    } else {
+      throw Exception("Error al cargar las áreas");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const appBarElementsColor = Color.fromRGBO(79, 67, 73, 1);
-
-    // Datos simulados de petición a base de datos
-    List<Map<String, String>> responseList = [
-      {"area": "Área de Embotellado", "zona": "Zona Operativa", "id": "1"},
-      {"area": "Área de Higiene", "zona": "Zona Soporte", "id": "2"},
-      {"area": "Área de Baños", "zona": "Zona de Comunes", "id": "3"},
-    ];
-
-    // Asignación dinámica de colores a los elementos de la lista de áreas
-    List<Widget> areasList = [];
-
-    for (int i = 0; i < responseList.length; i++) {
-      Color color = Color.fromRGBO(214, 231, 239, 1);
-      Color textColor = Colors.black;
-
-      areasList.insert(
-        i,
-        AreaInfo(
-          area: responseList[i]["area"],
-          zone: responseList[i]["zona"],
-          color: color,
-          areaID: responseList[i]["id"],
-          textColor: textColor,
-          goToNamed: 'Calificar 5s',
-        ),
-      );
-    }
-
     final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
@@ -68,29 +64,52 @@ class AuditPageState extends State<AuditPage> {
           ),
         ),
       ),
-      body: ListView(
-        children: <Widget>[
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: fetchAreas(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No se encontraron áreas"));
+          }
+
+          final areasList = snapshot.data!.map((area) {
+            return AreaInfo(
+              area: area["area"],
+              zone: area["zona"],
+              color: const Color.fromRGBO(214, 231, 239, 1),
+              areaID: area["id"],
+              textColor: Colors.black,
+              goToNamed: 'Calificar 5s',
+            );
+          }).toList();
+
+          return ListView(
+            children: [
               Container(
                 margin: const EdgeInsets.all(20),
                 child: SearchBar(
                   onChanged: (value) {
-                    // Falta lógica de búsqueda
-                    // Pista: Modificar areasList y solo mostrar los que entren dentro de la búsqueda
+                    // Puedes implementar lógica de búsqueda aquí
                     print(value);
                   },
                   leading: const SizedBox(width: 50, child: Icon(Icons.search)),
                   hintText: "Buscar",
                 ),
               ),
-            ] +
-            areasList,
+              ...areasList,
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.goNamed('CreateQuestionnairePage');
         },
-        child: Icon(Icons.add),
-        backgroundColor: Color.fromRGBO(240, 222, 229, 1),
+        child: const Icon(Icons.add),
+        backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
         foregroundColor: appBarElementsColor,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

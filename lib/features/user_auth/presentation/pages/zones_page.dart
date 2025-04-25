@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ZonesPage extends StatefulWidget {
   const ZonesPage({super.key});
@@ -18,13 +20,24 @@ class _ZonesPageState extends State<ZonesPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
-    await Future.delayed(
-        const Duration(seconds: 1)); // Simula una carga de datos
-    return [
-      {"id": "1", "area": "Producción", "zona": "Zona Operativa"},
-      {"id": "2", "area": "Mantenimiento", "zona": "Zona Soporte"},
-      {"id": "3", "area": "Administración", "zona": "Zona de Comunes"},
-    ];
+    final orgId = 2; // Cambia si es dinámico
+    final response = await http.get(
+      Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map<Map<String, dynamic>>((item) {
+        return {
+          "id": item["id"].toString(),
+          "area": item["name"] ?? "",
+          "zona": item["description"] ?? "",
+        };
+      }).toList();
+    } else {
+      throw Exception('Error al obtener las áreas');
+    }
   }
 
   @override
@@ -64,7 +77,7 @@ class _ZonesPageState extends State<ZonesPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No data found'));
+            return const Center(child: Text('No se encontraron áreas'));
           }
 
           final responseList = snapshot.data!;
