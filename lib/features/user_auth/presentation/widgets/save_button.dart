@@ -28,7 +28,7 @@ class SaveButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: scheme.secondary,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: [
+          boxShadow: const [
             // sombra sutil para que parezca flotante
             BoxShadow(
               color: Colors.black26,

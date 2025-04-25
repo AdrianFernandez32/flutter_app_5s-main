@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/add_questionnaire_dialog.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
@@ -20,7 +21,7 @@ class QuestionnairesAdminMenu extends StatefulWidget {
 }
 
 class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
-  final List<Map<String, dynamic>> mockQuestionnaires = const [
+  final List<Map<String, dynamic>> mockQuestionnaires = [
     {
       'title': 'Cuestionario A',
       'id': '1',
@@ -75,22 +76,7 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 100,
-            left: 16,
-            child: SaveButton(
-                saveStates: saveStates,
-                onSave: (String state) {
-                  print("Save: $state");
-                }),
-          ),
-          const AdminNavBar(),
-          FloatingPlusActionButton(
-            onPressed: () {
-              //TODO : Agregar funcionalidad
-              print("AddDepartment");
-            },
-          )
+
         ],
       ),
     );
@@ -100,6 +86,23 @@ class _QuestionnairesAdminMenuState extends State<QuestionnairesAdminMenu> {
     context.pushNamed(
       'QuestionnaireAdminMenu',
       queryParameters: {'departmentId': widget.departmentId, 'fiveSId': id},
+    );
+  }
+
+  void _showAddQuestionnaireDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AddQuestionnaireDialog(
+        onSave: (String name) {
+          setState(() {
+            // TODO: Change when connected to the backend
+            mockQuestionnaires.add({
+              'title': name,
+              'id': (mockQuestionnaires.length + 1).toString(),
+            });
+          });
+        },
+      ),
     );
   }
 }

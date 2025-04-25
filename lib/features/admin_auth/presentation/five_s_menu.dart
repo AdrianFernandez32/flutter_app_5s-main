@@ -48,7 +48,7 @@ class FiveSMenu extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 100,
+            bottom: 30,
             left: 20,
             right: 20,
             child: Container(
@@ -77,7 +77,6 @@ class FiveSMenu extends StatelessWidget {
               ),
             ),
           ),
-          const AdminNavBar(),
         ],
       ),
     );
