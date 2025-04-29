@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/utils/color_scheme_manager.dart';
 import 'package:go_router/go_router.dart';
@@ -19,6 +20,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isLoading = false;
 
+  // Método para seleccionar imagen desde la galería.
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -27,6 +29,52 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
     }
   }
 
+  // Método que usa el presigned URL para subir la imagen a S3.
+  Future<String> _uploadImage(File imageFile) async {
+    try {
+      // 1. Obtener la URL pre-firmada desde el endpoint
+      final presignedUri = Uri.parse(
+          'https://djnxv2fqbiqog.cloudfront.net/image/presigned-url/' +
+              _nameController.text);
+      final presignedResponse = await http.get(presignedUri);
+
+      if (presignedResponse.statusCode != 200) {
+        throw Exception(
+            'Error al obtener la URL pre-firmada: ${presignedResponse.statusCode}');
+      }
+
+      final presignedUrl = presignedResponse.body.trim();
+
+      if (presignedUrl.isEmpty) {
+        throw Exception('La URL pre-firmada está vacía.');
+      }
+
+      // 2. Leer los bytes de la imagen
+      final imageBytes = await imageFile.readAsBytes();
+
+      // 3. Subir la imagen con un PUT a la URL pre-firmada
+      final putResponse = await http.put(
+        Uri.parse(presignedUrl),
+        headers: {
+          'Content-Type':
+              'image/jpeg', // Asegúrate de que el tipo MIME sea correcto
+        },
+        body: imageBytes,
+      );
+
+      if (putResponse.statusCode != 200 && putResponse.statusCode != 201) {
+        throw Exception('Error al subir la imagen: ${putResponse.statusCode}');
+      }
+
+      // 4. Retornar la URL final de la imagen (sin parámetros de query)
+      final finalImageUrl = presignedUrl.split('?').first;
+      return finalImageUrl;
+    } catch (e) {
+      throw Exception('Error en la carga de la imagen: $e');
+    }
+  }
+
+  // Método que crea la organización. Si se subió imagen se incluye el URL real, de lo contrario, se envía como vacía.
   Future<void> _createOrganization() async {
     if (_nameController.text.isEmpty || _descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -38,22 +86,27 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
     setState(() => _isLoading = true);
 
     try {
-      final uri =
-          Uri.parse('https://tu-api.com/organizations'); // cambia esta URL
-      final request = http.MultipartRequest('POST', uri);
-
-      request.fields['name'] = _nameController.text;
-      request.fields['description'] = _descriptionController.text;
-      request.fields['colorPalette'] = selectedPalette.name;
-
+      // Subir imagen si se seleccionó. Sino, logoUrl quedará en blanco.
+      String logoUrl = '';
       if (_image != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath('logo', _image!.path),
-        );
+        logoUrl = await _uploadImage(_image!);
       }
 
-      final response = await request.send();
-      final body = await response.stream.bytesToString();
+      // Armar payload para el POST.
+      final uri = Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/');
+      final payload = {
+        'name': _nameController.text,
+        'description': _descriptionController.text,
+        'colorPalette': selectedPalette.name,
+        'logoUrl': logoUrl,
+      };
+      final body = jsonEncode(payload);
+
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (!mounted) return;
@@ -64,7 +117,9 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response.statusCode} - $body')),
+          SnackBar(
+              content:
+                  Text('Error: ${response.statusCode} - ${response.body}')),
         );
       }
     } catch (e) {
@@ -73,9 +128,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
         SnackBar(content: Text('Error de red: $e')),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -247,12 +300,15 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       onPressed: _createOrganization,
-                      child: const Text("Crear",
-                          style: TextStyle(fontSize: 16, color: Colors.white)),
+                      child: const Text(
+                        "Crear",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 100),
