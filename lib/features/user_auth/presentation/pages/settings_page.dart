@@ -188,7 +188,7 @@ class SettingsPageState extends State<SettingsPage> {
 }
 
 class _SwitchExample extends StatefulWidget {
-  const _SwitchExample({super.key});
+  const _SwitchExample();
 
   @override
   State<_SwitchExample> createState() => _SwitchExampleState();

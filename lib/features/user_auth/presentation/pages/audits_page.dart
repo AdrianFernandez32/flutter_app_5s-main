@@ -36,7 +36,8 @@ class _AuditsPageState extends State<AuditsPage> {
   FilterSettings filterSettings = FilterSettings();
   List<AreaWidget> audits = [];
 
-  _AuditsPageState({required this.zone, required this.color, required this.area});
+  _AuditsPageState(
+      {required this.zone, required this.color, required this.area});
 
   @override
   void initState() {
@@ -45,9 +46,10 @@ class _AuditsPageState extends State<AuditsPage> {
   }
 
   Future<void> _fetchAudits() async {
-    final subareaId = 1; // Cambiar si es necesario
+    const subareaId = 1; // Cambiar si es necesario
     final response = await http.get(
-      Uri.parse('https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId'),
+      Uri.parse(
+          'https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId'),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -57,9 +59,13 @@ class _AuditsPageState extends State<AuditsPage> {
 
       setState(() {
         audits = auditsData.map<AreaWidget>((audit) {
-          final progress = (audit['questionsAnswered'] / (audit['totalQuestions'] ?? 1)) * 100;
-          final date = DateTime.now(); // Puedes agregar fecha real si el backend la provee
-          final formattedDate = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+          final progress =
+              (audit['questionsAnswered'] / (audit['totalQuestions'] ?? 1)) *
+                  100;
+          final date = DateTime
+              .now(); // Puedes agregar fecha real si el backend la provee
+          final formattedDate =
+              "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
 
           return AreaWidget(
             zone: zone,
@@ -185,20 +191,25 @@ class _AuditsPageState extends State<AuditsPage> {
   }
 
   List<Widget> _buildFilteredAreaWidgets() {
-    return audits.where((audit) {
-      return _filterByRating(audit.progress) && _filterByDate(audit.date);
-    }).map((audit) => Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: audit,
-    )).toList();
+    return audits
+        .where((audit) {
+          return _filterByRating(audit.progress) && _filterByDate(audit.date);
+        })
+        .map((audit) => Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: audit,
+            ))
+        .toList();
   }
 
   bool _filterByRating(double progress) {
-    return filterSettings.ratingFilter == null || progress >= filterSettings.ratingFilter!;
+    return filterSettings.ratingFilter == null ||
+        progress >= filterSettings.ratingFilter!;
   }
 
   bool _filterByDate(String date) {
-    return filterSettings.dateFilter == null || date == filterSettings.dateFilter;
+    return filterSettings.dateFilter == null ||
+        date == filterSettings.dateFilter;
   }
 }
 

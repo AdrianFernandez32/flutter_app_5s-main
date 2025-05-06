@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/user_basic_info.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
 
@@ -56,23 +57,22 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          toolbarHeight: 80,
-          backgroundColor: Color.fromRGBO(252, 221, 198, 1),
-          title: const Text(
-            "Registro",
-            style: TextStyle(color: Colors.black, fontSize: 32),
-          ),
-          leading: IconButton(
-              onPressed: () {
-                context.goNamed("SplashScreen");
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-                size: 33,
-              )),
-          
+        toolbarHeight: 80,
+        backgroundColor: const Color.fromRGBO(252, 221, 198, 1),
+        title: const Text(
+          "Registro",
+          style: TextStyle(color: Colors.black, fontSize: 32),
         ),
+        leading: IconButton(
+            onPressed: () {
+              context.goNamed("SplashScreen");
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+              size: 33,
+            )),
+      ),
       body: Container(
         color: backgroundColor,
         child: Container(
