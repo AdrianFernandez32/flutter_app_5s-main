@@ -22,7 +22,7 @@ class _AreaMenuState extends State<AreaMenu> {
   List<Map<String, dynamic>> areas = [];
   bool isLoading = true;
   String? errorMessage;
-  int orgId = 1;
+  int orgId = 2;
 
   @override
   void initState() {
@@ -104,22 +104,15 @@ class _AreaMenuState extends State<AreaMenu> {
                 )),
           ),
           const AdminNavBar(),
-          FloatingPlusActionButton(
-            onPressed: () {
-              //TODO : Agregar funcionalidad
-              print("AddDepartment");
-            },
-          )
         ],
       ),
     );
   }
 
-//TODO: Agregar funcionalidad
   void _handleDepartmentTap(String id) {
     context.pushNamed(
-      'FiveSMenu',
-      pathParameters: {'departmentId': id},
+      'AddSubArea',
+      pathParameters: {'areaId': id},
     );
   }
 }

@@ -187,9 +187,12 @@ final GoRouter _router = GoRouter(
         path: "/areas_menu",
         builder: (context, state) => const AreaMenu()),
     GoRoute(
-        name: "AddDepartment",
-        path: "/subareas",
-        builder: (context, state) => const AddSubArea()),
+      name: "AddSubArea",
+      path: "/subareas/:areaId",
+      builder: (context, state) => AddSubArea(
+        areaId: state.pathParameters['areaId']!,
+      ),
+    ),
     GoRoute(
       name: "FiveSMenu",
       path: '/fiveS/:departmentId',

@@ -12,7 +12,8 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
 class AddSubArea extends StatefulWidget {
-  const AddSubArea({super.key});
+  final String areaId;
+  const AddSubArea({required this.areaId, super.key});
 
   @override
   State<AddSubArea> createState() => _AddSubAreaState();
