@@ -30,15 +30,15 @@ class AdminDashboardPage extends StatelessWidget {
                           bottomRight: Radius.circular(20),
                         ),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           CircleAvatar(
                             backgroundImage: NetworkImage(
                                 'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
                             radius: 30,
                           ),
-                          const SizedBox(width: 16),
-                          const Column(
+                          SizedBox(width: 16),
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -69,8 +69,8 @@ class AdminDashboardPage extends StatelessWidget {
                   children: [
                     _buildMenuItem(context, Icons.business, 'Crear nueva org',
                         '/create_org'),
-                    _buildMenuItem(context, Icons.apartment, 'Departamentos',
-                        '/departments'),
+                    _buildMenuItem(
+                        context, Icons.apartment, 'Areas', '/areas_menu'),
                     _buildMenuItem(context, Icons.person, 'Accesos', '/access'),
                   ],
                 ),
@@ -86,7 +86,7 @@ class AdminDashboardPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.blue,
                 borderRadius: BorderRadius.circular(40),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 10,
@@ -145,7 +145,7 @@ class AdminDashboardPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
             vertical: 16.0, horizontal: 12.0), // Increased padding
         leading: Icon(icon, color: Colors.blue),
         title: Text(

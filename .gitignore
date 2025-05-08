@@ -67,3 +67,5 @@ lib/generated_plugin_registrant.dart
 
 # End of https://www.toptal.com/developers/gitignore/api/flutter
 .env
+.idea/
+android/app/.cxx/
