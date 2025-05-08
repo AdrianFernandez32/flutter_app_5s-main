@@ -73,7 +73,7 @@ class _MainMenuState extends State<MainMenu> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.fromLTRB(16.0, 40, 16.0, 16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 10, 16.0, 0),
                 child: const Column(
                   children: [
                     _Button(
@@ -82,7 +82,7 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Auditar',
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 1,
                     ),
                     _Button(
                       title: 'Auditorías',
@@ -90,7 +90,7 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Zones Page',
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 1,
                     ),
                     _Button(
                       title: 'Ajustes',
@@ -98,7 +98,7 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Settings',
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 1,
                     ),
                     _Button(
                       title: 'Áreas',
@@ -106,19 +106,16 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Gestion de Areas',
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 1,
                     ),
                     _Button(
                       title: 'Accesos',
                       icon: Icons.person,
-                      goToNamed: 'Gestion de Areas',
+                      goToNamed: 'Gestion de Accesos',
                     ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 60,
-              )
             ],
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/add_department.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
@@ -120,6 +121,11 @@ final GoRouter _router = GoRouter(
       path: '/gestionareas',
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
+    ),
+    GoRoute(
+      path: '/gestiondeaccesos',
+      name: 'Gestion de Accesos',
+      builder: (context, state) => const AccessesPage(),
     ),
     GoRoute(
       path: '/editarareas',
