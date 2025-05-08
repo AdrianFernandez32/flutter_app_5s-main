@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/add_questionnaire_dialog.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/subarea_item.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/five_s_card.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/save_button.dart';
