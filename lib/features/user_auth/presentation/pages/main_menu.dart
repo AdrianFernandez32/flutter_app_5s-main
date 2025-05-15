@@ -78,7 +78,7 @@ class _MainMenuState extends State<MainMenu> {
                   children: [
                     _Button(
                       title: 'Auditar',
-                      icon: Icons.library_add_check,
+                      icon: Icons.library_add_check_outlined,
                       goToNamed: 'Auditar',
                     ),
                     SizedBox(
@@ -86,25 +86,29 @@ class _MainMenuState extends State<MainMenu> {
                     ),
                     _Button(
                       title: 'Auditorías',
-                      icon: Icons.file_copy,
+                      icon: Icons.file_copy_outlined,
                       goToNamed: 'Zones Page',
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     _Button(
-                      title: 'Ajustes',
-                      icon: Icons.settings,
-                      goToNamed: 'Settings',
+                      title: 'Áreas',
+                      icon: Icons.grid_view_outlined,
+                      goToNamed: 'Gestion de Areas',
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     _Button(
-                      title: 'Áreas',
-                      icon: Icons.grid_view_rounded,
-                      goToNamed: 'Gestion de Areas',
+                      title: 'Ajustes',
+                      icon: Icons.settings_outlined,
+                      goToNamed: 'Settings',
                     ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    
                   ],
                 ),
               ),
