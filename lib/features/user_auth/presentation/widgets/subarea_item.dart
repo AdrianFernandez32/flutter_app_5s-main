@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class DepartmentItem extends StatelessWidget {
+class SubAreaItem extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  const DepartmentItem({
+  const SubAreaItem({
     super.key,
     required this.title,
     required this.onTap,

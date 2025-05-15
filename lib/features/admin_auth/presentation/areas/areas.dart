@@ -5,41 +5,24 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart'
     show AdminAppBar;
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/area_item.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
-class AddDepartment extends StatefulWidget {
-  const AddDepartment({super.key});
+class AreaMenu extends StatefulWidget {
+  const AreaMenu({super.key});
 
   @override
-  State<AddDepartment> createState() => _AddDepartmentState();
+  State<AreaMenu> createState() => _AreaMenuState();
 }
 
-class _AddDepartmentState extends State<AddDepartment> {
-  final List<Map<String, dynamic>> mockDepartments = const [
-    {
-      'title': 'Ventas',
-      'id': '1',
-    },
-    {
-      'title': 'Recursos Humanos',
-      'id': '2',
-    },
-    {
-      'title': 'Tecnología',
-      'id': '3',
-    },
-    {
-      'title': 'Marketing',
-      'id': '4',
-    },
-  ];
-  List<Map<String, dynamic>> departments = [];
+class _AreaMenuState extends State<AreaMenu> {
+  List<Map<String, dynamic>> areas = [];
   bool isLoading = true;
   String? errorMessage;
+  int orgId = 1;
 
   @override
   void initState() {
@@ -50,30 +33,33 @@ class _AddDepartmentState extends State<AddDepartment> {
   Future<void> _fetchDepartments() async {
     try {
       final response = await http.get(
-          Uri.parse('${dotenv.env['API_URL']}/org/'),
-          headers: {'Authorization': 'Bearer ...'});
+        Uri.parse('${dotenv.env['API_URL']}/org/$orgId/area'),
+        headers: {'Authorization': 'Bearer ...'},
+      );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as List;
+        final List data = jsonDecode(response.body);
+        debugPrint('Datos recibidos: ${data.length}');
         setState(() {
-          departments = data
+          areas = data
               .map((item) => {
-                    'title': item['name'],
                     'id': item['id'].toString(),
+                    'name': item['name'] ?? '',
+                    'description': item['description'] ?? '',
+                    'logoUrl': item['logoUrl'] ?? '',
                   })
               .toList();
           isLoading = false;
         });
       } else {
         setState(() {
-          errorMessage =
-              'Error al cargar departamentos: ${response.statusCode}';
+          errorMessage = 'Error ${response.statusCode}';
           isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        errorMessage = 'Error de conexión: $e';
+        errorMessage = 'Excepción: $e';
         isLoading = false;
       });
     }
@@ -82,13 +68,21 @@ class _AddDepartmentState extends State<AddDepartment> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    if (errorMessage != null) {
+      return Center(child: Text(errorMessage!));
+    }
     return Scaffold(
       appBar: AdminAppBar(
-          title: "Departamentos",
-          onBackPressed: () {
-            //TODO : Agregar funcionalidad
-            print("Go to previous page");
-          }),
+        title: "Areas",
+        onBackPressed: () {
+          context.pushNamed(
+            'AdminDashboard',
+          );
+        },
+      ),
       body: Stack(
         children: [
           Padding(
@@ -97,11 +91,13 @@ class _AddDepartmentState extends State<AddDepartment> {
                 color: colorScheme.surface,
                 child: ListView(
                   children: [
-                    ...mockDepartments
-                        .map((department) => DepartmentItem(
-                              title: department['title'],
-                              onTap: () =>
-                                  _handleDepartmentTap(department['id']),
+                    ...areas
+                        .map((area) => AreaItem(
+                              id: area['id'],
+                              name: area['name'],
+                              description: area['description'],
+                              logoUrl: area['logoUrl'],
+                              onTap: () => _handleDepartmentTap(area['id']),
                             ))
                         .toList(),
                   ],
