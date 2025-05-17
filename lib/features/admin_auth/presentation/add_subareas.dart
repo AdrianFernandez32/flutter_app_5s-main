@@ -4,19 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart'
     show AdminAppBar;
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/departmentItem.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/subarea_item.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
-class AddDepartment extends StatefulWidget {
-  const AddDepartment({super.key});
+class AddSubArea extends StatefulWidget {
+  const AddSubArea({super.key});
 
   @override
-  State<AddDepartment> createState() => _AddDepartmentState();
+  State<AddSubArea> createState() => _AddSubAreaState();
 }
 
-class _AddDepartmentState extends State<AddDepartment> {
+class _AddSubAreaState extends State<AddSubArea> {
   final List<Map<String, dynamic>> mockDepartments = const [
     {
       'title': 'Ventas',
@@ -38,6 +39,7 @@ class _AddDepartmentState extends State<AddDepartment> {
   List<Map<String, dynamic>> departments = [];
   bool isLoading = true;
   String? errorMessage;
+  int orgId = 1;
 
   @override
   void initState() {
@@ -48,7 +50,7 @@ class _AddDepartmentState extends State<AddDepartment> {
   Future<void> _fetchDepartments() async {
     try {
       final response = await http.get(
-          Uri.parse('${dotenv.env['API_URL']}/org/'),
+          Uri.parse('${dotenv.env['API_URL']}/org/$orgId/area'),
           headers: {'Authorization': 'Bearer ...'});
 
       if (response.statusCode == 200) {
@@ -56,8 +58,8 @@ class _AddDepartmentState extends State<AddDepartment> {
         setState(() {
           departments = data
               .map((item) => {
-                    'title': item['name'],
                     'id': item['id'].toString(),
+                    'title': item['name'],
                   })
               .toList();
           isLoading = false;
@@ -82,11 +84,13 @@ class _AddDepartmentState extends State<AddDepartment> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AdminAppBar(
-          title: "Departamentos",
-          onBackPressed: () {
-            //TODO : Agregar funcionalidad
-            print("Go to previous page");
-          }),
+        title: "Departamentos",
+        onBackPressed: () {
+          context.pushNamed(
+            'AdminDashboard',
+          );
+        },
+      ),
       body: Stack(
         children: [
           Padding(
@@ -96,7 +100,7 @@ class _AddDepartmentState extends State<AddDepartment> {
                 child: ListView(
                   children: [
                     ...mockDepartments
-                        .map((department) => DepartmentItem(
+                        .map((department) => SubAreaItem(
                               title: department['title'],
                               onTap: () =>
                                   _handleDepartmentTap(department['id']),
@@ -106,19 +110,11 @@ class _AddDepartmentState extends State<AddDepartment> {
                 )),
           ),
           const AdminNavBar(),
-          Positioned(
-            bottom: 100,
-            right: 20,
-            child: FloatingActionButton(
-                onPressed: () {
-                  print('Department added');
-                },
-                backgroundColor: colorScheme.secondary,
-                shape: const CircleBorder(),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                )),
+          FloatingPlusActionButton(
+            onPressed: () {
+              //TODO : Agregar funcionalidad
+              print("AddDepartment");
+            },
           )
         ],
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/admin_auth/presentation/add_department.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/add_subareas.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_page.dart';
@@ -9,7 +11,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_organization_page.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/five_s_menu.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/five_s_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
@@ -25,6 +27,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/access_user_admin.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
@@ -37,6 +40,8 @@ void main() async {
   //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6YnFsZHdpcWhjeGdqb3VmcnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzNzI1NDIsImV4cCI6MjAyNTk0ODU0Mn0.2vSOwP4wBIv5lwztvsCkr97iyjw9dS0l-BCH0ndbyGI',
   // );
   //  Change Notifier Provider for the theme changes
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(ChangeNotifierProvider(
     create: (context) => ThemeProvider(),
     child: const MyApp(),
@@ -188,10 +193,15 @@ final GoRouter _router = GoRouter(
       path: '/create_questionnaire',
       builder: (context, state) => const CreateQuestionnairePage(),
     ),
+    // Area and Subarea routes
+    GoRoute(
+        name: "AreaMenu",
+        path: "/areas_menu",
+        builder: (context, state) => const AreaMenu()),
     GoRoute(
         name: "AddDepartment",
-        path: "/departments",
-        builder: (context, state) => const AddDepartment()),
+        path: "/subareas",
+        builder: (context, state) => const AddSubArea()),
     GoRoute(
       name: "FiveSMenu",
       path: '/fiveS/:departmentId',
@@ -206,7 +216,16 @@ final GoRouter _router = GoRouter(
       //   }
       //   return null;
       // }
-    )
+    ),
+    GoRoute(
+        name: "QuestionnaireAdminMenu",
+        path: '/subareas/:departmentId/5s/:fiveSId',
+        builder: (context, state) {
+          final departmentId = state.pathParameters['departmentId']!;
+          final fiveSId = state.pathParameters['fiveSId']!;
+          return QuestionnairesAdminMenu(
+              departmentId: departmentId, fiveSId: fiveSId);
+        }),
   ],
 );
 
