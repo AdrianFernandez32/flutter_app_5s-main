@@ -131,38 +131,43 @@ class AccesesPageState extends State<AccessesPage> {
     const fontColor = Color.fromRGBO(0, 0, 0, 1);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: colorScheme.onSecondary,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 30,
-            backgroundImage:
-                AssetImage('assets/images/profile_placeholder.png'),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: fontColor,
+    return InkWell(
+      onTap: () {
+        context.goNamed('AccessesPageUsuario');
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colorScheme.onSecondary,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            const CircleAvatar(
+              radius: 30,
+              backgroundImage:
+                  AssetImage('assets/images/profile_placeholder.png'),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: fontColor,
+                  ),
                 ),
-              ),
-              Text(
-                "Se unió el: $joinDate",
-                style: const TextStyle(color: fontColor),
-              ),
-            ],
-          ),
-        ],
+                Text(
+                  "Se unió el: $joinDate",
+                  style: const TextStyle(color: fontColor),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

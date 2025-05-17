@@ -24,6 +24,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/statistics_
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/access_user_admin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
@@ -70,6 +71,11 @@ final GoRouter _router = GoRouter(
       path: '/acceso_admin',
       name: 'AdminAccessPage',
       builder: (context, state) => const AdminAccessPage(),
+    ),
+    GoRoute(
+      path: '/acceso_admin_usuario',
+      name: 'AccessesPageUsuario',
+      builder: (context, state) => const AccessesPageUsuario(),
     ),
     GoRoute(
       path: '/inicio_admin',
