@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class QuestionnairePage extends StatefulWidget {
   const QuestionnairePage({Key? key}) : super(key: key);
@@ -99,7 +97,8 @@ class _QuestionView extends StatelessWidget {
                 question ?? "No hay pregunta",
                 overflow: TextOverflow.clip,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
               const SizedBox(
                 height: 30,
@@ -200,10 +199,16 @@ class __CommentFieldState extends State<_CommentField> {
             ),
           ),
           const Divider(),
-          Row(children: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.add_photo_alternate_rounded)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.sticky_note_2_outlined)),
-          ],)
+          Row(
+            children: [
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.add_photo_alternate_rounded)),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.sticky_note_2_outlined)),
+            ],
+          )
         ],
       ),
     );

@@ -39,7 +39,8 @@ class UserBasicInfo extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              color: Color.fromARGB(255, 155, 155, 155), // Fondo gris claro
+              color:
+                  const Color.fromARGB(255, 155, 155, 155), // Fondo gris claro
             ),
             child: Column(
               children: [

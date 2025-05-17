@@ -4,6 +4,7 @@ import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart
 import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
@@ -25,6 +26,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/statistics_
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/access_user_admin.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -76,6 +78,11 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const AdminAccessPage(),
     ),
     GoRoute(
+      path: '/acceso_admin_usuario',
+      name: 'AccessesPageUsuario',
+      builder: (context, state) => const AccessesPageUsuario(),
+    ),
+    GoRoute(
       path: '/inicio_admin',
       name: 'InicioAdmin',
       builder: (context, state) => const InicioAdminPage(),
@@ -125,6 +132,11 @@ final GoRouter _router = GoRouter(
       path: '/gestionareas',
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
+    ),
+    GoRoute(
+      path: '/gestiondeaccesos',
+      name: 'Gestion de Accesos',
+      builder: (context, state) => const AccessesPage(),
     ),
     GoRoute(
       path: '/editarareas',

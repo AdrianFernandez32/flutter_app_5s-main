@@ -6,10 +6,12 @@ class CreateQuestionnairePage extends StatefulWidget {
   const CreateQuestionnairePage({Key? key}) : super(key: key);
 
   @override
-  _CreateQuestionnairePageState createState() => _CreateQuestionnairePageState();
+  _CreateQuestionnairePageState createState() =>
+      _CreateQuestionnairePageState();
 }
 
-class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with TickerProviderStateMixin {
+class _CreateQuestionnairePageState extends State<CreateQuestionnairePage>
+    with TickerProviderStateMixin {
   late TextEditingController _preguntaController;
   late TextEditingController _tituloController;
   late TabController _tabController;
@@ -18,8 +20,10 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
   String _selectedS = '1';
   String? _selectedSubArea;
   List<Map<String, dynamic>> _subAreas = [];
-  List<String> _preguntas = ['Pregunta 1'];
-  List<TextEditingController> _preguntaControllers = [TextEditingController()];
+  final List<String> _preguntas = ['Pregunta 1'];
+  final List<TextEditingController> _preguntaControllers = [
+    TextEditingController()
+  ];
 
   @override
   void initState() {
@@ -49,9 +53,8 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
   }
 
   Future<void> _fetchSubAreas() async {
-    final response = await Supabase.instance.client
-        .from('subarea')
-        .select('id, name');
+    final response =
+        await Supabase.instance.client.from('subarea').select('id, name');
 
     final data = response as List<dynamic>;
     final areas = data.map((item) {
@@ -63,7 +66,9 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
 
     setState(() {
       _subAreas = areas;
-      _selectedSubArea = _subAreas.isNotEmpty ? _subAreas[0]['name'] : null; // Use name instead of id
+      _selectedSubArea = _subAreas.isNotEmpty
+          ? _subAreas[0]['name']
+          : null; // Use name instead of id
     });
   }
 
@@ -81,18 +86,17 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
     final userName = user.userMetadata?['name'] ?? 'Unknown';
 
     // Insertar el cuestionario
-    final response = await Supabase.instance.client
-        .from('questionnaire')
-        .insert({
-          'name': title,
-          's_id': sSelected,
-          'sub_area': subAreaName, // Store the name of the sub-area
-          'active': true,
-          'created_at': dateNow,
-          'created_by': userName,
-          'updated_at': dateNow,
-          'updated_by': userName,
-        });
+    final response =
+        await Supabase.instance.client.from('questionnaire').insert({
+      'name': title,
+      's_id': sSelected,
+      'sub_area': subAreaName, // Store the name of the sub-area
+      'active': true,
+      'created_at': dateNow,
+      'created_by': userName,
+      'updated_at': dateNow,
+      'updated_by': userName,
+    });
 
     // Obtener el ID del cuestionario recién insertado
     final fresponse = await Supabase.instance.client
@@ -106,16 +110,14 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
 
     // Insertar las preguntas utilizando el ID del cuestionario
     for (var controller in _preguntaControllers) {
-      await Supabase.instance.client
-          .from('question')
-          .insert({
-            'name': controller.text,
-            'questionnaire_id': newQuestionnaireId,
-            'created_at': dateNow,
-            'created_by': userName,
-            'updated_at': dateNow,
-            'updated_by': userName,
-          });
+      await Supabase.instance.client.from('question').insert({
+        'name': controller.text,
+        'questionnaire_id': newQuestionnaireId,
+        'created_at': dateNow,
+        'created_by': userName,
+        'updated_at': dateNow,
+        'updated_by': userName,
+      });
     }
   }
 
@@ -126,7 +128,8 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
 
       _tabController.dispose();
       _tabController = TabController(length: _preguntas.length, vsync: this);
-      _tabController.animateTo(_preguntas.length - 1); // Cambiar al nuevo índice
+      _tabController
+          .animateTo(_preguntas.length - 1); // Cambiar al nuevo índice
     });
   }
 
@@ -137,7 +140,8 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
         backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
         leading: IconButton(
           onPressed: () {
-            context.goNamed('Auditar'); // Asegúrate de que esta ruta existe en tu configuración de GoRouter
+            context.goNamed(
+                'Auditar'); // Asegúrate de que esta ruta existe en tu configuración de GoRouter
           },
           icon: const Icon(
             Icons.arrow_back,
@@ -220,7 +224,9 @@ class _CreateQuestionnairePageState extends State<CreateQuestionnairePage> with 
                       labelColor: Colors.black,
                       unselectedLabelColor: Colors.grey,
                       isScrollable: true,
-                      tabs: _preguntas.map((preg) => Tab(child: Text(preg))).toList(),
+                      tabs: _preguntas
+                          .map((preg) => Tab(child: Text(preg)))
+                          .toList(),
                     ),
                     Expanded(
                       child: TabBarView(

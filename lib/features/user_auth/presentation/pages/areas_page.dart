@@ -26,7 +26,7 @@ class AreasPageState extends State<AreasPage> {
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
     try {
-      final orgId = 2; // Cambia este ID según el que necesites
+      const orgId = 2; // Cambia este ID según el que necesites
       final response = await http.get(
         Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
         headers: {
@@ -124,7 +124,7 @@ class AreasPageState extends State<AreasPage> {
           List<Widget> areasList = [];
 
           for (int i = 0; i < responseList.length; i++) {
-            Color color = Color.fromRGBO(214, 231, 239, 1);
+            Color color = const Color.fromRGBO(214, 231, 239, 1);
             Color textColor = Colors.black;
 
             areasList.add(AreaInfo(
@@ -175,12 +175,6 @@ class AreasPageState extends State<AreasPage> {
           );
         },
       ),
-
     );
   }
 }
-
-
-
-
-
