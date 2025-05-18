@@ -13,7 +13,7 @@ class AuditPage extends StatefulWidget {
 
 class AuditPageState extends State<AuditPage> {
   Future<List<Map<String, dynamic>>> fetchAreas() async {
-    final orgId = 2; // Cambia esto si el orgId es dinámico
+    const orgId = 2; // Cambia esto si el orgId es dinámico
     final response = await http.get(
       Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
       headers: {'Content-Type': 'application/json'},
@@ -108,9 +108,9 @@ class AuditPageState extends State<AuditPage> {
         onPressed: () {
           context.goNamed('CreateQuestionnairePage');
         },
-        child: const Icon(Icons.add),
         backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
         foregroundColor: appBarElementsColor,
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

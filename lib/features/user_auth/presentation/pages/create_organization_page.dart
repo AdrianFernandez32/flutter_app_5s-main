@@ -34,8 +34,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
     try {
       // 1. Obtener la URL pre-firmada desde el endpoint
       final presignedUri = Uri.parse(
-          'https://djnxv2fqbiqog.cloudfront.net/image/presigned-url/' +
-              _nameController.text);
+          'https://djnxv2fqbiqog.cloudfront.net/image/presigned-url/${_nameController.text}');
       final presignedResponse = await http.get(presignedUri);
 
       if (presignedResponse.statusCode != 200) {

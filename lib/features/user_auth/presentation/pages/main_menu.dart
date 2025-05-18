@@ -35,20 +35,20 @@ class _MainMenuState extends State<MainMenu> {
                           const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
                       decoration: BoxDecoration(
                         color: colorScheme.secondary,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
                         ),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           CircleAvatar(
                             backgroundImage: NetworkImage(
                                 'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
                             radius: 30,
                           ),
-                          const SizedBox(width: 16),
-                          const Column(
+                          SizedBox(width: 16),
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -73,44 +73,49 @@ class _MainMenuState extends State<MainMenu> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.fromLTRB(16.0, 40, 16.0, 16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 10, 16.0, 0),
                 child: const Column(
                   children: [
                     _Button(
                       title: 'Auditar',
-                      icon: Icons.library_add_check,
+                      icon: Icons.library_add_check_outlined,
                       goToNamed: 'Auditar',
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 1,
                     ),
                     _Button(
                       title: 'Auditorías',
-                      icon: Icons.file_copy,
+                      icon: Icons.file_copy_outlined,
                       goToNamed: 'Zones Page',
                     ),
                     SizedBox(
-                      height: 10,
-                    ),
-                    _Button(
-                      title: 'Ajustes',
-                      icon: Icons.settings,
-                      goToNamed: 'Settings',
-                    ),
-                    SizedBox(
-                      height: 10,
+                      height: 1,
                     ),
                     _Button(
                       title: 'Áreas',
-                      icon: Icons.grid_view_rounded,
+                      icon: Icons.grid_view_outlined,
                       goToNamed: 'Gestion de Areas',
+                    ),
+                    SizedBox(
+                      height: 1,
+                    ),
+                    _Button(
+                      title: 'Ajustes',
+                      icon: Icons.settings_outlined,
+                      goToNamed: 'Settings',
+                    ),
+                    SizedBox(
+                      height: 1,
+                    ),
+                    _Button(
+                      title: 'Accesos',
+                      icon: Icons.person,
+                      goToNamed: 'Gestion de Accesos',
                     ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 60,
-              )
             ],
           ),
         ],

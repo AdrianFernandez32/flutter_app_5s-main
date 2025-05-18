@@ -137,12 +137,14 @@ class _QuestionnaireWidget extends StatelessWidget {
                   onPressed: () {},
                   icon: const Icon(Icons.edit_outlined),
                   style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
+                    backgroundColor: WidgetStatePropertyAll(
                       Color.fromRGBO(134, 75, 111, 1),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12,),
+                const SizedBox(
+                  width: 12,
+                ),
               ],
             ),
           ),
