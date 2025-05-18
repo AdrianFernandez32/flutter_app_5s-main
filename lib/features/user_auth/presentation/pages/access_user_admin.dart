@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/departmentItem.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_page.dart';
 
