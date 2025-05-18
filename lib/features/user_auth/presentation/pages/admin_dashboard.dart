@@ -70,7 +70,7 @@ class AdminDashboardPage extends StatelessWidget {
                     _buildMenuItem(context, Icons.business, 'Crear nueva org',
                         '/create_org'),
                     _buildMenuItem(
-                        context, Icons.apartment, 'Areas', '/areas_menu'),
+                        context, Icons.group, 'Organizaciones', '/areas_menu'),
                     _buildMenuItem(context, Icons.person, 'Accesos', '/access'),
                   ],
                 ),

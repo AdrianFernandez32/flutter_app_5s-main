@@ -6,9 +6,11 @@ import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_app
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/subarea_item.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/floating_plus_action_button.dart';
+import 'package:flutter_app_5s/utils/global_states/id_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AddSubArea extends StatefulWidget {
   const AddSubArea({super.key});
@@ -18,36 +20,35 @@ class AddSubArea extends StatefulWidget {
 }
 
 class _AddSubAreaState extends State<AddSubArea> {
-  final List<Map<String, dynamic>> mockDepartments = const [
-    {
-      'title': 'Ventas',
-      'id': '1',
-    },
-    {
-      'title': 'Recursos Humanos',
-      'id': '2',
-    },
-    {
-      'title': 'Tecnología',
-      'id': '3',
-    },
-    {
-      'title': 'Marketing',
-      'id': '4',
-    },
-  ];
-  List<Map<String, dynamic>> departments = [];
+  List<Map<String, dynamic>> subAreas = [];
   bool isLoading = true;
   String? errorMessage;
-  int orgId = 1;
 
   @override
   void initState() {
     super.initState();
-    _fetchDepartments();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final idProvider = Provider.of<IdProvider>(context, listen: false);
+      if (idProvider.orgId == null || idProvider.areaId == null) {
+        context.goNamed('OrgMenu');
+      }
+    });
+    _fetchSubAreas();
   }
 
-  Future<void> _fetchDepartments() async {
+  Future<void> _fetchSubAreas() async {
+    final idProvider = Provider.of<IdProvider>(context, listen: false);
+    final orgId = idProvider.orgId;
+    final areaId = idProvider.areaId;
+
+    if (orgId == null || areaId == null) {
+      setState(() {
+        errorMessage = 'Faltan IDs necesarios';
+        isLoading = false;
+      });
+      return;
+    }
+
     try {
       final response = await http.get(
           Uri.parse('${dotenv.env['API_URL']}/org/$orgId/area'),
@@ -56,7 +57,7 @@ class _AddSubAreaState extends State<AddSubArea> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as List;
         setState(() {
-          departments = data
+          subAreas = data
               .map((item) => {
                     'id': item['id'].toString(),
                     'title': item['name'],
@@ -86,6 +87,7 @@ class _AddSubAreaState extends State<AddSubArea> {
       appBar: AdminAppBar(
         title: "Departamentos",
         onBackPressed: () {
+          IdProvider().clearAreaId();
           context.pushNamed(
             'AdminDashboard',
           );
@@ -99,11 +101,10 @@ class _AddSubAreaState extends State<AddSubArea> {
                 color: colorScheme.surface,
                 child: ListView(
                   children: [
-                    ...mockDepartments
+                    ...subAreas
                         .map((department) => SubAreaItem(
                               title: department['title'],
-                              onTap: () =>
-                                  _handleDepartmentTap(department['id']),
+                              onTap: () => _handleSubAreaTap(department['id']),
                             ))
                         .toList(),
                   ],
@@ -121,11 +122,9 @@ class _AddSubAreaState extends State<AddSubArea> {
     );
   }
 
-//TODO: Agregar funcionalidad
-  void _handleDepartmentTap(String id) {
-    context.pushNamed(
-      'FiveSMenu',
-      pathParameters: {'departmentId': id},
-    );
+  void _handleSubAreaTap(String id) {
+    final idProvider = Provider.of<IdProvider>(context, listen: false);
+    idProvider.setSubareaId(id);
+    context.pushNamed('FiveSMenu');
   }
 }

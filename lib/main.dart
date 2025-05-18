@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/add_subareas.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart';
+import 'package:flutter_app_5s/features/admin_auth/presentation/areas/org_menu.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
@@ -25,6 +26,8 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/signin_page
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/statistics_audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
+import 'package:flutter_app_5s/utils/global_states/id_provider.dart';
+import 'package:flutter_app_5s/utils/global_states/themeProvider.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/access_user_admin.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -42,10 +45,14 @@ void main() async {
   //  Change Notifier Provider for the theme changes
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(ChangeNotifierProvider(
-    create: (context) => ThemeProvider(),
-    child: const MyApp(),
-  ));
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ChangeNotifierProvider(create: (_) => IdProvider()),
+    ],
+      child: const MyApp(),
+    )
+  );
 }
 
 final supabase = Supabase.instance.client;
@@ -193,15 +200,23 @@ final GoRouter _router = GoRouter(
       path: '/create_questionnaire',
       builder: (context, state) => const CreateQuestionnairePage(),
     ),
+    // Org Menu route
+    GoRoute(
+      name: "OrgMenu",
+      path: "/org_menu",
+      builder: (context, state) => const OrgMenu(),
+    ),
     // Area and Subarea routes
     GoRoute(
         name: "AreaMenu",
         path: "/areas_menu",
         builder: (context, state) => const AreaMenu()),
     GoRoute(
-        name: "AddDepartment",
-        path: "/subareas",
-        builder: (context, state) => const AddSubArea()),
+      name: "AddSubArea",
+      path: "/subareas",
+      builder: (context, state) => const AddSubArea(
+      ),
+    ),
     GoRoute(
       name: "FiveSMenu",
       path: '/fiveS/:departmentId',
