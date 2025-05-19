@@ -5,6 +5,7 @@ import 'package:flutter_app_5s/utils/color_scheme_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_app_5s/auth/auth_service.dart';
 
 class CreateOrganizationPage extends StatefulWidget {
   const CreateOrganizationPage({Key? key}) : super(key: key);
@@ -32,10 +33,21 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   // Método que usa el presigned URL para subir la imagen a S3.
   Future<String> _uploadImage(File imageFile) async {
     try {
+      // Obtener el token JWT del AuthService
+      final authService = AuthService();
+      final accessToken = authService.accessToken;
+      if (accessToken == null || accessToken.isEmpty) {
+        throw Exception('No has iniciado sesión.');
+      }
       // 1. Obtener la URL pre-firmada desde el endpoint
       final presignedUri = Uri.parse(
           'https://djnxv2fqbiqog.cloudfront.net/image/presigned-url/${_nameController.text}');
-      final presignedResponse = await http.get(presignedUri);
+      final presignedResponse = await http.get(
+        presignedUri,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
 
       if (presignedResponse.statusCode != 200) {
         throw Exception(
@@ -82,6 +94,16 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
       return;
     }
 
+    // Obtener el token JWT del AuthService
+    final authService = AuthService();
+    final accessToken = authService.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No has iniciado sesión.')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -103,7 +125,10 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
 
       final response = await http.post(
         uri,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
         body: body,
       );
 
@@ -118,7 +143,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-                  Text('Error: ${response.statusCode} - ${response.body}')),
+                  Text('Error: \\${response.statusCode} - \\${response.body}')),
         );
       }
     } catch (e) {
