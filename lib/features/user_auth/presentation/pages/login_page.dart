@@ -2,8 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_app_5s/utils/common.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:auth0_flutter/auth0_flutter.dart';
+import 'package:http/http.dart' as http;
+
+// Reemplaza estos valores con los de tu Auth0
+final auth0 = Auth0(
+  'dev-aodesvgtpd08tn2z.us.auth0.com', // Nuevo dominio de Auth0
+  'XVv0JTHH67GBp0dtZ6jsJzHJqEj88SlD', // Nuevo clientId de Auth0
+);
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -93,43 +99,34 @@ class _LoginPageState extends State<LoginPage> {
                         height: 60,
                       ),
                       FilledButton(
-                        onPressed: () {
-                          context
-                              .goNamed('CreateOrganization'); // Redirige aqui
-                        },
-                        child: const Text(
-                          "Iniciar Sesión",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        // onPressed: () async {
-                        //   final isValid = _formkey.currentState?.validate();
-                        //   if (isValid != true) {
-                        //     return;
-                        //   }
-                        //   try {
-                        //     final AuthResponse response =
-                        //         await client.auth.signInWithPassword(
-                        //       email: _emailController.text,
-                        //       password: _passwordController.text,
-                        //     );
-                        //     // if (response.session != null) {
-                        //     //   context.goNamed('Menu');
-                        //     // }
-                        //   } catch (e) {
-                        //     // ignore: use_build_context_synchronously
-                        //     ScaffoldMessenger.of(context)
-                        //         .showSnackBar(const SnackBar(
-                        //       content: Text('Log-in failed'),
-                        //       backgroundColor: Colors.redAccent,
-                        //     ));
-                        //   }
+                        onPressed: () async {
+                          try {
+                            final result = await auth0.webAuthentication().login(
+                              audience: 'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/',
+                              parameters: {
+                                'login_hint': _emailController.text,
+                              },
+                            );
+                            // Aquí tienes el token de usuario:
+                            final idToken = result.idToken;
+                            final accessToken = result.accessToken;
+                            final user = result.user; // Info del usuario
 
-                        //   //Navigator.of(context).pushReplacementNamed('/menu');
-                        // },
-                        // child: const Text(
-                        //   "Iniciar Sesión",
-                        //   style: TextStyle(fontSize: 16),
-                        // )),
+                            // Puedes guardar el token en memoria o en storage seguro
+                            // Y luego usarlo para llamar a tu backend
+
+                            // Ejemplo: llamar a tu backend con el token
+                            await callBackendApi(accessToken);
+
+                            // Redirige a la pantalla principal
+                            context.goNamed('Menu');
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error de login: $e')),
+                            );
+                          }
+                        },
+                        child: const Text("Iniciar Sesión"),
                       ),
                       const SizedBox(
                         height: 20,
@@ -150,5 +147,21 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+}
+
+Future<void> callBackendApi(String accessToken) async {
+  final response = await http.get(
+    Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user/whoami'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
+  if (response.statusCode == 200) {
+    // Usuario autenticado correctamente
+    print('Usuario: ${response.body}');
+  } else {
+    // Error de autenticación
+    print('Error: ${response.body}');
   }
 }
