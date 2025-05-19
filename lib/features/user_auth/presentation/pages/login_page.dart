@@ -7,8 +7,8 @@ import 'package:http/http.dart' as http;
 
 // Reemplaza estos valores con los de tu Auth0
 final auth0 = Auth0(
-  'dev-aodesvgtpd08tn2z.us.auth0.com', // Tu dominio de Auth0
-  'kZXrCzr8ckjxok7VKXBeVbyzyMWFGD65', // Tu clientId de Auth0
+  'dev-aodesvgtpd08tn2z.us.auth0.com', // Nuevo dominio de Auth0
+  'XVv0JTHH67GBp0dtZ6jsJzHJqEj88SlD', // Nuevo clientId de Auth0
 );
 
 class LoginPage extends StatefulWidget {
@@ -102,7 +102,10 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () async {
                           try {
                             final result = await auth0.webAuthentication().login(
-                              audience: 'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/', // Opcional, si tu backend lo requiere
+                              audience: 'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/',
+                              parameters: {
+                                'login_hint': _emailController.text,
+                              },
                             );
                             // Aquí tienes el token de usuario:
                             final idToken = result.idToken;
