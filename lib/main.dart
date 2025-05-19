@@ -164,7 +164,18 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/cuestionario',
       name: 'Cuestionario',
-      builder: (context, state) => const QuestionnairePage(),
+      builder: (context, state) => QuestionnairePage(
+        auditData: const {
+          'auditCategories': [
+            {
+              'name': 'Demo',
+              'auditQuestions': [
+                {'id': 1, 'question': 'Demo question?'}
+              ]
+            }
+          ]
+        },
+      ),
     ),
     GoRoute(
       path: '/gestioncuestionarios',

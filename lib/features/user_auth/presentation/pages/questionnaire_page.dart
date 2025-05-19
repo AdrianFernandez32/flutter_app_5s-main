@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class QuestionnairePage extends StatefulWidget {
-  const QuestionnairePage({Key? key}) : super(key: key);
+  final Map<String, dynamic> auditData;
+  const QuestionnairePage({Key? key, required this.auditData})
+      : super(key: key);
 
   @override
   State<QuestionnairePage> createState() => _QuestionnairePageState();
@@ -12,66 +14,63 @@ class QuestionnairePage extends StatefulWidget {
 class _QuestionnairePageState extends State<QuestionnairePage> {
   @override
   Widget build(BuildContext context) {
-    const List<Map<String, String>> response = [
-      {
-        "id": "1",
-        "pregunta": "¿Cuál es la raíz cuadrada de 16?",
-      },
-      {
-        "id": "2",
-        "pregunta":
-            "¿Aquí va una pregunta muy larga para probar el textOverflow de pixeles?",
-      },
-      {
-        "id": "3",
-        "pregunta": "¿Esta es otra pregunta?",
-      },
-      {
-        "id": "4",
-        "pregunta": "¿Cuál es el sentido de la vida?",
-      }
-    ];
-
-    int length = response.length;
-
+    // Parse questions from auditData
+    final auditCategories =
+        widget.auditData['auditCategories'] as List<dynamic>? ?? [];
+    List<Map<String, dynamic>> questions = [];
+    String categoryTitle = '';
+    if (auditCategories.isNotEmpty) {
+      // For simplicity, use the first category (can be improved for multiple tabs)
+      final category = auditCategories[0];
+      categoryTitle = category['name'] ?? '';
+      final auditQuestions = category['auditQuestions'] as List<dynamic>? ?? [];
+      questions = auditQuestions
+          .map((q) => {
+                'id': q['id'].toString(),
+                'pregunta': q['question'] ?? '',
+              })
+          .toList();
+    }
+    int length = questions.length;
     List<Widget> tabs = [];
     List<Widget> tabsViews = [];
-
     for (var i = 0; i < length; i++) {
       tabs.insert(
           i,
           Tab(
-            text: "Pregunta ${i + 1}",
+            text: "Pregunta \\${i + 1}",
           ));
       tabsViews.insert(
           i,
           _QuestionView(
-            question: response[i]["pregunta"],
+            question: questions[i]["pregunta"],
           ));
     }
-
     return DefaultTabController(
-      length: length,
+      length: length == 0 ? 1 : length,
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 180,
-          title: const Center(
+          title: Center(
             child: Text(
-              "S1 SEIRI",
-              style: TextStyle(
+              categoryTitle.isNotEmpty ? categoryTitle : "Cuestionario",
+              style: const TextStyle(
                   color: Color.fromRGBO(46, 21, 0, 1),
                   fontSize: 50,
                   fontWeight: FontWeight.bold),
             ),
           ),
           bottom: TabBar(
-            tabs: tabs,
+            tabs: length == 0 ? [const Tab(text: "Pregunta 1")] : tabs,
             isScrollable: true,
           ),
         ),
-        body: TabBarView(
-          children: tabsViews,
-        ),
+        body: length == 0
+            ? const Center(
+                child: Text("No hay preguntas en este cuestionario."))
+            : TabBarView(
+                children: tabsViews,
+              ),
       ),
     );
   }
@@ -99,7 +98,8 @@ class _QuestionView extends StatelessWidget {
                 question ?? "No hay pregunta",
                 overflow: TextOverflow.clip,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
               const SizedBox(
                 height: 30,
@@ -200,10 +200,16 @@ class __CommentFieldState extends State<_CommentField> {
             ),
           ),
           const Divider(),
-          Row(children: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.add_photo_alternate_rounded)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.sticky_note_2_outlined)),
-          ],)
+          Row(
+            children: [
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.add_photo_alternate_rounded)),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.sticky_note_2_outlined)),
+            ],
+          )
         ],
       ),
     );
