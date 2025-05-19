@@ -35,20 +35,20 @@ class _MainMenuState extends State<MainMenu> {
                           const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
                       decoration: BoxDecoration(
                         color: colorScheme.secondary,
-                        borderRadius: const BorderRadius.only(
+                        borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
                         ),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           CircleAvatar(
                             backgroundImage: NetworkImage(
                                 'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
                             radius: 30,
                           ),
-                          SizedBox(width: 16),
-                          Column(
+                          const SizedBox(width: 16),
+                          const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -73,7 +73,7 @@ class _MainMenuState extends State<MainMenu> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.fromLTRB(16.0, 10, 16.0, 0),
+                padding: const EdgeInsets.fromLTRB(16.0, 40, 16.0, 16.0),
                 child: const Column(
                   children: [
                     _Button(
@@ -82,7 +82,7 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Auditar',
                     ),
                     SizedBox(
-                      height: 1,
+                      height: 10,
                     ),
                     _Button(
                       title: 'Auditorías',
@@ -90,7 +90,7 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Zones Page',
                     ),
                     SizedBox(
-                      height: 1,
+                      height: 10,
                     ),
                     _Button(
                       title: 'Áreas',
@@ -98,7 +98,7 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Gestion de Areas',
                     ),
                     SizedBox(
-                      height: 1,
+                      height: 10,
                     ),
                     _Button(
                       title: 'Ajustes',
@@ -106,16 +106,15 @@ class _MainMenuState extends State<MainMenu> {
                       goToNamed: 'Settings',
                     ),
                     SizedBox(
-                      height: 1,
+                      height: 10,
                     ),
-                    _Button(
-                      title: 'Accesos',
-                      icon: Icons.person,
-                      goToNamed: 'Gestion de Accesos',
-                    ),
+                    
                   ],
                 ),
               ),
+              const SizedBox(
+                height: 60,
+              )
             ],
           ),
         ],

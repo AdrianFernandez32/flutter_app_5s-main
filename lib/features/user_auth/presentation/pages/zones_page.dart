@@ -20,7 +20,7 @@ class _ZonesPageState extends State<ZonesPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
-    const orgId = 2; // Cambia si es dinámico
+    final orgId = 2; // Cambia si es dinámico
     final response = await http.get(
       Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
       headers: {'Content-Type': 'application/json'},

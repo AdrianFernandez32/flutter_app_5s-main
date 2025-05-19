@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/settings_page.dart';
+import 'package:flutter_app_5s/main.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_app_5s/utils/common.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,26 +24,29 @@ class _SplashScreenState extends State<SplashScreen> {
 
   User? _user;
 
-  @override
-  void initState() {
-    super.initState();
-    _getAuth();
-  }
+@override
+void initState() {
+  super.initState();
+  _getAuth();
+}
 
-  Future<void> _getAuth() async {
-    if (mounted) {
-      setState(() {
-        _user = client.auth.currentUser;
-      });
-    }
-    client.auth.onAuthStateChange.listen((event) {
-      if (mounted) {
-        setState(() {
-          _user = event.session?.user;
-        });
-      }
+Future<void> _getAuth() async {
+  if (mounted) {
+    setState(() {
+      _user = client.auth.currentUser;
     });
   }
+  client.auth.onAuthStateChange.listen((event) {
+    if (mounted) {
+      setState(() {
+        _user = event.session?.user;
+      });
+    }
+  });
+}
+
+
+ 
 
   /* @override
   Widget build(BuildContext context) {

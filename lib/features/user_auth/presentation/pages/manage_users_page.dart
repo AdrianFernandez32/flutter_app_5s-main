@@ -177,7 +177,7 @@ class _AreasUsersInfo extends StatelessWidget {
                   onPressed: () {},
                   icon: const Icon(Icons.edit_outlined),
                   style: const ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
+                    backgroundColor: MaterialStatePropertyAll(
                       Color.fromRGBO(134, 75, 111, 1),
                     ),
                   ),

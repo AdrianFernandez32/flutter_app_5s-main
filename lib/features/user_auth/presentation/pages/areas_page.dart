@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/area_info.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/subareas_page.dart';
 
 class AreasPage extends StatefulWidget {
   const AreasPage({Key? key}) : super(key: key);
@@ -16,7 +15,6 @@ class AreasPageState extends State<AreasPage> {
   late Future<List<Map<String, dynamic>>> _areasFuture;
   List<Map<String, dynamic>> _areasList = [];
   List<Map<String, dynamic>> _filteredAreasList = [];
-  String _searchQuery = "";
 
   @override
   void initState() {
@@ -26,7 +24,7 @@ class AreasPageState extends State<AreasPage> {
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
     try {
-      const orgId = 2; // Cambia este ID según el que necesites
+      final orgId = 2; // Cambia este ID según el que necesites
       final response = await http.get(
         Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
         headers: {
@@ -68,14 +66,12 @@ class AreasPageState extends State<AreasPage> {
     }).toList();
 
     setState(() {
-      _searchQuery = query;
       _filteredAreasList = filteredAreas;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    const appBarElementsColor = Color.fromRGBO(79, 67, 73, 1);
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +108,7 @@ class AreasPageState extends State<AreasPage> {
             );
           } else if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}'),
+              child: Text('Error: \\${snapshot.error}'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
@@ -124,16 +120,70 @@ class AreasPageState extends State<AreasPage> {
           List<Widget> areasList = [];
 
           for (int i = 0; i < responseList.length; i++) {
-            Color color = const Color.fromRGBO(214, 231, 239, 1);
-            Color textColor = Colors.black;
-
-            areasList.add(AreaInfo(
-              area: responseList[i]["area"],
-              zone: responseList[i]["zona"],
-              color: color,
-              areaID: responseList[i]["id"],
-              textColor: textColor,
-            ));
+            IconData icon;
+            // Placeholder icons based on index
+            if (i == 0) {
+              icon = Icons.wc; // Toilet
+            } else if (i == 1) {
+              icon = Icons.local_bar; // Bottle
+            } else {
+              icon = Icons.cleaning_services; // Spray
+            }
+            areasList.add(
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SubareasPage(
+                        orgId: 2, // TODO: Replace with actual orgId if needed
+                        areaId: int.parse(responseList[i]["id"]),
+                        areaName: responseList[i]["area"],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(214, 231, 239, 1),
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(icon, size: 48, color: Colors.black87),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              responseList[i]["area"],
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              responseList[i]["zona"],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.blueGrey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios,
+                          color: Colors.blue, size: 32),
+                    ],
+                  ),
+                ),
+              ),
+            );
           }
           return ListView(
             children: <Widget>[
@@ -170,6 +220,38 @@ class AreasPageState extends State<AreasPage> {
                       ),
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 16),
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.filter_list),
+                        label: const Text('Zona'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(230, 235, 245, 1),
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.sort_by_alpha),
+                        label: const Text('A-Z'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(230, 235, 245, 1),
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                 ] +
                 areasList,
           );
