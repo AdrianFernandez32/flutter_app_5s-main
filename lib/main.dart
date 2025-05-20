@@ -22,6 +22,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_list_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
 
 void main() async {
   // await Supabase.initialize(
@@ -90,7 +91,7 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
     ),
-
+  
     GoRoute(
       path: '/calificar5s',
       name: 'Calificar 5s',
@@ -107,25 +108,25 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const CreateOrganizationPage(),
     ),
     GoRoute(
-      path: '/auditsPage/:subareaId/:subareaName',
+      path: '/auditsPage/:zone/:area',
       name: 'Audits Page',
       builder: (context, state) {
-        final subareaId =
-            int.tryParse(state.pathParameters['subareaId'] ?? '') ?? 0;
-        final subareaName = state.pathParameters['subareaName'] ?? '';
+        final zone = state.pathParameters['zone']!;
+        final area = state.pathParameters['area']!;
+
         final color = state.extra as Color? ?? Colors.black;
         return AuditsPage(
-          subareaId: subareaId,
-          subareaName: subareaName,
+          zone: zone,
           color: color,
+          area: area,
         );
       },
     ),
     GoRoute(
       path: '/cuestionario',
       name: 'Cuestionario',
-      builder: (context, state) => const QuestionnairePage(
-        auditData: {
+      builder: (context, state) => QuestionnairePage(
+        auditData: const {
           'auditCategories': [
             {
               'name': 'Demo',
@@ -138,16 +139,23 @@ final GoRouter _router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/gestionaccesos',
+      path: '/gestionaccesos/:userId',
       name: 'Gestion de Acceso Usuario',
-      builder: (context, state) => const AccessesPageUsuario(),
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return AccessesPageUsuario(userId: userId);
+      },
     ),
     GoRoute(
       path: '/accesos',
       name: 'AccessesListPage',
       builder: (context, state) => const AccessesListPage(),
     ),
-
+    GoRoute(
+      path: '/organizations',
+      name: 'OrganizationsListPage',
+      builder: (context, state) => const OrganizationsListPage(),
+    ),
     // Area and Subarea routes
     GoRoute(
         name: "AreaMenu",
