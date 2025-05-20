@@ -43,6 +43,20 @@ class _QuestionnairePageState extends State<QuestionnairePage>
           'category': cat,
           'question': q,
         });
+        // Precargar respuestas previas si existen
+        final questionId =
+            q['id'] is int ? q['id'] : int.tryParse(q['id'].toString()) ?? 0;
+        if (q['items'] != null) {
+          for (var item in q['items']) {
+            if (item['auditAnswer'] != null) {
+              respuestas[questionId] = {
+                'score': item['auditAnswer']['score'],
+                'comment': item['auditAnswer']['notes'],
+              };
+              break; // Solo toma la primera respuesta encontrada por pregunta
+            }
+          }
+        }
       }
     }
     sOrder = sCategoriesMap.keys.toList()..sort();
