@@ -44,7 +44,7 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
           onPressed: () {
-            context.goNamed('Gestion de Accesos');
+            context.goNamed('AccessesListPage');
           },
         ),
       ),

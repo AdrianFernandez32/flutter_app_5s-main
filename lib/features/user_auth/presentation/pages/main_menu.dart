@@ -108,7 +108,7 @@ class _MainMenuState extends State<MainMenu> {
                     _Button(
                       title: 'Accesos',
                       icon: Icons.person_outline,
-                      goToNamed: 'Gestion de Acceso Usuario',
+                      goToNamed: 'AccessesListPage',
                     ),
                     SizedBox(
                       height: 10,
