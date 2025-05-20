@@ -8,6 +8,23 @@ class AuthService {
   String? accessToken;
   String? idToken;
   UserProfile? user; // <-- Cambia aquí el tipo
+
+  Future<void> logout() async {
+    try {
+      final auth0 = Auth0(
+        'dev-aodesvgtpd08tn2z.us.auth0.com',
+        'XVv0JTHH67GBp0dtZ6jsJzHJqEj88SlD',
+      );
+      await auth0.webAuthentication().logout();
+      // Limpiar los datos de la sesión
+      accessToken = null;
+      idToken = null;
+      user = null;
+    } catch (e) {
+      print('Error durante el logout: $e');
+      rethrow;
+    }
+  }
 }
 
 final authService = AuthService();

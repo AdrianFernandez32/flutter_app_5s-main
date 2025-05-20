@@ -116,6 +116,9 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: ListTile(
+                            onTap: () {
+                              context.goNamed('Menu');
+                            },
                             title: Text(
                               org['name'] ?? 'Sin nombre',
                               style: TextStyle(
