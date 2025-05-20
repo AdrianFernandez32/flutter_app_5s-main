@@ -75,7 +75,6 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                             // Ejemplo: llamar a tu backend con el token
                             await getUserRoles(authService.accessToken!);
 
-                            // Redirige a la pantalla principal
                             context.goNamed('OrganizationsListPage');
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(

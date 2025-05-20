@@ -127,6 +127,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
         uri,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
         },
         body: body,
       );
