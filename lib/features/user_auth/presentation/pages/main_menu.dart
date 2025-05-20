@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 // Removed unused import
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_app_5s/auth/auth_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MainMenu extends StatefulWidget {
   const MainMenu({
@@ -13,6 +16,52 @@ class MainMenu extends StatefulWidget {
 }
 
 class _MainMenuState extends State<MainMenu> {
+  Map<String, dynamic>? _userProfile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final authService = AuthService();
+      final accessToken = authService.accessToken;
+
+      if (accessToken == null || accessToken.isEmpty) {
+        throw Exception('No access token available');
+      }
+
+      final response = await http.get(
+        Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user/profile'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = json.decode(response.body);
+        print('USER PROFILE RESPONSE:');
+        print(decoded);
+        setState(() {
+          _userProfile = decoded;
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load user profile');
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading profile: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -43,22 +92,24 @@ class _MainMenuState extends State<MainMenu> {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
+                            backgroundImage: _userProfile?['picture'] != null
+                                ? NetworkImage(_userProfile!['picture'])
+                                : const NetworkImage(
+                                    'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
                             radius: 30,
                           ),
                           const SizedBox(width: 16),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Bienvenido',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),
                               Text(
-                                'Carlos Trasviña',
-                                style: TextStyle(
+                                _userProfile?['name'] ?? 'Usuario',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -105,15 +156,6 @@ class _MainMenuState extends State<MainMenu> {
                       icon: Icons.settings_outlined,
                       goToNamed: 'Settings',
                     ),
-                    _Button(
-                      title: 'Accesos',
-                      icon: Icons.person_outline,
-                      goToNamed: 'AccessesListPage',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    
                   ],
                 ),
               ),
