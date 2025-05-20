@@ -19,11 +19,38 @@ class _AccessesListPageState extends State<AccessesListPage> {
   String? error;
   String searchQuery = '';
   bool isAZ = false;
+  Map<String, List<Map<String, String>>> userRoles = {};
 
   @override
   void initState() {
     super.initState();
     fetchUsers();
+  }
+
+  Future<void> fetchUserRoles(String userId) async {
+    final authService = AuthService();
+    final accessToken = authService.accessToken;
+    if (accessToken == null) return;
+    try {
+      final response = await http.get(
+        Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user-roles/$userId'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final departments = (data['departments'] as List?)?.map((d) => {
+          'name': d['department'] ?? '',
+          'role': d['role'] ?? '',
+        }).toList().cast<Map<String, String>>() ?? [];
+        setState(() {
+          userRoles[userId] = departments;
+        });
+      }
+    } catch (e) {
+      // Ignorar errores individuales
+    }
   }
 
   Future<void> fetchUsers() async {
@@ -55,6 +82,13 @@ class _AccessesListPageState extends State<AccessesListPage> {
           filteredUsers = users;
           isLoading = false;
         });
+        // Llama a fetchUserRoles para cada usuario
+        for (final user in users) {
+          final userId = user['id']?.toString();
+          if (userId != null) {
+            fetchUserRoles(userId);
+          }
+        }
       } else {
         setState(() {
           error = 'Error: \\${response.statusCode}';
@@ -263,7 +297,10 @@ class _AccessesListPageState extends State<AccessesListPage> {
                             return InkWell(
                               borderRadius: BorderRadius.circular(20),
                               onTap: () {
-                                context.goNamed('Gestion de Acceso Usuario');
+                                final userId = user['id']?.toString();
+                                if (userId != null) {
+                                  context.goNamed('Gestion de Acceso Usuario', pathParameters: {'userId': userId});
+                                }
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -279,23 +316,62 @@ class _AccessesListPageState extends State<AccessesListPage> {
                                   ],
                                 ),
                                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                                child: Row(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    CircleAvatar(
-                                      radius: 32,
-                                      backgroundImage: user['image'] != null
-                                          ? AssetImage(user['image']!)
-                                          : const AssetImage('lib/assets/images/perfil_fake.jpg') as ImageProvider,
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 32,
+                                          backgroundImage: user['image'] != null
+                                              ? AssetImage(user['image']!)
+                                              : const AssetImage('lib/assets/images/perfil_fake.jpg') as ImageProvider,
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Text(
+                                            user['name'] ?? 'Sin nombre',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                              color: Color(0xFF223A53),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 16),
-                                    Text(
-                                      user['name'] ?? 'Sin nombre',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color: Color(0xFF223A53),
-                                      ),
-                                    ),
+                                    if (userRoles[user['id']?.toString()] != null)
+                                      ...userRoles[user['id']?.toString()]!.map((dept) => Padding(
+                                            padding: const EdgeInsets.only(top: 4.0, left: 8.0),
+                                            child: Card(
+                                              color: const Color(0xFFE9EEF1),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: ListTile(
+                                                dense: true,
+                                                title: Center(
+                                                  child: Text(
+                                                    dept['name']!,
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 15,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                                subtitle: Center(
+                                                  child: Text(
+                                                    'Rol: ${dept['role']!}',
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )),
                                   ],
                                 ),
                               ),
