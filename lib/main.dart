@@ -91,7 +91,7 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
     ),
-  
+
     GoRoute(
       path: '/calificar5s',
       name: 'Calificar 5s',
@@ -108,17 +108,16 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const CreateOrganizationPage(),
     ),
     GoRoute(
-      path: '/auditsPage/:zone/:area',
+      path: '/auditsPage/:subareaId/:subareaName',
       name: 'Audits Page',
       builder: (context, state) {
-        final zone = state.pathParameters['zone']!;
-        final area = state.pathParameters['area']!;
-
+        final subareaId = int.parse(state.pathParameters['subareaId']!);
+        final subareaName = state.pathParameters['subareaName']!;
         final color = state.extra as Color? ?? Colors.black;
         return AuditsPage(
-          zone: zone,
+          subareaId: subareaId,
+          subareaName: subareaName,
           color: color,
-          area: area,
         );
       },
     ),

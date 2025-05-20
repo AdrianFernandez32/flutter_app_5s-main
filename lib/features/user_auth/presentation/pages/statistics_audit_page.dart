@@ -59,7 +59,9 @@ class AuditViewExample extends StatelessWidget {
           backgroundColor: const Color.fromRGBO(240, 222, 229, 1),
           leading: IconButton(
             onPressed: () {
-              context.go('/auditsPage/$zona/$area', extra: color);
+              // Convert zona to a numeric ID (you may need to adjust this based on your actual data structure)
+              final subareaId = 1; // Replace with actual conversion logic
+              context.go('/auditsPage/$subareaId/$area', extra: color);
             },
             icon: const Icon(
               Icons.arrow_back,
