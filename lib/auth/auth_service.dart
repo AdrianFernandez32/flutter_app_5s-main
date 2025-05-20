@@ -8,6 +8,7 @@ class AuthService {
   String? accessToken;
   String? idToken;
   UserProfile? user; // <-- Cambia aquí el tipo
+  String? organizationId; // ID de la organización seleccionada
 
   Future<void> logout() async {
     try {
@@ -20,6 +21,7 @@ class AuthService {
       accessToken = null;
       idToken = null;
       user = null;
+      organizationId = null; // También limpiamos el ID de la organización
     } catch (e) {
       print('Error durante el logout: $e');
       rethrow;

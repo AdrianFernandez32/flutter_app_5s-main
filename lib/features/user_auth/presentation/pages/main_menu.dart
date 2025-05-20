@@ -20,109 +20,109 @@ class _MainMenuState extends State<MainMenu> {
       appBar: AppBar(
         backgroundColor: colorScheme.secondary,
         elevation: 0,
-        toolbarHeight: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => context.goNamed('OrganizationsListPage'),
+        ),
+        title: const Text('Menú Principal', style: TextStyle(color: Colors.white)),
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Container(
-                padding: EdgeInsets.zero, // Ensure no extra padding
-                child: Column(
-                  children: [
-                    Container(
-                      padding:
-                          const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondary,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondary,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
+                          radius: 30,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
-                            radius: 30,
-                          ),
-                          const SizedBox(width: 16),
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Bienvenido',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
+                        const SizedBox(width: 16),
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Bienvenido',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 16),
+                            ),
+                            Text(
+                              'Carlos Trasviña',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              Text(
-                                'Carlos Trasviña',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(16.0, 40, 16.0, 16.0),
-                child: const Column(
-                  children: [
-                    _Button(
-                      title: 'Auditar',
-                      icon: Icons.library_add_check_outlined,
-                      goToNamed: 'Auditar',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    _Button(
-                      title: 'Auditorías',
-                      icon: Icons.file_copy_outlined,
-                      goToNamed: 'Zones Page',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    _Button(
-                      title: 'Áreas',
-                      icon: Icons.grid_view_outlined,
-                      goToNamed: 'Gestion de Areas',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    _Button(
-                      title: 'Ajustes',
-                      icon: Icons.settings_outlined,
-                      goToNamed: 'Settings',
-                    ),
-                    _Button(
-                      title: 'Accesos',
-                      icon: Icons.person_outline,
-                      goToNamed: 'AccessesListPage',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    
-                  ],
-                ),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(16.0, 24, 16.0, 16.0),
+              child: const Column(
+                children: [
+                  _Button(
+                    title: 'Auditar',
+                    icon: Icons.library_add_check_outlined,
+                    goToNamed: 'Auditar',
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _Button(
+                    title: 'Auditorías',
+                    icon: Icons.file_copy_outlined,
+                    goToNamed: 'Zones Page',
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _Button(
+                    title: 'Áreas',
+                    icon: Icons.grid_view_outlined,
+                    goToNamed: 'Gestion de Areas',
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _Button(
+                    title: 'Ajustes',
+                    icon: Icons.settings_outlined,
+                    goToNamed: 'Settings',
+                  ),
+                  _Button(
+                    title: 'Accesos',
+                    icon: Icons.person_outline,
+                    goToNamed: 'AccessesListPage',
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 60,
-              )
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
+        ),
       ),
     );
   }
@@ -148,25 +148,25 @@ class _Button extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.symmetric(
-          vertical: 17,
+          vertical: 8,
         ),
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: 15,
+          vertical: 12,
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.white,
           border: Border.all(
-            color: Colors.grey, // Use black87 for a deeper black
-            width: 1, // Adjust thickness
+            color: Colors.grey,
+            width: 1,
           ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              size: 70,
+              size: 50,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -174,13 +174,13 @@ class _Button extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 26,
+                  fontSize: 22,
                 ),
               ),
             ),
             const Icon(
               Icons.arrow_forward_ios,
-              size: 40,
+              size: 30,
             ),
           ],
         ),
