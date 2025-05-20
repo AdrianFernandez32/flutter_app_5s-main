@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_app_5s/auth/auth_service.dart';
 
 class AccessesPageUsuario extends StatefulWidget {
-  const AccessesPageUsuario({Key? key}) : super(key: key);
+  final String userId;
+  const AccessesPageUsuario({Key? key, required this.userId}) : super(key: key);
 
   @override
   AccessesPageUsuarioState createState() => AccessesPageUsuarioState();
@@ -20,18 +24,38 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
     _fetchUserData();
   }
 
-  // Simulate fetching data from an API
   Future<void> _fetchUserData() async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
-    setState(() {
-      userName = 'Santiago Pérez';
-      userEmail = 'santiago.perez@cetys.edu.mx';
-      departments = [
-        {'name': 'Departamento A', 'role': 'Auditor'},
-        {'name': 'Departamento B', 'role': 'Auditor'},
-      ];
-      isLoading = false;
-    });
+    setState(() { isLoading = true; });
+    try {
+      final authService = AuthService();
+      final accessToken = authService.accessToken;
+      if (accessToken == null) {
+        setState(() { isLoading = false; });
+        return;
+      }
+      final response = await http.get(
+        Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user-roles/${widget.userId}'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          userName = data['name'] ?? '';
+          userEmail = data['email'] ?? '';
+          departments = (data['departments'] as List?)?.map((d) => {
+            'name': d['department'] ?? '',
+            'role': d['role'] ?? '',
+          }).toList().cast<Map<String, String>>() ?? [];
+          isLoading = false;
+        });
+      } else {
+        setState(() { isLoading = false; });
+      }
+    } catch (e) {
+      setState(() { isLoading = false; });
+    }
   }
 
   @override

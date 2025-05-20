@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_app_5s/auth/auth_service.dart';
+import 'package:flutter/rendering.dart';
 
 class OrganizationsListPage extends StatefulWidget {
   const OrganizationsListPage({Key? key}) : super(key: key);
@@ -57,17 +58,17 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
   }
 
   void _showJoinDialog() {
-    String code = '';
+    TextEditingController codeController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Unirse a una organización'),
           content: TextField(
+            controller: codeController,
             decoration: const InputDecoration(
               labelText: 'Código de acceso',
             ),
-            onChanged: (value) => code = value,
           ),
           actions: [
             TextButton(
@@ -75,9 +76,46 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () {
-                // Aquí iría la lógica para unirse
+              onPressed: () async {
+                final inviteCode = codeController.text.trim();
+                if (inviteCode.isEmpty) return;
+                final authService = AuthService();
+                final accessToken = authService.accessToken;
                 Navigator.of(context).pop();
+                if (accessToken == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Sesión expirada. Inicia sesión de nuevo.')),
+                  );
+                  return;
+                }
+                setState(() { isLoading = true; });
+                try {
+                  final response = await http.post(
+                    Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/join'),
+                    headers: {
+                      'Authorization': 'Bearer $accessToken',
+                      'Content-Type': 'application/json',
+                    },
+                    body: jsonEncode({'inviteCode': inviteCode}),
+                  );
+                  if (response.statusCode == 200) {
+                    await fetchOrganizations();
+                    setState(() { isLoading = false; });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('¡Te has unido a la organización!')),
+                    );
+                  } else {
+                    setState(() { isLoading = false; });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error al unirse: \\${response.statusCode}')),
+                    );
+                  }
+                } catch (e) {
+                  setState(() { isLoading = false; });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error de red: $e')),
+                  );
+                }
               },
               child: const Text('Unirse'),
             ),
@@ -89,6 +127,7 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('JWT actual: \\${AuthService().accessToken}');
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
@@ -117,6 +156,8 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                           ),
                           child: ListTile(
                             onTap: () {
+                              final authService = AuthService();
+                              authService.organizationId = org['id']?.toString();
                               context.goNamed('Menu');
                             },
                             title: Text(

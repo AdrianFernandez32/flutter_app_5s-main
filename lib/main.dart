@@ -139,9 +139,12 @@ final GoRouter _router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/gestionaccesos',
+      path: '/gestionaccesos/:userId',
       name: 'Gestion de Acceso Usuario',
-      builder: (context, state) => const AccessesPageUsuario(),
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return AccessesPageUsuario(userId: userId);
+      },
     ),
     GoRoute(
       path: '/accesos',
