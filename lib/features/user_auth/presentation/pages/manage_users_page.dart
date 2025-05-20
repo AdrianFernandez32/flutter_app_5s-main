@@ -123,82 +123,92 @@ class _AreasUsersInfo extends StatelessWidget {
   final String? zone;
   final String? role;
 
-  const _AreasUsersInfo({Key? key, this.area, this.name, this.zone, this.role})
-      : super(key: key);
+  const _AreasUsersInfo({
+    Key? key,
+    this.name,
+    this.area,
+    this.zone,
+    this.role,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const TextStyle textStyle = TextStyle(
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-        color: Color.fromRGBO(134, 75, 111, 1));
-    const TextStyle textStyle2 =
-        TextStyle(fontSize: 13, color: Color.fromRGBO(134, 75, 111, 1));
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(32)),
-              color: const Color.fromRGBO(243, 228, 233, 1),
-              border: Border.all(color: const Color.fromRGBO(134, 75, 111, 1)),
-            ),
-            height: 150,
-            margin: const EdgeInsets.only(left: 15),
-            child: Row(
-              children: [
-                const SizedBox(
-                  width: 75,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Expanded(
-                        flex: 2,
-                        child: SizedBox(),
-                      ),
-                      Text(name ?? "", style: textStyle),
-                      const Expanded(child: SizedBox()),
-                      Text(area ?? "", style: textStyle2),
-                      const Expanded(child: SizedBox()),
-                      Text(zone ?? "", style: textStyle2),
-                      const Expanded(child: SizedBox()),
-                      Text(role ?? "", style: textStyle2),
-                      const Expanded(
-                        flex: 3,
-                        child: SizedBox(),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton.filled(
-                  onPressed: () {},
-                  icon: const Icon(Icons.edit_outlined),
-                  style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
-                      Color.fromRGBO(134, 75, 111, 1),
+    const textStyle = TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    );
+    const textStyle2 = TextStyle(
+      fontSize: 14,
+      color: Colors.black87,
+    );
+
+    return GestureDetector(
+      onTap: () {
+        context.goNamed('Gestion de Acceso Usuario');
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(214, 231, 239, 1),
+          borderRadius: BorderRadius.circular(32),
+        ),
+        child: Stack(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 75),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Expanded(
+                          flex: 2,
+                          child: SizedBox(),
+                        ),
+                        Text(name ?? "", style: textStyle),
+                        const Expanded(child: SizedBox()),
+                        Text(area ?? "", style: textStyle2),
+                        const Expanded(child: SizedBox()),
+                        Text(zone ?? "", style: textStyle2),
+                        const Expanded(child: SizedBox()),
+                        Text(role ?? "", style: textStyle2),
+                        const Expanded(
+                          flex: 3,
+                          child: SizedBox(),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-              ],
-            ),
-          ),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: CircleAvatar(
-              radius: 40,
-              // La imagen la tiene que tomar de afuera
-              backgroundImage: AssetImage(
-                "lib/assets/images/perfil_fake.jpg",
+                  IconButton.filled(
+                    onPressed: () {
+                      context.goNamed('Gestion de Acceso Usuario');
+                    },
+                    icon: const Icon(Icons.edit_outlined),
+                    style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(
+                        Color.fromRGBO(134, 75, 111, 1),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: CircleAvatar(
+                radius: 40,
+                backgroundImage: AssetImage(
+                  "lib/assets/images/perfil_fake.jpg",
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

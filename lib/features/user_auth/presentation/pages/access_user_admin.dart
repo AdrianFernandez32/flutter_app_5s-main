@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_page.dart';
 
 class AccessesPageUsuario extends StatefulWidget {
   const AccessesPageUsuario({Key? key}) : super(key: key);
 
   @override
-  AccesesPageUsuarioState createState() => AccesesPageUsuarioState();
+  AccessesPageUsuarioState createState() => AccessesPageUsuarioState();
 }
-class AccesesPageUsuarioState extends State<AccessesPageUsuario> {
+class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
   // State variables for user and departments
   String userName = '';
   String userEmail = '';

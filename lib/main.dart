@@ -24,6 +24,7 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/signin_page
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/statistics_audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/access_user_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -186,6 +187,11 @@ final GoRouter _router = GoRouter(
       path: '/gestionusuarios',
       name: 'Gestion de Usuarios',
       builder: (context, state) => const ManageUsersPage(),
+    ),
+    GoRoute(
+      path: '/gestionaccesos',
+      name: 'Gestion de Acceso Usuario',
+      builder: (context, state) => const AccessesPageUsuario(),
     ),
     GoRoute(
       name: 'CreateQuestionnairePage',
