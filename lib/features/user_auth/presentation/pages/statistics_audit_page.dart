@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/bar_chart.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/radar_chart.dart';
-import 'package:go_router/go_router.dart';
 
 class StatisticsAuditPage extends StatelessWidget {
   final String zona;

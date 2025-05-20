@@ -1,7 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/widgets/user_basic_info.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_app_5s/auth/auth_service.dart';
+
+class UserBasicInfo extends StatelessWidget {
+  final String? username;
+  final String? area;
+  final String? rol;
+  final String? zone;
+
+  const UserBasicInfo({
+    Key? key,
+    this.username,
+    this.area,
+    this.rol,
+    this.zone,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(240, 222, 229, 1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          const CircleAvatar(
+            radius: 50,
+            backgroundColor: Color.fromRGBO(134, 75, 111, 1),
+            child: Icon(
+              Icons.person,
+              size: 50,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            username ?? 'Sin nombre',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(79, 67, 73, 1),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            rol ?? 'Sin rol',
+            style: const TextStyle(
+              fontSize: 18,
+              color: Color.fromRGBO(79, 67, 73, 1),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${area ?? 'Sin área'} - ${zone ?? 'Sin zona'}',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color.fromRGBO(79, 67, 73, 1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -148,7 +211,16 @@ class SettingsPageState extends State<SettingsPage> {
                 child: Center(
                   child: TextButton(
                     onPressed: () async {
-                      context.goNamed("AdminAccessPage");
+                      try {
+                        await authService.logout();
+                        if (!mounted) return;
+                        context.goNamed("AdminAccessPage");
+                      } catch (e) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error al cerrar sesión: $e')),
+                        );
+                      }
                     },
                     child: const Text(
                       "Cerrar Sesión",

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/add_subareas.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
-import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
@@ -23,6 +22,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_list_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
 
 void main() async {
   // await Supabase.initialize(
@@ -44,11 +44,6 @@ final supabase = Supabase.instance.client;
 final GoRouter _router = GoRouter(
   initialLocation: '/inicio_admin',
   routes: [
-    GoRoute(
-      path: '/',
-      name: 'SplashScreen',
-      builder: (context, state) => const SplashScreen(),
-    ),
     GoRoute(
       path: '/acceso_admin',
       name: 'AdminAccessPage',
@@ -153,7 +148,11 @@ final GoRouter _router = GoRouter(
       name: 'AccessesListPage',
       builder: (context, state) => const AccessesListPage(),
     ),
-  
+    GoRoute(
+      path: '/organizations',
+      name: 'OrganizationsListPage',
+      builder: (context, state) => const OrganizationsListPage(),
+    ),
     // Area and Subarea routes
     GoRoute(
         name: "AreaMenu",
