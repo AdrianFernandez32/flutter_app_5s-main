@@ -4,8 +4,6 @@ import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart
 import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/account_page.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
@@ -13,24 +11,17 @@ import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_orga
 import 'package:flutter_app_5s/features/admin_auth/presentation/five_s_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/manage_areas_page.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/manage_questionnaries_page.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/manage_users_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/questionnaire_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/settings_page.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/signin_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/statistics_audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/zones_page.dart';
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_questionnarie_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/access_user_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/themeProvider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
-import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_dashboard.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_list_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
 
@@ -60,20 +51,6 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
-      path: '/login',
-      name: 'Login',
-      builder: (context, state) => const LoginPage(),
-    ),
-    GoRoute(
-      path: '/admin_login',
-      name: 'AdminLogin',
-      builder: (context, state) => const AdminLoginPage(),
-    ),
-    GoRoute(
-        path: '/admin_dashboard',
-        name: 'AdminDashboard',
-        builder: (context, state) => const AdminDashboardPage()),
-    GoRoute(
       path: '/acceso_admin',
       name: 'AdminAccessPage',
       builder: (context, state) => const AdminAccessPage(),
@@ -83,16 +60,7 @@ final GoRouter _router = GoRouter(
       name: 'InicioAdmin',
       builder: (context, state) => const InicioAdminPage(),
     ),
-    GoRoute(
-      path: '/signin',
-      name: 'Signin',
-      builder: (context, state) => const SignInPage(),
-    ),
-    GoRoute(
-      path: '/account',
-      name: 'Account',
-      builder: (context, state) => const AccountPage(),
-    ),
+
     GoRoute(
       path: '/menu',
       name: 'Menu',
@@ -129,11 +97,7 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
     ),
-    GoRoute(
-      path: '/editarareas',
-      name: 'Editar Areas',
-      builder: (context, state) => const ManageAreasPage(),
-    ),
+  
     GoRoute(
       path: '/calificar5s',
       name: 'Calificar 5s',
@@ -179,16 +143,6 @@ final GoRouter _router = GoRouter(
           ]
         },
       ),
-    ),
-    GoRoute(
-      path: '/gestioncuestionarios',
-      name: 'Gestion de Cuestionarios',
-      builder: (context, state) => const ManageQuestionnariesPage(),
-    ),
-    GoRoute(
-      path: '/gestionusuarios',
-      name: 'Gestion de Usuarios',
-      builder: (context, state) => const ManageUsersPage(),
     ),
     GoRoute(
       path: '/gestionaccesos',
