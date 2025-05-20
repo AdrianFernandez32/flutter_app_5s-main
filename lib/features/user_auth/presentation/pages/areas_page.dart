@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/subareas_page.dart';
+import 'package:flutter_app_5s/auth/auth_service.dart';
 
 class AreasPage extends StatefulWidget {
   const AreasPage({Key? key}) : super(key: key);
@@ -24,11 +25,17 @@ class AreasPageState extends State<AreasPage> {
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
     try {
-      final orgId = 2; // Cambia este ID según el que necesites
+      final authService = AuthService();
+      final orgId = authService.organizationId;
+      if (orgId == null) {
+        throw Exception('No hay organización seleccionada');
+      }
+
       final response = await http.get(
         Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${authService.accessToken}',
         },
       );
 
@@ -132,11 +139,20 @@ class AreasPageState extends State<AreasPage> {
             areasList.add(
               GestureDetector(
                 onTap: () {
+                  final authService = AuthService();
+                  final orgId = authService.organizationId;
+                  if (orgId == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('No hay organización seleccionada')),
+                    );
+                    return;
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => SubareasPage(
-                        orgId: 2, // TODO: Replace with actual orgId if needed
+                        orgId: int.parse(orgId),
                         areaId: int.parse(responseList[i]["id"]),
                         areaName: responseList[i]["area"],
                       ),

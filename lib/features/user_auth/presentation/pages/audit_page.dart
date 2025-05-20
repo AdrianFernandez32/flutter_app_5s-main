@@ -51,15 +51,17 @@ class AuditPageState extends State<AuditPage> {
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
     try {
-      final orgId = await _fetchOrgId();
-      setState(() {
-        _orgId = orgId;
-      });
       final authService = AuthService();
+      final orgId = authService.organizationId;
+      if (orgId == null) {
+        throw Exception('No hay organización seleccionada');
+      }
+
       final accessToken = authService.accessToken;
       if (accessToken == null || accessToken.isEmpty) {
         throw Exception('No has iniciado sesión.');
       }
+
       final response = await http.get(
         Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
         headers: {
@@ -79,10 +81,11 @@ class AuditPageState extends State<AuditPage> {
         setState(() {
           _areasList = List<Map<String, dynamic>>.from(areas);
           _filteredAreasList = _areasList;
+          _orgId = int.parse(orgId);
         });
         return _areasList;
       } else {
-        throw Exception('Error al cargar áreas: \\${response.statusCode}');
+        throw Exception('Error al cargar áreas: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error de red: $e');
