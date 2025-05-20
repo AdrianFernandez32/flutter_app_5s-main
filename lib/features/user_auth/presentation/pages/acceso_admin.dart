@@ -73,10 +73,10 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                             authService.user = result.user;
 
                             // Ejemplo: llamar a tu backend con el token
-                            await callBackendApi(authService.accessToken!);
+                            await getUserRoles(authService.accessToken!);
 
                             // Redirige a la pantalla principal
-                            context.goNamed('CreateOrganization');
+                            context.goNamed('OrganizationsListPage');
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Error de login: $e')),
@@ -109,18 +109,12 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
   }
 }
 
-Future<void> callBackendApi(String accessToken) async {
+Future<void> getUserRoles(String accessToken) async {
   final response = await http.get(
-    Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user/whoami'),
+    Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user-roles/myroles'),
     headers: {
       'Authorization': 'Bearer $accessToken',
     },
   );
-  if (response.statusCode == 200) {
-    // Usuario autenticado correctamente
-    print('Usuario: \\${response.body}');
-  } else {
-    // Error de autenticación
-    print('Error: \\${response.body}');
-  }
+  print('User Roles response: \\${response.statusCode} - \\${response.body}');
 }

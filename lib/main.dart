@@ -32,6 +32,7 @@ import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_dashboard.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_list_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
 
 void main() async {
   // await Supabase.initialize(
@@ -198,6 +199,11 @@ final GoRouter _router = GoRouter(
       path: '/accesos',
       name: 'AccessesListPage',
       builder: (context, state) => const AccessesListPage(),
+    ),
+    GoRoute(
+      path: '/organizations',
+      name: 'OrganizationsListPage',
+      builder: (context, state) => const OrganizationsListPage(),
     ),
     GoRoute(
       name: 'CreateQuestionnairePage',

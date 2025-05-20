@@ -21,6 +21,13 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    final authService = AuthService();
+    print('JWT: ${authService.accessToken}');
+  }
+
   // Método para seleccionar imagen desde la galería.
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -33,13 +40,11 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   // Método que usa el presigned URL para subir la imagen a S3.
   Future<String> _uploadImage(File imageFile) async {
     try {
-      // Obtener el token JWT del AuthService
       final authService = AuthService();
       final accessToken = authService.accessToken;
       if (accessToken == null || accessToken.isEmpty) {
         throw Exception('No has iniciado sesión.');
       }
-      // 1. Obtener la URL pre-firmada desde el endpoint
       final presignedUri = Uri.parse(
           'https://djnxv2fqbiqog.cloudfront.net/image/presigned-url/${_nameController.text}');
       final presignedResponse = await http.get(
@@ -48,40 +53,35 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
           'Authorization': 'Bearer $accessToken',
         },
       );
-
       if (presignedResponse.statusCode != 200) {
-        throw Exception(
-            'Error al obtener la URL pre-firmada: ${presignedResponse.statusCode}');
+        String msg = 'Error al obtener la URL pre-firmada: ${presignedResponse.statusCode}';
+        try {
+          final decoded = jsonDecode(presignedResponse.body);
+          if (decoded is Map && decoded['message'] != null) {
+            msg = decoded['message'];
+          }
+        } catch (_) {}
+        throw Exception(msg);
       }
-
       final presignedUrl = presignedResponse.body.trim();
-
       if (presignedUrl.isEmpty) {
         throw Exception('La URL pre-firmada está vacía.');
       }
-
-      // 2. Leer los bytes de la imagen
       final imageBytes = await imageFile.readAsBytes();
-
-      // 3. Subir la imagen con un PUT a la URL pre-firmada
       final putResponse = await http.put(
         Uri.parse(presignedUrl),
         headers: {
-          'Content-Type':
-              'image/jpeg', // Asegúrate de que el tipo MIME sea correcto
+          'Content-Type': 'image/jpeg',
         },
         body: imageBytes,
       );
-
       if (putResponse.statusCode != 200 && putResponse.statusCode != 201) {
         throw Exception('Error al subir la imagen: ${putResponse.statusCode}');
       }
-
-      // 4. Retornar la URL final de la imagen (sin parámetros de query)
       final finalImageUrl = presignedUrl.split('?').first;
       return finalImageUrl;
     } catch (e) {
-      throw Exception('Error en la carga de la imagen: $e');
+      rethrow;
     }
   }
 
@@ -93,8 +93,6 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
       );
       return;
     }
-
-    // Obtener el token JWT del AuthService
     final authService = AuthService();
     final accessToken = authService.accessToken;
     if (accessToken == null || accessToken.isEmpty) {
@@ -103,17 +101,20 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
       );
       return;
     }
-
     setState(() => _isLoading = true);
-
     try {
-      // Subir imagen si se seleccionó. Sino, logoUrl quedará en blanco.
       String logoUrl = '';
       if (_image != null) {
-        logoUrl = await _uploadImage(_image!);
+        try {
+          logoUrl = await _uploadImage(_image!);
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al subir la imagen: $e')),
+          );
+          setState(() => _isLoading = false);
+          return;
+        }
       }
-
-      // Armar payload para el POST.
       final uri = Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/');
       final payload = {
         'name': _nameController.text,
@@ -122,34 +123,40 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
         'logoUrl': logoUrl,
       };
       final body = jsonEncode(payload);
-
       final response = await http.post(
         uri,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
         },
         body: body,
       );
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Organización creada exitosamente')),
         );
-        context.goNamed('Menu');
+        context.goNamed('OrganizationsListPage');
       } else {
+        String msg = 'Error: ${response.statusCode}';
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded is Map && decoded['message'] != null) {
+            msg = decoded['message'];
+          } else if (decoded is String) {
+            msg = decoded;
+          }
+        } catch (_) {
+          msg = response.body;
+        }
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Error: \\${response.statusCode} - \\${response.body}')),
+          SnackBar(content: Text(msg)),
         );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error de red: $e')),
+        SnackBar(content: Text('Error: $e')),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -168,153 +175,149 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: colorScheme.secondary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            context.goNamed('OrganizationsListPage');
+          },
+        ),
+        title: const Text('Crear organización', style: TextStyle(color: Colors.white)),
+      ),
+      backgroundColor: colorScheme.background,
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: AbsorbPointer(
               absorbing: _isLoading,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Spacer(flex: 2),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: CircleAvatar(
-                            radius: 95,
-                            backgroundColor: Colors.blue,
-                            child: CircleAvatar(
-                              radius: 92,
-                              backgroundColor: Colors.grey[200],
-                              backgroundImage:
-                                  _image != null ? FileImage(_image!) : null,
-                              child: _image == null
-                                  ? const Icon(Icons.add,
-                                      size: 50, color: Colors.blue)
-                                  : null,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Text(
-                          _image == null ? "Agregar foto" : "Cambiar foto",
-                          style: const TextStyle(color: Colors.blue),
-                        ),
-                      ],
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 70,
+                      backgroundColor: colorScheme.secondary,
+                      child: CircleAvatar(
+                        radius: 67,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage:
+                            _image != null ? FileImage(_image!) : null,
+                        child: _image == null
+                            ? Icon(Icons.add, size: 40, color: colorScheme.secondary)
+                            : null,
+                      ),
                     ),
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextField(
-                          controller: _nameController,
-                          decoration: InputDecoration(
-                            hintText: "Agregar nombre de organización",
-                            hintStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.blue, width: 2),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        DropdownMenu<PaletteType>(
-                          width: 400,
-                          initialSelection: selectedPalette,
-                          onSelected: (PaletteType? newValue) {
-                            if (newValue != null) {
-                              setState(() => selectedPalette = newValue);
-                            }
-                          },
-                          dropdownMenuEntries: const [
-                            DropdownMenuEntry(
-                                value: PaletteType.blue, label: "Blue"),
-                            DropdownMenuEntry(
-                                value: PaletteType.purple, label: "Purple"),
-                            DropdownMenuEntry(
-                                value: PaletteType.green, label: "Green"),
-                            DropdownMenuEntry(
-                                value: PaletteType.wine, label: "Wine"),
-                            DropdownMenuEntry(
-                                value: PaletteType.blue, label: "Default"),
-                          ],
-                          inputDecorationTheme: InputDecorationTheme(
-                            hintStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.blue, width: 2),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: _descriptionController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            hintText: "Añade una descripción",
-                            hintStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.blue, width: 2),
-                            ),
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 12),
+                  Text(
+                    _image == null ? "Agregar foto" : "Cambiar foto",
+                    style: TextStyle(color: colorScheme.secondary),
+                  ),
+                  const SizedBox(height: 30),
+                  TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      hintText: "Agregar nombre de organización",
+                      hintStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                      filled: true,
+                      fillColor: colorScheme.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.secondary, width: 1),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.secondary, width: 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.primary, width: 2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  DropdownMenu<PaletteType>(
+                    width: 400,
+                    initialSelection: selectedPalette,
+                    onSelected: (PaletteType? newValue) {
+                      if (newValue != null) {
+                        setState(() => selectedPalette = newValue);
+                      }
+                    },
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry(
+                          value: PaletteType.blue, label: "Blue"),
+                      DropdownMenuEntry(
+                          value: PaletteType.purple, label: "Purple"),
+                      DropdownMenuEntry(
+                          value: PaletteType.green, label: "Green"),
+                      DropdownMenuEntry(
+                          value: PaletteType.wine, label: "Wine"),
+                      DropdownMenuEntry(
+                          value: PaletteType.blue, label: "Default"),
+                    ],
+                    inputDecorationTheme: InputDecorationTheme(
+                      hintStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                      filled: true,
+                      fillColor: colorScheme.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.secondary, width: 1),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.secondary, width: 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.primary, width: 2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _descriptionController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: "Añade una descripción",
+                      hintStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                      filled: true,
+                      fillColor: colorScheme.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.secondary, width: 1),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.secondary, width: 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                            color: colorScheme.primary, width: 2),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -335,7 +338,7 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
