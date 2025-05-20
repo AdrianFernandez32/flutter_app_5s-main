@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/add_subareas.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
-import 'package:flutter_app_5s/features/app/splash_screen/splash_screen.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
@@ -44,11 +43,6 @@ final supabase = Supabase.instance.client;
 final GoRouter _router = GoRouter(
   initialLocation: '/inicio_admin',
   routes: [
-    GoRoute(
-      path: '/',
-      name: 'SplashScreen',
-      builder: (context, state) => const SplashScreen(),
-    ),
     GoRoute(
       path: '/acceso_admin',
       name: 'AdminAccessPage',
@@ -96,7 +90,7 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
     ),
-  
+
     GoRoute(
       path: '/calificar5s',
       name: 'Calificar 5s',
@@ -113,25 +107,25 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const CreateOrganizationPage(),
     ),
     GoRoute(
-      path: '/auditsPage/:zone/:area',
+      path: '/auditsPage/:subareaId/:subareaName',
       name: 'Audits Page',
       builder: (context, state) {
-        final zone = state.pathParameters['zone']!;
-        final area = state.pathParameters['area']!;
-
+        final subareaId =
+            int.tryParse(state.pathParameters['subareaId'] ?? '') ?? 0;
+        final subareaName = state.pathParameters['subareaName'] ?? '';
         final color = state.extra as Color? ?? Colors.black;
         return AuditsPage(
-          zone: zone,
+          subareaId: subareaId,
+          subareaName: subareaName,
           color: color,
-          area: area,
         );
       },
     ),
     GoRoute(
       path: '/cuestionario',
       name: 'Cuestionario',
-      builder: (context, state) => QuestionnairePage(
-        auditData: const {
+      builder: (context, state) => const QuestionnairePage(
+        auditData: {
           'auditCategories': [
             {
               'name': 'Demo',
@@ -153,7 +147,7 @@ final GoRouter _router = GoRouter(
       name: 'AccessesListPage',
       builder: (context, state) => const AccessesListPage(),
     ),
-  
+
     // Area and Subarea routes
     GoRoute(
         name: "AreaMenu",

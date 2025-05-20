@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/subareas_page.dart';
+import 'package:flutter_app_5s/auth/auth_service.dart';
 
 class ZonesPage extends StatefulWidget {
-  const ZonesPage({super.key});
+  final bool modoHistorico;
+  const ZonesPage({super.key, this.modoHistorico = false});
 
   @override
   State<ZonesPage> createState() => _ZonesPageState();
@@ -20,12 +23,19 @@ class _ZonesPageState extends State<ZonesPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchAreas() async {
-    final orgId = 2; // Cambia si es dinámico
+    final orgId = 55;
+    final authService = AuthService();
+    final accessToken = authService.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('No has iniciado sesión.');
+    }
     final response = await http.get(
       Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
     );
-
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map<Map<String, dynamic>>((item) {
@@ -36,7 +46,7 @@ class _ZonesPageState extends State<ZonesPage> {
         };
       }).toList();
     } else {
-      throw Exception('Error al obtener las áreas');
+      throw Exception('Error al obtener las áreas: ${response.statusCode}');
     }
   }
 
@@ -91,6 +101,7 @@ class _ZonesPageState extends State<ZonesPage> {
               color: color,
               areaID: item["id"],
               textColor: textColor,
+              modoHistorico: widget.modoHistorico,
             );
           }).toList();
 
@@ -107,6 +118,7 @@ class AuditWidget extends StatelessWidget {
   final Color color;
   final Color textColor;
   final String? areaID;
+  final bool modoHistorico;
 
   const AuditWidget({
     Key? key,
@@ -115,6 +127,7 @@ class AuditWidget extends StatelessWidget {
     required this.color,
     required this.areaID,
     required this.textColor,
+    this.modoHistorico = false,
   }) : super(key: key);
 
   @override
@@ -123,13 +136,16 @@ class AuditWidget extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: GestureDetector(
         onTap: () {
-          context.goNamed(
-            'Audits Page',
-            pathParameters: {
-              'zone': zone ?? "",
-              'area': area ?? "",
-            },
-            extra: color,
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SubareasPage(
+                orgId: 2,
+                areaId: int.tryParse(areaID ?? '') ?? 0,
+                areaName: area ?? '',
+                modoHistorico: modoHistorico,
+              ),
+            ),
           );
         },
         child: Stack(
@@ -176,13 +192,16 @@ class AuditWidget extends StatelessWidget {
                       color: Colors.black54,
                     ),
                     onPressed: () {
-                      context.goNamed(
-                        'Audits Page',
-                        pathParameters: {
-                          'zone': zone ?? "",
-                          'area': area ?? "",
-                        },
-                        extra: color,
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SubareasPage(
+                            orgId: 2,
+                            areaId: int.tryParse(areaID ?? '') ?? 0,
+                            areaName: area ?? '',
+                            modoHistorico: modoHistorico,
+                          ),
+                        ),
                       );
                     },
                     iconSize: 50.0,

@@ -2,94 +2,70 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-
-class FilterSettings {
-  int? ratingFilter;
-  String? dateFilter;
-}
+import 'package:flutter_app_5s/auth/auth_service.dart';
 
 class AuditsPage extends StatefulWidget {
-  final String zone;
-  final String area;
+  final int subareaId;
+  final String subareaName;
   final Color color;
 
   const AuditsPage({
     Key? key,
-    required this.zone,
+    required this.subareaId,
+    required this.subareaName,
     required this.color,
-    required this.area,
   }) : super(key: key);
 
   @override
-  State<AuditsPage> createState() => _AuditsPageState(
-        zone: zone,
-        color: color,
-        area: area,
-      );
+  State<AuditsPage> createState() => _AuditsPageState();
 }
 
 class _AuditsPageState extends State<AuditsPage> {
-  final String zone;
-  final String area;
-  final Color color;
-
-  FilterSettings filterSettings = FilterSettings();
-  List<AreaWidget> audits = [];
-
-  _AuditsPageState({required this.zone, required this.color, required this.area});
+  late Future<List<dynamic>> _activeAuditsFuture;
+  late Future<List<dynamic>> _historicAuditsFuture;
 
   @override
   void initState() {
     super.initState();
-    _fetchAudits();
+    _activeAuditsFuture = fetchAudits('active');
+    _historicAuditsFuture = fetchAudits('historic');
   }
 
-  Future<void> _fetchAudits() async {
-    final subareaId = 1; // Cambiar si es necesario
+  Future<List<dynamic>> fetchAudits(String type) async {
+    final authService = AuthService();
+    final accessToken = authService.accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      throw Exception('No has iniciado sesión.');
+    }
     final response = await http.get(
-      Uri.parse('https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId'),
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse(
+          'https://djnxv2fqbiqog.cloudfront.net/audit/subarea/${widget.subareaId}/$type'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
     );
-
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      final List<dynamic> auditsData = data;
-
-      setState(() {
-        audits = auditsData.map<AreaWidget>((audit) {
-          final progress = (audit['questionsAnswered'] / (audit['totalQuestions'] ?? 1)) * 100;
-          final date = DateTime.now(); // Puedes agregar fecha real si el backend la provee
-          final formattedDate = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-
-          return AreaWidget(
-            zone: zone,
-            date: formattedDate,
-            progress: progress,
-            color: color,
-            area: area,
-          );
-        }).toList();
-      });
+      return jsonDecode(response.body) as List<dynamic>;
     } else {
-      throw Exception('No se pudieron cargar las auditorías');
+      throw Exception(
+          'Error al obtener auditorías ($type): ${response.statusCode}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
         backgroundColor: colorScheme.secondary,
-        title: const Text(
-          "Auditar",
-          style: TextStyle(color: Colors.white, fontSize: 32),
+        title: Text(
+          widget.subareaName,
+          style: const TextStyle(color: Colors.white, fontSize: 32),
         ),
         leading: IconButton(
           onPressed: () {
-            context.goNamed("Menu");
+            context.goNamed("Zones Page");
           },
           icon: const Icon(
             Icons.arrow_back,
@@ -107,233 +83,105 @@ class _AuditsPageState extends State<AuditsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DropdownButton<int>(
-                  value: filterSettings.ratingFilter,
-                  onChanged: (newValue) {
-                    setState(() {
-                      filterSettings.ratingFilter = newValue;
-                    });
-                  },
-                  items: const [
-                    DropdownMenuItem<int>(
-                      value: null,
-                      child: Text("Calificacion"),
-                    ),
-                    DropdownMenuItem<int>(
-                      value: 50,
-                      child: Text("50+"),
-                    ),
-                    DropdownMenuItem<int>(
-                      value: 80,
-                      child: Text("80+"),
-                    ),
-                  ],
-                ),
-                DropdownButton<String>(
-                  value: filterSettings.dateFilter,
-                  onChanged: (newValue) {
-                    setState(() {
-                      filterSettings.dateFilter = newValue;
-                    });
-                  },
-                  items: _buildDateDropdownItems(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Expanded(
-              child: ListView(
-                children: _buildFilteredAreaWidgets(),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Auditorías en proceso',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              FutureBuilder<List<dynamic>>(
+                future: _activeAuditsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No hay auditorías en proceso.');
+                  }
+                  return Column(
+                    children: snapshot.data!
+                        .map((audit) => AuditCard(
+                            audit: audit,
+                            color: widget.color,
+                            status: 'En proceso'))
+                        .toList(),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Auditorías completadas',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              FutureBuilder<List<dynamic>>(
+                future: _historicAuditsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No hay auditorías completadas.');
+                  }
+                  return Column(
+                    children: snapshot.data!
+                        .map((audit) => AuditCard(
+                            audit: audit,
+                            color: widget.color,
+                            status: 'Completada'))
+                        .toList(),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  List<DropdownMenuItem<String>> _buildDateDropdownItems() {
-    final List<DropdownMenuItem<String>> items = [];
-    final startDate = DateTime(2024, 1, 1);
-    final endDate = DateTime(2024, 5, 22);
-
-    for (DateTime date = startDate;
-        date.isBefore(endDate);
-        date = date.add(const Duration(days: 1))) {
-      final formattedDate =
-          "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-      items.add(DropdownMenuItem<String>(
-        value: formattedDate,
-        child: Text(formattedDate),
-      ));
-    }
-
-    items.insert(
-      0,
-      const DropdownMenuItem<String>(
-        value: null,
-        child: Text("Fecha"),
-      ),
-    );
-
-    return items;
-  }
-
-  List<Widget> _buildFilteredAreaWidgets() {
-    return audits.where((audit) {
-      return _filterByRating(audit.progress) && _filterByDate(audit.date);
-    }).map((audit) => Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: audit,
-    )).toList();
-  }
-
-  bool _filterByRating(double progress) {
-    return filterSettings.ratingFilter == null || progress >= filterSettings.ratingFilter!;
-  }
-
-  bool _filterByDate(String date) {
-    return filterSettings.dateFilter == null || date == filterSettings.dateFilter;
   }
 }
 
-class AreaWidget extends StatelessWidget {
-  final String zone;
-  final String date;
-  final String area;
-  final double progress;
+class AuditCard extends StatelessWidget {
+  final dynamic audit;
   final Color color;
+  final String status;
 
-  const AreaWidget({
-    Key? key,
-    required this.zone,
-    required this.date,
-    required this.progress,
-    required this.color,
-    required this.area,
-  }) : super(key: key);
+  const AuditCard(
+      {Key? key,
+      required this.audit,
+      required this.color,
+      required this.status})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final progress =
+        (audit['questionsAnswered'] / (audit['totalQuestions'] ?? 1)) * 100;
+    final date = audit['createdAt'] != null
+        ? DateTime.tryParse(audit['createdAt'])
+        : null;
+    final formattedDate = date != null
+        ? "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}"
+        : "Sin fecha";
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 12, 20, 0),
-      child: GestureDetector(
-        onTap: () {
-          context.goNamed('Auditorias',
-              pathParameters: {
-                'zona': zone,
-                'auditDate': date,
-                'area': area,
-              },
-              extra: color);
-        },
-        child: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                color: color,
-              ),
-              height: 80,
-              margin: const EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  const SizedBox(width: 75),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Expanded(child: SizedBox()),
-                        Text(
-                          zone,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Expanded(child: SizedBox()),
-                        Text(
-                          date,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Expanded(child: SizedBox()),
-                        const Text(
-                          "Completada",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: _buildProgressIcon(progress),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: CircleAvatar(
-                radius: 40,
-                backgroundImage: AssetImage(
-                  "lib/assets/images/vino.jpg",
-                ),
-              ),
-            ),
-          ],
-        ),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ListTile(
+        title: Text('Fecha: $formattedDate'),
+        subtitle: Text('Progreso: ${progress.toInt()}%'),
+        trailing: Text(status,
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: status == 'Completada' ? Colors.green : Colors.orange)),
       ),
     );
-  }
-
-  Widget _buildProgressIcon(double progress) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: 60.0,
-          height: 60.0,
-          decoration: BoxDecoration(
-            color: _getProgressColor(progress),
-            shape: BoxShape.circle,
-          ),
-        ),
-        Text(
-          progress.toInt().toString(),
-          style: const TextStyle(
-            fontSize: 30.0,
-            color: Colors.black54,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color _getProgressColor(double progress) {
-    if (progress < 50) {
-      return const Color.fromARGB(255, 208, 34, 34);
-    } else if (progress < 80) {
-      return const Color.fromARGB(255, 220, 193, 1);
-    } else {
-      return const Color.fromARGB(255, 25, 187, 79);
-    }
   }
 }
