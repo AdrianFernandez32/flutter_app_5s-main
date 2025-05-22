@@ -214,8 +214,6 @@ class _AccessesListPageState extends State<AccessesListPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('JWT actual: \\${AuthService().accessToken}');
-    print('OrgId actual: \\${AuthService().organizationId}');
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
