@@ -86,7 +86,7 @@ class SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              // Notificaciones y Terminos de Privacidad
+              // Terminos de Privacidad (sin notificaciones)
               Center(
                 child: Container(
                   padding: const EdgeInsets.only(top: 12, bottom: 12),
@@ -102,44 +102,25 @@ class SettingsPageState extends State<SettingsPage> {
                         decoration: const BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                             color: Color.fromRGBO(240, 222, 229, 1)),
-                        child: const Column(
+                        child: const Row(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "Notificaciones",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color: Color.fromRGBO(79, 67, 73, 1)),
-                                  ),
-                                ),
-                                _SwitchExample(),
-                              ],
+                            Expanded(
+                              child: SizedBox(),
                             ),
-                            Divider(),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SizedBox(),
-                                ),
-                                Icon(
-                                  Icons.attach_file,
+                            Icon(
+                              Icons.attach_file,
+                              color: Color.fromRGBO(134, 75, 111, 1),
+                            ),
+                            Text(
+                              "Terminos de Privacidad",
+                              style: TextStyle(
                                   color: Color.fromRGBO(134, 75, 111, 1),
-                                ),
-                                Text(
-                                  "Terminos de Privacidad",
-                                  style: TextStyle(
-                                      color: Color.fromRGBO(134, 75, 111, 1),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16),
-                                ),
-                                Expanded(
-                                  child: SizedBox(),
-                                )
-                              ],
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16),
                             ),
+                            Expanded(
+                              child: SizedBox(),
+                            )
                           ],
                         ),
                       )),
@@ -181,7 +162,6 @@ class SettingsPageState extends State<SettingsPage> {
           ),
 
           // FAQ
-
           const SingleChildScrollView(
             child: Column(
               children: [
@@ -191,32 +171,6 @@ class SettingsPageState extends State<SettingsPage> {
           )
         ]),
       ),
-    );
-  }
-}
-
-class _SwitchExample extends StatefulWidget {
-  const _SwitchExample({super.key});
-
-  @override
-  State<_SwitchExample> createState() => _SwitchExampleState();
-}
-
-class _SwitchExampleState extends State<_SwitchExample> {
-  bool light = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return Switch(
-      // This bool value toggles the switch.
-      value: light,
-      activeColor: const Color.fromRGBO(134, 75, 111, 1),
-      onChanged: (bool value) {
-        // This is called when the user toggles the switch.
-        setState(() {
-          light = value;
-        });
-      },
     );
   }
 }

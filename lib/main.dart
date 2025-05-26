@@ -51,6 +51,11 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
+      path: '/settings',
+      name: 'SettingsPage',
+      builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
       path: '/login',
       name: 'Login',
       builder: (context, state) => const LoginPage(),
