@@ -71,6 +71,7 @@ class InicioAdminPage extends StatelessWidget {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () => context.go('/settings'),
+                      //Ignoren esta ruta solo era para confirmar que esta eliminado las notificaciones
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             const Color.fromARGB(255, 49, 136, 235),
