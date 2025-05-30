@@ -84,11 +84,15 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                 Navigator.of(context).pop();
                 if (accessToken == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Sesión expirada. Inicia sesión de nuevo.')),
+                    const SnackBar(
+                        content:
+                            Text('Sesión expirada. Inicia sesión de nuevo.')),
                   );
                   return;
                 }
-                setState(() { isLoading = true; });
+                setState(() {
+                  isLoading = true;
+                });
                 try {
                   final response = await http.post(
                     Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/join'),
@@ -100,18 +104,27 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                   );
                   if (response.statusCode == 200) {
                     await fetchOrganizations();
-                    setState(() { isLoading = false; });
+                    setState(() {
+                      isLoading = false;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('¡Te has unido a la organización!')),
+                      const SnackBar(
+                          content: Text('¡Te has unido a la organización!')),
                     );
                   } else {
-                    setState(() { isLoading = false; });
+                    setState(() {
+                      isLoading = false;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error al unirse: \\${response.statusCode}')),
+                      SnackBar(
+                          content: Text(
+                              'Error al unirse: \\${response.statusCode}')),
                     );
                   }
                 } catch (e) {
-                  setState(() { isLoading = false; });
+                  setState(() {
+                    isLoading = false;
+                  });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error de red: $e')),
                   );
@@ -131,7 +144,8 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Organizaciones', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Organizaciones', style: TextStyle(color: Colors.white)),
         backgroundColor: colorScheme.secondary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -141,7 +155,8 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
           : error != null
               ? Center(child: Text(error!))
               : organizations.isEmpty
-                  ? const Center(child: Text('No hay organizaciones para mostrar'))
+                  ? const Center(
+                      child: Text('No hay organizaciones para mostrar'))
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: organizations.length,
@@ -157,8 +172,14 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                           child: ListTile(
                             onTap: () {
                               final authService = AuthService();
-                              authService.organizationId = org['id']?.toString();
-                              context.goNamed('Menu');
+                              if (org['name']?.toString().toLowerCase() ==
+                                  'admin') {
+                                context.goNamed('AdminAccessPage');
+                              } else {
+                                authService.organizationId =
+                                    org['id']?.toString();
+                                context.goNamed('Menu');
+                              }
                             },
                             title: Text(
                               org['name'] ?? 'Sin nombre',
@@ -168,7 +189,10 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                               ),
                             ),
                             subtitle: org['description'] != null
-                                ? Text(org['description'], style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)))
+                                ? Text(org['description'],
+                                    style: TextStyle(
+                                        color: colorScheme.onSurface
+                                            .withOpacity(0.7)))
                                 : null,
                           ),
                         );
@@ -189,14 +213,16 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ListTile(
-                      leading: Icon(Icons.add_business, color: colorScheme.secondary),
+                      leading: Icon(Icons.add_business,
+                          color: colorScheme.secondary),
                       title: const Text('Crear organización'),
                       onTap: () {
                         Navigator.of(context).pop('create');
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.group_add, color: colorScheme.secondary),
+                      leading:
+                          Icon(Icons.group_add, color: colorScheme.secondary),
                       title: const Text('Unirse a una organización'),
                       onTap: () {
                         Navigator.of(context).pop('join');
@@ -217,4 +243,4 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
       ),
     );
   }
-} 
+}
