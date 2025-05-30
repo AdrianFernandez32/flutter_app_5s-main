@@ -54,7 +54,11 @@ final GoRouter _router = GoRouter(
       name: 'InicioAdmin',
       builder: (context, state) => const InicioAdminPage(),
     ),
-
+    GoRoute(
+      path: '/android/com.example.flutterapp5s/callback',
+      name: 'Auth0Callback',
+      builder: (context, state) => const AdminAccessPage(),
+    ),
     GoRoute(
       path: '/menu',
       name: 'Menu',

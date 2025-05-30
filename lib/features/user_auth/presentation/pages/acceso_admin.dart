@@ -64,9 +64,21 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                       child: FilledButton(
                         onPressed: () async {
                           try {
-                            final result = await auth0.webAuthentication().login(
-                              audience: 'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/',
-                            );
+                            print('🔍 Iniciando proceso de login...');
+                            print(
+                                '🔍 Auth0 Domain: dev-aodesvgtpd08tn2z.us.auth0.com');
+                            print(
+                                '🔍 Client ID: XVv0JTHH67GBp0dtZ6jsJzHJqEj88SlD');
+                            print('🔍 Scheme: com.example.flutterapp5s');
+
+                            final result = await auth0
+                                .webAuthentication(
+                                  scheme: 'com.example.flutterapp5s',
+                                )
+                                .login(
+                                  audience:
+                                      'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/',
+                                );
                             // Guarda los tokens y el usuario globalmente
                             authService.accessToken = result.accessToken;
                             authService.idToken = result.idToken;
@@ -77,6 +89,9 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
 
                             context.goNamed('OrganizationsListPage');
                           } catch (e) {
+                            print('❌ Error completo: $e');
+                            print('❌ Stack trace: ${StackTrace.current}');
+                            print('❌ Error type: ${e.runtimeType}');
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Error de login: $e')),
                             );
@@ -84,7 +99,8 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                         },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor: const Color.fromARGB(255, 49, 136, 235),
+                          backgroundColor:
+                              const Color.fromARGB(255, 49, 136, 235),
                         ),
                         child: const Text(
                           "Acceder",

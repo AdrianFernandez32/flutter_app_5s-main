@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.flutter_app_5s"
+    namespace "com.example.flutterapp5s"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -42,7 +42,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.flutter_app_5s"
+        applicationId "com.example.flutterapp5s"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
@@ -52,7 +52,7 @@ android {
         
         manifestPlaceholders = [
             auth0Domain: "dev-aodesvgtpd08tn2z.us.auth0.com",
-            auth0Scheme: "com.example.flutter_app_5s"
+            auth0Scheme: "com.example.flutterapp5s"
         ]
     }
 

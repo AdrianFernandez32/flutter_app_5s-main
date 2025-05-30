@@ -1,4 +1,4 @@
-package com.example.flutter_app_5s
+package com.example.flutterapp5s
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
