@@ -118,6 +118,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:auth0_flutter/auth0_flutter.dart';
 
 class AdminAccessPage extends StatefulWidget {
   const AdminAccessPage({Key? key}) : super(key: key);
