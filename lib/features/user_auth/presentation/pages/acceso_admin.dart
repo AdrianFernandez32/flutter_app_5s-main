@@ -119,7 +119,7 @@ import 'package:auth0_flutter/auth0_flutter.dart';
 
 final auth0 = Auth0(
   'dev-hjpyk5n4wwo7vblz.us.auth0.com',
-  'VfUwLTwEos9u7shjDHnyna9d1BEadiaG', // reemplaza con tu clientId
+  'VfUwLTwEos9u7shjDHnyna9d1BEadiaG',
 );
 
 class AuthService {
@@ -158,11 +158,8 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
       authService.idToken = result.idToken;
       authService.user = result.user;
 
-      // Aquí podrías hacer la llamada a backend para validar roles o permisos
-
       if (mounted) {
-        context.goNamed(
-            'OrganizationsListPage'); // O la ruta que tengas para el dashboard
+        context.goNamed('OrganizationsListPage');
       }
     } catch (e) {
       setState(() {

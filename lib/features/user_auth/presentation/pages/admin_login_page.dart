@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:auth0_flutter/auth0_flutter.dart';
 
+final auth0 = Auth0(
+  'dev-hjpyk5n4wwo7vblz.us.auth0.com',
+  'VfUwLTwEos9u7shjDHnyna9d1BEadiaG',
+);
+
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
 
