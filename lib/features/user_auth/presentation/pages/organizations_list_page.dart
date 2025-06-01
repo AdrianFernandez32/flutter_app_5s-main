@@ -274,27 +274,6 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
       backgroundColor: colorScheme.background,
       body: Column(
         children: [
-          // Botón de acceso rápido al admin
-          if (userRole != null && userRole!['roleName'] == 'ADMIN')
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.goNamed('Menu');
-                },
-                icon: const Icon(Icons.admin_panel_settings),
-                label: const Text('Acceso Rápido Admin'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.secondary,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
           // Contenido principal
           Expanded(
             child: isLoading
