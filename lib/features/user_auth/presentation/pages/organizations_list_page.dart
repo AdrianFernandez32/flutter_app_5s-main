@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_app_5s/auth/auth_service.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_app_5s/utils/global_states/admin_id_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class OrganizationsListPage extends StatefulWidget {
   const OrganizationsListPage({Key? key}) : super(key: key);
@@ -16,11 +19,103 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
   List<dynamic> organizations = [];
   bool isLoading = true;
   String? error;
+  Map<String, dynamic>? userRole;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
-    fetchOrganizations();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _fetchUserInfo();
+    await fetchOrganizations();
+  }
+
+  Future<void> _fetchUserInfo() async {
+    try {
+      final authService = AuthService();
+      final accessToken = authService.accessToken;
+
+      if (accessToken == null) {
+        print('No hay token de acceso disponible');
+        return;
+      }
+
+      // Primero obtenemos la información del usuario
+      final whoamiResponse = await http.get(
+        Uri.parse('${dotenv.env['API_URL']}/user/whoami'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (whoamiResponse.statusCode == 200) {
+        // El endpoint devuelve un texto plano con el ID
+        final responseText = whoamiResponse.body;
+        // Extraemos el ID del texto "User ID from JWT (sub): auth0|..."
+        final idMatch = RegExp(r'auth0\|[a-zA-Z0-9]+').firstMatch(responseText);
+        if (idMatch != null) {
+          final extractedId = idMatch.group(0);
+          print('ID de usuario extraído: $extractedId');
+          setState(() {
+            userId = extractedId;
+          });
+
+          // Ahora obtenemos los roles del usuario
+          if (userId != null) {
+            await _fetchUserRoles();
+          }
+        } else {
+          print('No se pudo extraer el ID del usuario de la respuesta');
+        }
+      } else {
+        print(
+            'Error al obtener información del usuario: ${whoamiResponse.statusCode}');
+      }
+    } catch (e) {
+      print('Error al obtener información del usuario: $e');
+    }
+  }
+
+  Future<void> _fetchUserRoles() async {
+    try {
+      final authService = AuthService();
+      final accessToken = authService.accessToken;
+
+      if (accessToken == null || userId == null) {
+        print('No hay token de acceso o ID de usuario disponible');
+        return;
+      }
+
+      print('Obteniendo roles para el usuario: $userId');
+      // Usamos el endpoint con el userId específico
+      final response = await http.get(
+        Uri.parse('${dotenv.env['API_URL']}/user-roles/$userId'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('Respuesta de roles: $data');
+        if (data is List && data.isNotEmpty) {
+          setState(() {
+            userRole = data[0]; // Tomamos el primer rol
+          });
+          print('Rol del usuario: ${userRole?['roleName']}');
+        } else {
+          print('No se encontraron roles para el usuario');
+        }
+      } else {
+        print('Error al obtener el rol: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+      }
+    } catch (e) {
+      print('Error al obtener el rol: $e');
+    }
   }
 
   Future<void> fetchOrganizations() async {
@@ -138,6 +233,33 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
     );
   }
 
+  Future<void> _handleOrganizationTap(Map<String, dynamic> org) async {
+    final authService = AuthService();
+    final adminIdProvider =
+        Provider.of<AdminIdProvider>(context, listen: false);
+    final orgId = org['id']?.toString();
+
+    if (orgId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ID de organización no válido')),
+      );
+      return;
+    }
+
+    // Establecer el orgId en el provider
+    adminIdProvider.setOrgId(orgId);
+    authService.organizationId = orgId;
+
+    // Verificar si el usuario es admin
+    if (userRole != null && userRole!['roleName'] == 'ADMIN') {
+      print('Redirigiendo a AdminDashboard - Usuario es ADMIN');
+      context.goNamed('AdminDashboard');
+    } else {
+      print('Redirigiendo a Menu - Usuario no es ADMIN');
+      context.goNamed('Menu');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print('JWT actual: \\${AuthService().accessToken}');
@@ -150,54 +272,52 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: colorScheme.background,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-              ? Center(child: Text(error!))
-              : organizations.isEmpty
-                  ? const Center(
-                      child: Text('No hay organizaciones para mostrar'))
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: organizations.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final org = organizations[index];
-                        return Card(
-                          elevation: 2,
-                          color: colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: ListTile(
-                            onTap: () {
-                              final authService = AuthService();
-                              if (org['name']?.toString().toLowerCase() ==
-                                  'admin') {
-                                context.goNamed('AdminAccessPage');
-                              } else {
-                                authService.organizationId =
-                                    org['id']?.toString();
-                                context.goNamed('Menu');
-                              }
-                            },
-                            title: Text(
-                              org['name'] ?? 'Sin nombre',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            subtitle: org['description'] != null
-                                ? Text(org['description'],
+      body: Column(
+        children: [
+          // Contenido principal
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : error != null
+                    ? Center(child: Text(error!))
+                    : organizations.isEmpty
+                        ? const Center(
+                            child: Text('No hay organizaciones para mostrar'))
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: organizations.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final org = organizations[index];
+                              return Card(
+                                elevation: 2,
+                                color: colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: ListTile(
+                                  onTap: () => _handleOrganizationTap(org),
+                                  title: Text(
+                                    org['name'] ?? 'Sin nombre',
                                     style: TextStyle(
-                                        color: colorScheme.onSurface
-                                            .withOpacity(0.7)))
-                                : null,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  subtitle: org['description'] != null
+                                      ? Text(org['description'],
+                                          style: TextStyle(
+                                              color: colorScheme.onSurface
+                                                  .withOpacity(0.7)))
+                                      : null,
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: colorScheme.secondary,
         foregroundColor: colorScheme.onSecondary,
