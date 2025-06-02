@@ -192,7 +192,8 @@ class _SubareasPageState extends State<SubareasPage> {
                     if (accessToken == null || accessToken.isEmpty) {
                       throw Exception('No has iniciado sesión.');
                     }
-                    // Fetch active audits for this subarea
+
+                    // Verificar si hay una auditoría activa
                     final auditResp = await http.get(
                       Uri.parse(
                           'https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId/active'),
@@ -201,11 +202,18 @@ class _SubareasPageState extends State<SubareasPage> {
                         'Authorization': 'Bearer $accessToken',
                       },
                     );
+
                     if (auditResp.statusCode == 200) {
                       final List<dynamic> audits = json.decode(auditResp.body);
                       if (audits.isNotEmpty) {
                         final auditId = audits[0]['id'];
-                        // Fetch full audit info
+                        // Mostrar loading mientras se obtiene el cuestionario
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) =>
+                              const Center(child: CircularProgressIndicator()),
+                        );
                         final fullAuditResp = await http.get(
                           Uri.parse(
                               'https://djnxv2fqbiqog.cloudfront.net/audit/$auditId/full'),
@@ -214,6 +222,8 @@ class _SubareasPageState extends State<SubareasPage> {
                             'Authorization': 'Bearer $accessToken',
                           },
                         );
+                        if (!mounted) return;
+                        Navigator.of(context).pop(); // Cierra el loading
                         if (fullAuditResp.statusCode == 200) {
                           final auditData = json.decode(fullAuditResp.body);
                           // Navigate to QuestionnairePage with auditData
@@ -229,13 +239,135 @@ class _SubareasPageState extends State<SubareasPage> {
                           _showErrorDialog(
                               context, 'No se pudo obtener el cuestionario.');
                         }
-                      } else {
-                        _showErrorDialog(context,
-                            'No hay auditoría activa para esta subárea.');
+                        return;
                       }
-                    } else {
-                      _showErrorDialog(
-                          context, 'Error al buscar auditoría activa.');
+                    }
+
+                    // Si no hay auditoría activa, preguntar al usuario si desea crear una nueva
+                    final shouldCreate = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('No hay auditoría activa'),
+                        content: const Text(
+                            '¿Deseas iniciar una nueva auditoría para esta subárea?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('Cancelar'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text('Crear auditoría'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (shouldCreate == true) {
+                      // Mostrar loading
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) =>
+                            const Center(child: CircularProgressIndicator()),
+                      );
+                      try {
+                        final createAuditResp = await http.post(
+                          Uri.parse(
+                              'https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId'),
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer $accessToken',
+                          },
+                        );
+                        if (!mounted) return;
+                        Navigator.of(context).pop(); // Cierra el loading
+                        // Debug info
+                        print('Status code: \\${createAuditResp.statusCode}');
+                        print('Response body: \\${createAuditResp.body}');
+                        if (createAuditResp.statusCode == 201 ||
+                            createAuditResp.statusCode == 200) {
+                          final body = createAuditResp.body.trim();
+                          if (body.isNotEmpty) {
+                            final auditData = json.decode(body);
+                            if (auditData != null &&
+                                auditData is Map<String, dynamic>) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => QuestionnairePage(
+                                    auditData: auditData,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _showErrorDialog(context,
+                                  'La auditoría fue creada pero la respuesta es inválida.');
+                            }
+                          } else {
+                            // El body está vacío, obtener la auditoría activa
+                            final auditResp = await http.get(
+                              Uri.parse(
+                                  'https://djnxv2fqbiqog.cloudfront.net/audit/subarea/$subareaId/active'),
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer $accessToken',
+                              },
+                            );
+                            if (auditResp.statusCode == 200) {
+                              final List<dynamic> audits =
+                                  json.decode(auditResp.body);
+                              if (audits.isNotEmpty) {
+                                final auditId = audits[0]['id'];
+                                // Obtener el cuestionario completo
+                                final fullAuditResp = await http.get(
+                                  Uri.parse(
+                                      'https://djnxv2fqbiqog.cloudfront.net/audit/$auditId/full'),
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer $accessToken',
+                                  },
+                                );
+                                if (fullAuditResp.statusCode == 200) {
+                                  final auditData =
+                                      json.decode(fullAuditResp.body);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => QuestionnairePage(
+                                        auditData: auditData,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  _showErrorDialog(context,
+                                      'No se pudo obtener el cuestionario de la auditoría recién creada.');
+                                }
+                              } else {
+                                _showErrorDialog(context,
+                                    'No se encontró la auditoría recién creada.');
+                              }
+                            } else {
+                              _showErrorDialog(context,
+                                  'No se pudo obtener la auditoría recién creada.');
+                            }
+                          }
+                        } else {
+                          String errorMsg = 'No se pudo crear la auditoría.';
+                          try {
+                            final errorBody = json.decode(createAuditResp.body);
+                            if (errorBody is Map &&
+                                errorBody['message'] != null) {
+                              errorMsg = errorBody['message'];
+                            }
+                          } catch (_) {}
+                          _showErrorDialog(context, errorMsg);
+                        }
+                      } catch (e) {
+                        if (!mounted) return;
+                        Navigator.of(context).pop(); // Cierra el loading
+                        _showErrorDialog(context, 'Error de red: $e');
+                      }
                     }
                   }
                 },

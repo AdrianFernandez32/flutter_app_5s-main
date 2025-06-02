@@ -64,9 +64,14 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                       child: FilledButton(
                         onPressed: () async {
                           try {
-                            final result = await auth0.webAuthentication().login(
-                              audience: 'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/',
-                            );
+                            final result = await auth0
+                                .webAuthentication(
+                                  scheme: 'com.example.flutterapp5s',
+                                )
+                                .login(
+                                  audience:
+                                      'https://dev-aodesvgtpd08tn2z.us.auth0.com/api/v2/',
+                                );
                             // Guarda los tokens y el usuario globalmente
                             authService.accessToken = result.accessToken;
                             authService.idToken = result.idToken;
@@ -84,7 +89,8 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
                         },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor: const Color.fromARGB(255, 49, 136, 235),
+                          backgroundColor:
+                              const Color.fromARGB(255, 49, 136, 235),
                         ),
                         child: const Text(
                           "Acceder",

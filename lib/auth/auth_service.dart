@@ -16,7 +16,11 @@ class AuthService {
         'dev-aodesvgtpd08tn2z.us.auth0.com',
         'XVv0JTHH67GBp0dtZ6jsJzHJqEj88SlD',
       );
-      await auth0.webAuthentication().logout();
+      await auth0
+          .webAuthentication(
+              // scheme: 'com.example.flutterapp5s'
+              )
+          .logout();
       // Limpiar los datos de la sesión
       accessToken = null;
       idToken = null;

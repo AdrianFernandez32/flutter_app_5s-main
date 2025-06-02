@@ -37,13 +37,42 @@ class AreaItem extends StatelessWidget {
                   // Logo
                   CircleAvatar(
                     radius: 24,
-                    backgroundImage: NetworkImage(logoUrl),
-                    onBackgroundImageError: (_, __) {
-                      // aquí capturas el fallo, no dejes que lance
-                    },
-                    child: logoUrl.isEmpty
-                        ? Icon(Icons.business, color: colorScheme.onSurface)
-                        : null,
+                    backgroundColor: colorScheme.surface,
+                    child: logoUrl.isNotEmpty &&
+                            logoUrl != "https://via.placeholder.com/150"
+                        ? ClipOval(
+                            child: Image.network(
+                              logoUrl,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                print('Error cargando logo: $error');
+                                return Icon(
+                                  Icons.business,
+                                  color: colorScheme.onSurface,
+                                  size: 24,
+                                );
+                              },
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  strokeWidth: 2,
+                                );
+                              },
+                            ),
+                          )
+                        : Icon(
+                            Icons.business,
+                            color: colorScheme.onSurface,
+                            size: 24,
+                          ),
                   ),
                   const SizedBox(width: 16),
                   // Textos

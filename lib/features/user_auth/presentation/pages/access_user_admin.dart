@@ -60,10 +60,11 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: colorScheme.secondary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
@@ -78,309 +79,332 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
             : Column(
                 children: [
                   const SizedBox(height: 24),
-                  // Smaller Profile Avatar with blue border
+                  // Profile Avatar with blue border
                   Center(
                     child: Container(
-                      width: 120,
-                      height: 120,
+                      width: 140,
+                      height: 140,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.blue, width: 5),
+                        border: Border.all(color: colorScheme.secondary, width: 6),
                       ),
                       child: const CircleAvatar(
-                        radius: 54,
+                        radius: 64,
                         backgroundColor: Color(0xFFEDEDED),
                         backgroundImage: AssetImage('lib/assets/images/perfil_fake.jpg'),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Smaller User name
+                  // User name
                   Text(
-                    userName,
+                    userName.isNotEmpty ? userName : 'Sin nombre',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 22,
+                      fontSize: 24,
                       color: Colors.black,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 2.0, bottom: 16.0),
                     child: Text(
-                      userEmail,
+                      userEmail.isNotEmpty ? userEmail : 'Sin email',
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 15,
                         color: Colors.grey,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
-                  ...departments.map((dept) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                        child: Card(
-                          color: const Color(0xFFE9EEF1),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                            title: Center(
-                              child: Text(
-                                dept['name']!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                            subtitle: Center(
-                              child: Text(
-                                'Rol: ${dept['role']!}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.edit, size: 20, color: Colors.black87),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    String? selectedDepartment = dept['name'];
-                                    String? selectedRole = dept['role'];
-                                    final List<String> departmentOptions = departments.map((d) => d['name']!).toList();
-                                    final List<String> roleOptions = ['Viewer', 'Auditor', 'Admin'];
-                                    return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return Dialog(
-                                          backgroundColor: Colors.transparent,
-                                          insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
-                                          child: Container(
-                                            margin: const EdgeInsets.only(top: 60),
-                                            padding: const EdgeInsets.fromLTRB(20, 40, 20, 24),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(28),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.08),
-                                                  blurRadius: 16,
-                                                  offset: const Offset(0, 8),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Text(
-                                                  'Editar acceso',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 24),
-                                                Align(
-                                                  alignment: Alignment.centerLeft,
-                                                  child: Text(
-                                                    'Departamento',
-                                                    style: TextStyle(
-                                                      color: Colors.blueAccent,
-                                                      fontWeight: FontWeight.w500,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: Colors.grey.shade400, width: 1.2),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: DropdownButtonHideUnderline(
-                                                    child: DropdownButton<String>(
-                                                      isExpanded: true,
-                                                      value: selectedDepartment,
-                                                      hint: const Padding(
-                                                        padding: EdgeInsets.symmetric(horizontal: 12),
-                                                        child: Text(
-                                                          'Selecciona un departamento',
-                                                          style: TextStyle(
-                                                            color: Colors.grey,
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 18,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      icon: const Padding(
-                                                        padding: EdgeInsets.only(right: 8),
-                                                        child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
-                                                      ),
-                                                      items: departmentOptions.map((dep) => DropdownMenuItem(
-                                                        value: dep,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                          child: Text(
-                                                            dep,
-                                                            style: const TextStyle(
-                                                              color: Colors.grey,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 18,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )).toList(),
-                                                      onChanged: (value) {
-                                                        setState(() => selectedDepartment = value);
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 18),
-                                                Align(
-                                                  alignment: Alignment.centerLeft,
-                                                  child: Text(
-                                                    'Rol',
-                                                    style: TextStyle(
-                                                      color: Colors.blueAccent,
-                                                      fontWeight: FontWeight.w500,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: Colors.grey.shade400, width: 1.2),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: DropdownButtonHideUnderline(
-                                                    child: DropdownButton<String>(
-                                                      isExpanded: true,
-                                                      value: selectedRole,
-                                                      hint: const Padding(
-                                                        padding: EdgeInsets.symmetric(horizontal: 12),
-                                                        child: Text(
-                                                          'Selecciona un rol',
-                                                          style: TextStyle(
-                                                            color: Colors.grey,
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 18,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      icon: const Padding(
-                                                        padding: EdgeInsets.only(right: 8),
-                                                        child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
-                                                      ),
-                                                      items: roleOptions.map((role) => DropdownMenuItem(
-                                                        value: role,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                          child: Text(
-                                                            role,
-                                                            style: const TextStyle(
-                                                              color: Colors.grey,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 18,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )).toList(),
-                                                      onChanged: (value) {
-                                                        setState(() => selectedRole = value);
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 28),
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                        child: ElevatedButton(
-                                                          onPressed: () {
-                                                            // Aquí iría la lógica para editar el acceso
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.blue,
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(18),
-                                                            ),
-                                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                                          ),
-                                                          child: const Text(
-                                                            'Editar',
-                                                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                        child: ElevatedButton(
-                                                          onPressed: () {
-                                                            // Aquí iría la lógica para eliminar el acceso
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.blue,
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(18),
-                                                            ),
-                                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                                          ),
-                                                          child: const Text(
-                                                            'Eliminar',
-                                                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                        child: ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.blue,
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(18),
-                                                            ),
-                                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                                          ),
-                                                          child: const Text(
-                                                            'Cancelar',
-                                                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
+                  if (departments.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+                        child: const Center(
+                          child: Text(
+                            'Este usuario no tiene permisos asignados',
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                      )),
+                      ),
+                    )
+                  else
+                    ...departments.map((dept) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
+                          child: Card(
+                            color: Colors.grey[200],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                              title: Center(
+                                child: Text(
+                                  dept['name']?.isNotEmpty == true ? dept['name']! : 'Sin departamento',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              subtitle: Center(
+                                child: Text(
+                                  'Rol: ${dept['role']?.isNotEmpty == true ? dept['role']! : 'Sin rol'}',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.edit, size: 20, color: Colors.black87),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      String? selectedDepartment = dept['name'];
+                                      String? selectedRole = dept['role'];
+                                      final List<String> departmentOptions = departments.map((d) => d['name']!).toList();
+                                      final List<String> roleOptions = ['Viewer', 'Auditor', 'Admin'];
+                                      return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return Dialog(
+                                            backgroundColor: Colors.transparent,
+                                            insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                                            child: Container(
+                                              margin: const EdgeInsets.only(top: 60),
+                                              padding: const EdgeInsets.fromLTRB(20, 40, 20, 24),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(28),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.08),
+                                                    blurRadius: 16,
+                                                    offset: const Offset(0, 8),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Text(
+                                                    'Editar acceso',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  Align(
+                                                    alignment: Alignment.centerLeft,
+                                                    child: Text(
+                                                      'Departamento',
+                                                      style: TextStyle(
+                                                        color: Colors.blueAccent,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(color: Colors.grey.shade400, width: 1.2),
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                    child: DropdownButtonHideUnderline(
+                                                      child: DropdownButton<String>(
+                                                        isExpanded: true,
+                                                        value: selectedDepartment,
+                                                        hint: const Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: 12),
+                                                          child: Text(
+                                                            'Selecciona un departamento',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        icon: const Padding(
+                                                          padding: EdgeInsets.only(right: 8),
+                                                          child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
+                                                        ),
+                                                        items: departmentOptions.map((dep) => DropdownMenuItem(
+                                                          value: dep,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                            child: Text(
+                                                              dep,
+                                                              style: const TextStyle(
+                                                                color: Colors.grey,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )).toList(),
+                                                        onChanged: (value) {
+                                                          setState(() => selectedDepartment = value);
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 18),
+                                                  Align(
+                                                    alignment: Alignment.centerLeft,
+                                                    child: Text(
+                                                      'Rol',
+                                                      style: TextStyle(
+                                                        color: Colors.blueAccent,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(color: Colors.grey.shade400, width: 1.2),
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                    child: DropdownButtonHideUnderline(
+                                                      child: DropdownButton<String>(
+                                                        isExpanded: true,
+                                                        value: selectedRole,
+                                                        hint: const Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: 12),
+                                                          child: Text(
+                                                            'Selecciona un rol',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        icon: const Padding(
+                                                          padding: EdgeInsets.only(right: 8),
+                                                          child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
+                                                        ),
+                                                        items: roleOptions.map((role) => DropdownMenuItem(
+                                                          value: role,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                            child: Text(
+                                                              role,
+                                                              style: const TextStyle(
+                                                                color: Colors.grey,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )).toList(),
+                                                        onChanged: (value) {
+                                                          setState(() => selectedRole = value);
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 28),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                          child: ElevatedButton(
+                                                            onPressed: () {
+                                                              // Aquí iría la lógica para editar el acceso
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.blue,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(18),
+                                                              ),
+                                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                                            ),
+                                                            child: const Text(
+                                                              'Editar',
+                                                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                          child: ElevatedButton(
+                                                            onPressed: () {
+                                                              // Aquí iría la lógica para eliminar el acceso
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.blue,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(18),
+                                                              ),
+                                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                                            ),
+                                                            child: const Text(
+                                                              'Eliminar',
+                                                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                          child: ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.blue,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(18),
+                                                              ),
+                                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                                            ),
+                                                            child: const Text(
+                                                              'Cancelar',
+                                                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        )),
                   const Spacer(),
                 ],
               ),

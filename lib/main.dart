@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/admin_auth/presentation/add_subareas.dart';
-import 'package:flutter_app_5s/features/admin_auth/presentation/areas/areas.dart';
 import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/add_subareas.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/admin_dashboard.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
@@ -23,6 +24,7 @@ import 'package:go_router/go_router.dart';
 import "package:provider/provider.dart";
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_list_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
+import 'package:flutter_app_5s/utils/global_states/admin_id_provider.dart';
 
 void main() async {
   // await Supabase.initialize(
@@ -33,10 +35,15 @@ void main() async {
   //  Change Notifier Provider for the theme changes
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(ChangeNotifierProvider(
-    create: (context) => ThemeProvider(),
-    child: const MyApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AdminIdProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 final supabase = Supabase.instance.client;
@@ -50,11 +57,20 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const AdminAccessPage(),
     ),
     GoRoute(
+      path: '/admin_dashboard',
+      name: 'AdminDashboard',
+      builder: (context, state) => const AdminDashboardPage(),
+    ),
+    GoRoute(
       path: '/inicio_admin',
       name: 'InicioAdmin',
       builder: (context, state) => const InicioAdminPage(),
     ),
-
+    GoRoute(
+      path: '/android/com.example.flutterapp5s/callback',
+      name: 'Auth0Callback',
+      builder: (context, state) => const AdminAccessPage(),
+    ),
     GoRoute(
       path: '/menu',
       name: 'Menu',
@@ -91,7 +107,6 @@ final GoRouter _router = GoRouter(
       name: 'Gestion de Areas',
       builder: (context, state) => const AreasPage(),
     ),
-
     GoRoute(
       path: '/calificar5s',
       name: 'Calificar 5s',
@@ -157,13 +172,15 @@ final GoRouter _router = GoRouter(
     ),
     // Area and Subarea routes
     GoRoute(
-        name: "AreaMenu",
-        path: "/areas_menu",
-        builder: (context, state) => const AreaMenu()),
+      name: "AreaMenu",
+      path: "/areas_menu",
+      builder: (context, state) => const AreaMenu(),
+    ),
     GoRoute(
-        name: "AddDepartment",
-        path: "/subareas",
-        builder: (context, state) => const AddSubArea()),
+      name: "AddSubArea",
+      path: "/subareas",
+      builder: (context, state) => const AddSubArea(),
+    ),
     GoRoute(
       name: "FiveSMenu",
       path: '/fiveS/:departmentId',
@@ -171,23 +188,19 @@ final GoRouter _router = GoRouter(
         final departmentId = state.pathParameters['departmentId']!;
         return FiveSMenu(departmentId: departmentId);
       },
-      // Error with the parameter
-      // redirect: (state) {
-      //   if (state.pathParameters['departmentId'] == null) {
-      //     return '/error'; // Redirige si falta el parámetro
-      //   }
-      //   return null;
-      // }
     ),
     GoRoute(
-        name: "QuestionnaireAdminMenu",
-        path: '/subareas/:departmentId/5s/:fiveSId',
-        builder: (context, state) {
-          final departmentId = state.pathParameters['departmentId']!;
-          final fiveSId = state.pathParameters['fiveSId']!;
-          return QuestionnairesAdminMenu(
-              departmentId: departmentId, fiveSId: fiveSId);
-        }),
+      name: "QuestionnaireAdminMenu",
+      path: '/subareas/:departmentId/5s/:fiveSId',
+      builder: (context, state) {
+        final departmentId = state.pathParameters['departmentId']!;
+        final fiveSId = state.pathParameters['fiveSId']!;
+        return QuestionnairesAdminMenu(
+          departmentId: departmentId,
+          fiveSId: fiveSId,
+        );
+      },
+    ),
   ],
 );
 

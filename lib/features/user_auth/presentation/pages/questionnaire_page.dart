@@ -4,11 +4,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app_5s/auth/auth_service.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
+import 'package:go_router/go_router.dart';
 
 class QuestionnairePage extends StatefulWidget {
   final Map<String, dynamic> auditData;
   const QuestionnairePage({Key? key, required this.auditData})
       : super(key: key);
+
+  // Método estático para arreglar encoding
+  static String fixEncodingStatic(String text) {
+    try {
+      return utf8.decode(latin1.encode(text));
+    } catch (_) {
+      return text;
+    }
+  }
 
   @override
   State<QuestionnairePage> createState() => _QuestionnairePageState();
@@ -216,10 +226,8 @@ class _QuestionnairePageState extends State<QuestionnairePage>
             // Espera 500ms antes de navegar para evitar overlays bloqueados
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const MainMenu()),
-                  (Route<dynamic> route) => false,
-                );
+                ScaffoldMessenger.of(context).clearSnackBars();
+                context.goNamed('Menu');
               }
             });
           } else {
@@ -303,14 +311,15 @@ class _QuestionnairePageState extends State<QuestionnairePage>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  fixEncoding(currentCat['name'] ?? ''),
+                  QuestionnairePage.fixEncodingStatic(currentCat['name'] ?? ''),
                   style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  fixEncoding(currentCat['description'] ?? ''),
+                  QuestionnairePage.fixEncodingStatic(
+                      currentCat['description'] ?? ''),
                   style: const TextStyle(fontSize: 15, color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
@@ -336,9 +345,24 @@ class _QuestionnairePageState extends State<QuestionnairePage>
                     : int.tryParse(q['id'].toString()) ?? 0;
                 final respuesta =
                     respuestas[questionId] ?? {'score': null, 'comment': ''};
+                // Obtener el nombre del primer item si existe
+                String? itemName;
+                if (q['items'] != null &&
+                    q['items'] is List &&
+                    q['items'].isNotEmpty) {
+                  final item = q['items'][0];
+                  itemName = item['item']?.toString() ??
+                      item['name']?.toString() ??
+                      item['description']?.toString() ??
+                      item['label']?.toString() ??
+                      item['itemName']?.toString() ??
+                      item['itemId']?.toString();
+                }
                 return SingleChildScrollView(
                   child: _QuestionView(
-                    question: fixEncoding(q['question']),
+                    question:
+                        QuestionnairePage.fixEncodingStatic(q['question']),
+                    itemName: itemName,
                     questionId: questionId,
                     score: respuesta['score'],
                     comment: respuesta['comment'],
@@ -411,6 +435,7 @@ class _QuestionnairePageState extends State<QuestionnairePage>
 
 class _QuestionView extends StatefulWidget {
   final String? question;
+  final String? itemName;
   final int questionId;
   final int? score;
   final String? comment;
@@ -419,6 +444,7 @@ class _QuestionView extends StatefulWidget {
   const _QuestionView(
       {Key? key,
       this.question,
+      this.itemName,
       required this.questionId,
       this.score,
       this.comment,
@@ -490,6 +516,18 @@ class _QuestionViewState extends State<_QuestionView> {
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
+              if (widget.itemName != null && widget.itemName!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  QuestionnairePage.fixEncodingStatic(widget.itemName!),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
               const SizedBox(
                 height: 30,
               ),
