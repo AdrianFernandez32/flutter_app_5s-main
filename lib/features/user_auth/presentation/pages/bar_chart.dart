@@ -1,164 +1,111 @@
-import 'dart:math';
-
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-class BarChartWidget extends StatefulWidget {
-  const BarChartWidget({super.key});
+class BarChartWidget extends StatelessWidget {
+  final List<dynamic> audits;
+  final dynamic selectedAudit;
+  const BarChartWidget(
+      {Key? key, required this.audits, required this.selectedAudit})
+      : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => BarChartWidgetState();
-}
-
-class BarChartWidgetState extends State<BarChartWidget> {
-  String getMonthName(int monthIndex) {
-    List<String> months = [
-      'Ene',
-      'Feb',
-      'Mar',
-      'Abr',
-      'May',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic'
-    ];
-
-    int index = (monthIndex - 1) % 12;
-    return months[index];
-  }
-
-  Widget bottomTitles(double value, TitleMeta meta) {
-    const style = TextStyle(fontSize: 9);
-    String text = getMonthName(value.toInt() + 1);
-
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: Text(text, style: style),
-    );
-  }
-
-  Widget leftTitles(double value, TitleMeta meta) {
-    if (value == meta.max) {
-      return Container();
-    }
-    const style = TextStyle(
-      fontSize: 10,
-    );
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: Text(
-        meta.formattedValue,
-        style: style,
-      ),
-    );
+  List<dynamic> _getBarData() {
+    final data =
+        (audits.isEmpty && selectedAudit != null) ? [selectedAudit] : audits;
+    return data.map((audit) {
+      final score = (audit['score'] ?? 0).toDouble();
+      final date = audit['createdAt'] != null
+          ? DateTime.tryParse(audit['createdAt'])
+          : null;
+      final label =
+          date != null ? DateFormat('MMM. yyyy', 'es').format(date) : '';
+      return _AuditBarData(
+        label: label,
+        value: score,
+        color: score < 50
+            ? const Color(0xFFD22222)
+            : score < 80
+                ? const Color(0xFFB6E2A1)
+                : const Color(0xFFB6E2A1),
+        isNA: audit['score'] == null,
+      );
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.5,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final barsWidth = 8.0 * constraints.maxWidth / 100;
-            return BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.start,
-                barTouchData: BarTouchData(
-                  enabled: false,
-                ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      getTitlesWidget: bottomTitles,
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: leftTitles,
-                      interval: 10.0,
-                    ),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                gridData: FlGridData(
-                  show: true,
-                  checkToShowHorizontalLine: (value) => value % 10 == 0,
-                  getDrawingHorizontalLine: (value) => const FlLine(
-                    color: Colors.red,
-                    strokeWidth: 0.2,
-                  ),
-                  drawVerticalLine: false,
-                ),
-                borderData: FlBorderData(
-                  show: false,
-                ),
-                groupsSpace: 0.5,
-                barGroups: getData(20, barsWidth),
+    return FutureBuilder(
+      future: initializeDateFormatting('es'),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final barData = _getBarData();
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: SizedBox(
+            height: 260,
+            width: double.infinity,
+            child: SfCartesianChart(
+              margin:
+                  const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+              plotAreaBorderWidth: 0,
+              primaryXAxis: CategoryAxis(
+                axisLine: const AxisLine(width: 3, color: Colors.black),
+                majorTickLines: const MajorTickLines(size: 0),
+                labelStyle:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                majorGridLines: const MajorGridLines(width: 0),
               ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  List<BarChartGroupData> getData(int count, double barsWidth) {
-    List<BarChartGroupData> barChartGroups = [];
-    Random random = Random();
-
-    for (int i = 0; i < count; i++) {
-      double randomValue = 10 + random.nextDouble() * 90;
-
-      barChartGroups.add(
-        BarChartGroupData(
-          x: i,
-          barRods: [
-            BarChartRodData(
-              toY: 101,
-              rodStackItems: [
-                BarChartRodStackItem(
-                  0,
-                  randomValue,
-                  _getProgressBarColor(randomValue.toInt()),
+              primaryYAxis: NumericAxis(
+                minimum: 0,
+                maximum: 100,
+                interval: 20,
+                axisLine: const AxisLine(width: 3, color: Colors.black),
+                majorTickLines: const MajorTickLines(size: 0),
+                labelStyle:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                majorGridLines: const MajorGridLines(width: 0),
+              ),
+              series: <ColumnSeries<dynamic, String>>[
+                ColumnSeries<dynamic, String>(
+                  dataSource: barData,
+                  xValueMapper: (dynamic data, _) => data.label,
+                  yValueMapper: (dynamic data, _) =>
+                      data.isNA ? null : data.value,
+                  pointColorMapper: (dynamic data, _) =>
+                      data.isNA ? const Color(0xFF888888) : data.color,
+                  borderRadius: BorderRadius.circular(6),
+                  width: 0.5,
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelAlignment: ChartDataLabelAlignment.top,
+                    textStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  dataLabelMapper: (dynamic data, _) =>
+                      data.isNA ? 'NA' : data.value.toInt().toString(),
                 ),
               ],
-              borderRadius: BorderRadius.zero,
-              width: barsWidth,
-              color: Colors.transparent,
             ),
-          ],
-        ),
-      );
-      if (barChartGroups.length > 10) {
-        barChartGroups.removeAt(0);
-      }
-    }
-    return barChartGroups;
+          ),
+        );
+      },
+    );
   }
+}
 
-  Color _getProgressBarColor(int progress) {
-    if (progress < 50) {
-      return const Color.fromARGB(255, 208, 34, 34);
-    } else if (progress < 80) {
-      return const Color.fromARGB(255, 241, 162, 73);
-    } else {
-      return const Color.fromARGB(255, 25, 187, 79);
-    }
-  }
+class _AuditBarData {
+  final String label;
+  final double value;
+  final Color color;
+  final bool isNA;
+  _AuditBarData(
+      {required this.label,
+      required this.value,
+      required this.color,
+      this.isNA = false});
 }

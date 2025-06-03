@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_app_5s/utils/global_states/admin_id_provider.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
 
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({Key? key}) : super(key: key);
@@ -69,8 +70,6 @@ class AdminDashboardPage extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.all(16.0),
                   children: [
-                    _buildMenuItem(context, Icons.business, 'Crear nueva org',
-                        'CreateOrganization'),
                     _buildMenuItem(context, Icons.group, 'Áreas', 'AreaMenu',
                         onTap: () {
                       final idProvider =
@@ -86,69 +85,12 @@ class AdminDashboardPage extends StatelessWidget {
                       }
                       context.goNamed('AreaMenu');
                     }),
-                    _buildMenuItem(
-                        context, Icons.person, 'Accesos', 'AccessesListPage'),
                   ],
                 ),
               ),
             ],
           ),
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: 32.0,
-            child: Container(
-              padding: EdgeInsets.zero,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(40),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: BottomNavigationBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                type: BottomNavigationBarType.fixed,
-                selectedFontSize:
-                    0, // Para evitar espacio adicional por el texto
-                unselectedFontSize: 0,
-                items: const [
-                  BottomNavigationBarItem(
-                      icon: Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Icon(Icons.home, color: Colors.white)),
-                      label: ''),
-                  BottomNavigationBarItem(
-                      icon: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.person, color: Colors.white)),
-                      label: ''),
-                  BottomNavigationBarItem(
-                      icon: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.add_circle,
-                              size: 40, color: Colors.white)),
-                      label: ''),
-                  BottomNavigationBarItem(
-                      icon: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.article, color: Colors.white)),
-                      label: ''),
-                  BottomNavigationBarItem(
-                      icon: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.pie_chart, color: Colors.white)),
-                      label: ''),
-                ],
-              ),
-            ),
-          ),
+          const AdminNavBar(),
         ],
       ),
     );

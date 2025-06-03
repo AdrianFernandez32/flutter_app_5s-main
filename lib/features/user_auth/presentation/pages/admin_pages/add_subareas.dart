@@ -134,6 +134,133 @@ class _AddSubAreaState extends State<AddSubArea> {
     }
   }
 
+  void _showCreateSubAreaDialog() {
+    final TextEditingController nameController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Crear Subárea'),
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Nombre de la subárea',
+                hintText: 'Ingrese el nombre de la subárea',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese un nombre';
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final name = nameController.text.trim();
+                  Navigator.of(dialogContext).pop();
+
+                  final idProvider =
+                      Provider.of<AdminIdProvider>(context, listen: false);
+                  final orgId = idProvider.orgId;
+                  final areaId = idProvider.areaId;
+
+                  if (orgId == null || areaId == null) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Faltan IDs necesarios')),
+                      );
+                    }
+                    return;
+                  }
+
+                  final accessToken = authService.accessToken;
+                  if (accessToken == null) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('No hay token de acceso disponible')),
+                      );
+                    }
+                    return;
+                  }
+
+                  final baseUrl = dotenv.env['API_URL'];
+                  if (baseUrl == null) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Error de configuración: API_URL no definida')),
+                      );
+                    }
+                    return;
+                  }
+
+                  setState(() {
+                    isLoading = true;
+                  });
+
+                  try {
+                    final response = await http.post(
+                      Uri.parse('$baseUrl/org/$orgId/area/$areaId/subarea'),
+                      headers: {
+                        'Authorization': 'Bearer $accessToken',
+                        'Content-Type': 'application/json',
+                      },
+                      body: jsonEncode({'name': name}),
+                    );
+
+                    if (mounted) {
+                      if (response.statusCode == 201 ||
+                          response.statusCode == 200) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Subárea creada exitosamente')),
+                        );
+                        // Recargar la lista de subáreas
+                        await _fetchSubAreas();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Error al crear subárea: ${response.statusCode}')),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error de conexión: $e')),
+                      );
+                    }
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  }
+                }
+              },
+              child: const Text('Crear'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -158,7 +285,7 @@ class _AddSubAreaState extends State<AddSubArea> {
                 color: colorScheme.surface,
                 child: subAreas.isEmpty
                     ? const Center(
-                        child: Text('No hay departamentos para mostrar'),
+                        child: Text('No hay subáreas para mostrar'),
                       )
                     : ListView.builder(
                         itemCount: subAreas.length,
@@ -179,10 +306,7 @@ class _AddSubAreaState extends State<AddSubArea> {
           ),
           const AdminNavBar(),
           FloatingPlusActionButton(
-            onPressed: () {
-              //TODO : Agregar funcionalidad
-              print("AddDepartment");
-            },
+            onPressed: _showCreateSubAreaDialog,
           )
         ],
       ),
@@ -192,6 +316,14 @@ class _AddSubAreaState extends State<AddSubArea> {
   void _handleSubAreaTap(String id) {
     final idProvider = Provider.of<AdminIdProvider>(context, listen: false);
     idProvider.setSubareaId(id);
-    context.pushNamed('FiveSMenu');
+
+    // Encontrar el nombre de la subárea
+    final subarea = subAreas.firstWhere((s) => s['id'] == id);
+    final subareaName = subarea['title'] as String;
+
+    context.goNamed(
+      'FiveSMenu',
+      extra: subareaName,
+    );
   }
 }
