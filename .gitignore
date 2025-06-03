@@ -8,4 +8,6 @@ ios/Pods/
 ios/.symlinks/
 ios/Flutter/Flutter.podspec
 android/.gradle/
+android/.idea/
+.vscode/
 android/app/debug.keystore
