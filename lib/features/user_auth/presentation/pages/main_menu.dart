@@ -24,7 +24,8 @@ class _MainMenuState extends State<MainMenu> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.goNamed('OrganizationsListPage'),
         ),
-        title: const Text('Menú Principal', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Menú Principal', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -55,8 +56,8 @@ class _MainMenuState extends State<MainMenu> {
                           children: [
                             Text(
                               'Bienvenido',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 16),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
                             ),
                             Text(
                               'Carlos Trasviña',
@@ -95,22 +96,9 @@ class _MainMenuState extends State<MainMenu> {
                     height: 10,
                   ),
                   _Button(
-                    title: 'Áreas',
-                    icon: Icons.grid_view_outlined,
-                    goToNamed: 'Gestion de Areas',
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _Button(
                     title: 'Ajustes',
                     icon: Icons.settings_outlined,
                     goToNamed: 'Settings',
-                  ),
-                  _Button(
-                    title: 'Accesos',
-                    icon: Icons.person_outline,
-                    goToNamed: 'AccessesListPage',
                   ),
                   SizedBox(
                     height: 10,

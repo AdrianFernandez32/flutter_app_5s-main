@@ -226,14 +226,14 @@ class _SubareasPageState extends State<SubareasPage> {
                         Navigator.of(context).pop(); // Cierra el loading
                         if (fullAuditResp.statusCode == 200) {
                           final auditData = json.decode(fullAuditResp.body);
-                          // Navigate to QuestionnairePage with auditData
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => QuestionnairePage(
-                                auditData: auditData,
-                              ),
-                            ),
+                          // Navigate to SSelectionPage with auditData
+                          context.pushNamed(
+                            'SSelection',
+                            extra: {
+                              'auditData': auditData,
+                              'subareaId': int.parse(subareaId.toString()),
+                              'subareaName': subareaName,
+                            },
                           );
                         } else {
                           _showErrorDialog(
@@ -292,13 +292,13 @@ class _SubareasPageState extends State<SubareasPage> {
                             final auditData = json.decode(body);
                             if (auditData != null &&
                                 auditData is Map<String, dynamic>) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => QuestionnairePage(
-                                    auditData: auditData,
-                                  ),
-                                ),
+                              context.pushNamed(
+                                'SSelection',
+                                extra: {
+                                  'auditData': auditData,
+                                  'subareaId': int.parse(subareaId.toString()),
+                                  'subareaName': subareaName,
+                                },
                               );
                             } else {
                               _showErrorDialog(context,
@@ -331,13 +331,14 @@ class _SubareasPageState extends State<SubareasPage> {
                                 if (fullAuditResp.statusCode == 200) {
                                   final auditData =
                                       json.decode(fullAuditResp.body);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => QuestionnairePage(
-                                        auditData: auditData,
-                                      ),
-                                    ),
+                                  context.pushNamed(
+                                    'SSelection',
+                                    extra: {
+                                      'auditData': auditData,
+                                      'subareaId':
+                                          int.parse(subareaId.toString()),
+                                      'subareaName': subareaName,
+                                    },
                                   );
                                 } else {
                                   _showErrorDialog(context,
@@ -381,19 +382,32 @@ class _SubareasPageState extends State<SubareasPage> {
                   ),
                   child: Row(
                     children: [
-                      Icon(icon, size: 40, color: Colors.black87),
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1487D4),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 24),
                       Expanded(
-                        child: Text(
-                          subareas[i]['name'],
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              subareas[i]['name'],
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const Icon(Icons.arrow_forward_ios,
-                          color: Colors.blue, size: 28),
+                          color: Colors.blue, size: 32),
                     ],
                   ),
                 ),

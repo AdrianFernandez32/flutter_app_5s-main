@@ -4,10 +4,12 @@ class AdminIdProvider extends ChangeNotifier {
   String? _orgId;
   String? _areaId;
   String? _subareaId;
+  String? _baseCategoryId;
 
   String? get orgId => _orgId;
   String? get areaId => _areaId;
   String? get subareaId => _subareaId;
+  String? get baseCategoryId => _baseCategoryId;
 
   void setOrgId(String id) {
     _orgId = id;
@@ -21,6 +23,11 @@ class AdminIdProvider extends ChangeNotifier {
 
   void setSubareaId(String id) {
     _subareaId = id;
+    notifyListeners();
+  }
+
+  void setBaseCategoryId(String id) {
+    _baseCategoryId = id;
     notifyListeners();
   }
 
@@ -39,10 +46,16 @@ class AdminIdProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearBaseCategoryId() {
+    _baseCategoryId = null;
+    notifyListeners();
+  }
+
   void clearAll() {
     _orgId = null;
     _areaId = null;
     _subareaId = null;
+    _baseCategoryId = null;
     notifyListeners();
   }
 }

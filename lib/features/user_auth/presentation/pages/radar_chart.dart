@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class RadarChartWidget extends StatefulWidget {
-  const RadarChartWidget({Key? key}) : super(key: key);
+  final List<dynamic> audits;
+  final dynamic selectedAudit;
+  const RadarChartWidget(
+      {Key? key, required this.audits, required this.selectedAudit})
+      : super(key: key);
 
   @override
   RadarChartExampleState createState() => RadarChartExampleState();
@@ -77,102 +81,41 @@ class RadarChartExampleState extends State<RadarChartWidget> {
   }
 
   List<RadarDataSet> showingDataSets() {
-    return rawDataSets().asMap().entries.map((entry) {
-      final rawDataSet = entry.value;
-
-      return RadarDataSet(
-        fillColor: rawDataSet.title == "eses"
-            ? rawDataSet.color.withOpacity(0.7)
-            : rawDataSet.color.withOpacity(0),
-        borderColor: rawDataSet.color,
-        entryRadius: rawDataSet.title == "eses" ? 3 : 0,
+    // El primer dataset es la auditoría seleccionada (azul), los demás son históricos (gris)
+    List<RadarDataSet> sets = [];
+    if (widget.selectedAudit != null) {
+      sets.add(RadarDataSet(
+        fillColor: Colors.blue.withOpacity(0.7),
+        borderColor: Colors.blue,
+        entryRadius: 3,
+        dataEntries: _getSValues(widget.selectedAudit)
+            .map((e) => RadarEntry(value: e))
+            .toList(),
+        borderWidth: 3,
+      ));
+    }
+    for (final audit in widget.audits) {
+      if (widget.selectedAudit != null &&
+          audit['id'] == widget.selectedAudit['id']) continue;
+      sets.add(RadarDataSet(
+        fillColor: Colors.grey.withOpacity(0.2),
+        borderColor: Colors.grey,
+        entryRadius: 0,
         dataEntries:
-            rawDataSet.values.map((e) => RadarEntry(value: e)).toList(),
-        borderWidth: rawDataSet.title == "eses" ? 3 : 1,
-      );
-    }).toList();
+            _getSValues(audit).map((e) => RadarEntry(value: e)).toList(),
+        borderWidth: 1,
+      ));
+    }
+    return sets;
   }
 
-  List<RawDataSet> rawDataSets() {
-    return [
-      RawDataSet(
-        title: 'eses',
-        color: Colors.red,
-        values: [
-          0,
-          20,
-          40,
-          60,
-          100,
-        ],
-      ),
-      RawDataSet(
-        title: 'test',
-        color: Colors.transparent,
-        values: [
-          100,
-          100,
-          100,
-          100,
-          100,
-        ],
-      ),
-      RawDataSet(
-        title: 'test',
-        color: Colors.transparent,
-        values: [
-          0,
-          0,
-          0,
-          0,
-          0,
-        ],
-      ),
-      RawDataSet(
-        title: 'test',
-        color: Colors.grey,
-        values: [
-          20,
-          20,
-          20,
-          20,
-          20,
-        ],
-      ),
-      RawDataSet(
-        title: 'test',
-        color: Colors.grey,
-        values: [
-          40,
-          40,
-          40,
-          40,
-          40,
-        ],
-      ),
-      RawDataSet(
-        title: 'test',
-        color: Colors.grey,
-        values: [
-          60,
-          60,
-          60,
-          60,
-          60,
-        ],
-      ),
-      RawDataSet(
-        title: 'test',
-        color: Colors.grey,
-        values: [
-          80,
-          80,
-          80,
-          80,
-          80,
-        ],
-      ),
-    ];
+  List<double> _getSValues(dynamic audit) {
+    final sKeys = ['S1', 'S2', 'S3', 'S4', 'S5'];
+    if (audit == null || audit['s_scores'] == null) {
+      return List.filled(5, 0.0);
+    }
+    return List<double>.from(
+        sKeys.map((k) => (audit['s_scores'][k] ?? 0).toDouble()));
   }
 }
 
