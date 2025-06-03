@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_appbar.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/widgets/admin_navbar.dart';
+import 'package:flutter_app_5s/utils/global_states/admin_id_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app_5s/auth/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class FiveSMenu extends StatefulWidget {
   final String subareaId;
@@ -67,7 +69,7 @@ class _FiveSMenuState extends State<FiveSMenu> {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as List;
+        final data = jsonDecode(utf8.decode(response.bodyBytes)) as List;
         setState(() {
           categories = data
               .map((item) => {
@@ -153,7 +155,7 @@ class _FiveSMenuState extends State<FiveSMenu> {
       appBar: AdminAppBar(
         title: widget.subareaName,
         onBackPressed: () {
-          context.pop();
+          context.goNamed('AddSubArea');
         },
       ),
       body: Stack(
@@ -184,8 +186,13 @@ class _FiveSMenuState extends State<FiveSMenu> {
                         subtitle: Text(category['description']),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
-                          // TODO: Navegar a la página de preguntas de esta categoría
-                          print('Categoría seleccionada: ${category['id']}');
+                          // Guarda el baseCategoryId en el provider
+                          Provider.of<AdminIdProvider>(context, listen: false)
+                              .setBaseCategoryId(category['id'].toString());
+
+                          // Navega a la pantalla de preguntas
+                          context.goNamed(
+                              "QuestionsPage"); 
                         },
                       );
                     }).toList(),

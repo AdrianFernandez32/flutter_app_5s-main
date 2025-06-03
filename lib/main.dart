@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/add_subareas.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/admin_dashboard.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/five_s_menu.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/questions_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
@@ -198,6 +198,11 @@ final GoRouter _router = GoRouter(
           subareaName: subareaName,
         );
       },
+    ),
+    GoRoute(
+      name: "QuestionsPage",
+      path: '/questions',
+      builder: (context, state) => AdminQuestionsPage(),
     ),
   ],
 );
