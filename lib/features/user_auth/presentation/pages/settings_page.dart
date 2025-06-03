@@ -157,7 +157,8 @@ class SettingsPageState extends State<SettingsPage> {
                         padding: const EdgeInsets.only(
                             top: 12, bottom: 12, left: 20, right: 20),
                         decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
                             color: colorScheme.surface),
                         child: Column(
                           children: [

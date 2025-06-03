@@ -16,7 +16,7 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
   // State variables for user and departments
   String userName = '';
   String userEmail = '';
-  List<Map<String, String>> departments = [];
+  List<Map<String, dynamic>> departments = [];
   bool isLoading = true;
   Map<String, dynamic>? userData;
 
@@ -78,8 +78,14 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
         setState(() {
           departments = (data as List?)
                   ?.map((d) => {
-                        'name': (d['roleName'] ?? '').toString(),
-                        'role': (d['roleName'] ?? '').toString(),
+                        'id': d['id']?.toString(),
+                        'name': d['roleName'] ?? '',
+                        'role': d['roleName'] ?? '',
+                        'roleId': d['roleId']?.toString(),
+                        'allowedSubareaId': d['allowedSubareaId']?.toString(),
+                        'allowedSubareaName': d['allowedSubareaName'] ?? '',
+                        'areaId': d['areaId']?.toString(),
+                        'areaName': d['areaName'] ?? '',
                       })
                   .toList() ??
               [];
@@ -205,14 +211,33 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                                   ),
                                 ),
                               ),
-                              subtitle: Center(
-                                child: Text(
-                                  'Rol: ${dept['role']?.isNotEmpty == true ? dept['role']! : 'Sin rol'}',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black87,
+                              subtitle: Column(
+                                children: [
+                                  Text(
+                                    'Rol: ${dept['role']?.isNotEmpty == true ? dept['role']! : 'Sin rol'}',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black87,
+                                    ),
                                   ),
-                                ),
+                                  if (dept['areaName']?.isNotEmpty == true)
+                                    Text(
+                                      'Área: ${dept['areaName']}',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  if (dept['allowedSubareaName']?.isNotEmpty ==
+                                      true)
+                                    Text(
+                                      'Subárea: ${dept['allowedSubareaName']}',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                ],
                               ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.edit,
@@ -221,32 +246,17 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                                   showDialog(
                                     context: context,
                                     builder: (context) {
-                                      // Datos actuales del permiso
-                                      int? selectedRoleId;
-                                      if (dept['role']?.toLowerCase() ==
-                                          'auditor') {
-                                        selectedRoleId = 2;
-                                      } else if (dept['role']?.toLowerCase() ==
-                                          'editor') {
-                                        selectedRoleId = 3;
-                                      }
-
-                                      // No obtenemos el userRoleId del dept, lo obtendremos de la respuesta del API
-                                      int? userRoleId;
-                                      final int? currentSubareaId =
-                                          dept['allowedSubareaId'] is int
-                                              ? dept['allowedSubareaId'] as int?
-                                              : int.tryParse(
-                                                  dept['allowedSubareaId']
-                                                          ?.toString() ??
-                                                      '');
-                                      int? areaId = dept['areaId'] is int
-                                          ? dept['areaId'] as int?
-                                          : int.tryParse(
-                                              dept['areaId']?.toString() ?? '');
-                                      String areaName = dept['areaName'] ??
-                                          dept['areaId']?.toString() ??
-                                          'Área';
+                                      // Inicializar variables SIEMPRE que se abre el modal
+                                      int? selectedRoleId =
+                                          int.tryParse(dept['roleId'] ?? '');
+                                      int? userRoleId =
+                                          int.tryParse(dept['id'] ?? '');
+                                      int? currentSubareaId = int.tryParse(
+                                          dept['allowedSubareaId'] ?? '');
+                                      int? areaId =
+                                          int.tryParse(dept['areaId'] ?? '');
+                                      String areaName =
+                                          dept['areaName'] ?? 'Área';
                                       int? selectedSubareaId = currentSubareaId;
                                       List<Map<String, dynamic>> subareas = [];
                                       bool loadingSubareas = true;
@@ -389,7 +399,7 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
 
                                       return StatefulBuilder(
                                         builder: (context, setState) {
-                                          // Fetch roles and subareas only once
+                                          // Siempre que se abre el modal, hacer fetch de roles y subáreas
                                           if (loadingRoles) {
                                             fetchRoles().then((_) {
                                               final currentAreaId = areaId;
@@ -848,6 +858,137 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                                                                 child:
                                                                     const Text(
                                                                   'Cancelar',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          18,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          8),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  final confirmed =
+                                                                      await showDialog<
+                                                                          bool>(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (context) =>
+                                                                            AlertDialog(
+                                                                      title: const Text(
+                                                                          'Confirmar eliminación'),
+                                                                      content:
+                                                                          const Text(
+                                                                              '¿Estás seguro de que deseas eliminar este rol? Esta acción no se puede deshacer.'),
+                                                                      actions: [
+                                                                        TextButton(
+                                                                          onPressed: () =>
+                                                                              Navigator.of(context).pop(false),
+                                                                          child:
+                                                                              const Text('Cancelar'),
+                                                                        ),
+                                                                        TextButton(
+                                                                          onPressed: () =>
+                                                                              Navigator.of(context).pop(true),
+                                                                          child: const Text(
+                                                                              'Eliminar',
+                                                                              style: TextStyle(color: Colors.red)),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                  if (confirmed ==
+                                                                      true) {
+                                                                    final accessToken =
+                                                                        authService
+                                                                            .accessToken;
+                                                                    if (orgId ==
+                                                                            null ||
+                                                                        userRoleId ==
+                                                                            null) {
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        const SnackBar(
+                                                                            content:
+                                                                                Text('Faltan datos para eliminar.')),
+                                                                      );
+                                                                      return;
+                                                                    }
+                                                                    try {
+                                                                      final response =
+                                                                          await http
+                                                                              .delete(
+                                                                        Uri.parse(
+                                                                            'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/users/${widget.userId}/roles/$userRoleId'),
+                                                                        headers: {
+                                                                          'Authorization':
+                                                                              'Bearer $accessToken',
+                                                                        },
+                                                                      );
+                                                                      if (response.statusCode ==
+                                                                              200 ||
+                                                                          response.statusCode ==
+                                                                              204) {
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                        await _fetchUserData();
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                              content: Text('Rol eliminado correctamente.')),
+                                                                        );
+                                                                      } else {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              content: Text('Error al eliminar rol: \\${response.statusCode}')),
+                                                                        );
+                                                                      }
+                                                                    } catch (e) {
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        SnackBar(
+                                                                            content:
+                                                                                Text('Error de red: $e')),
+                                                                      );
+                                                                    }
+                                                                  }
+                                                                },
+                                                                style: ElevatedButton
+                                                                    .styleFrom(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            18),
+                                                                  ),
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          12),
+                                                                ),
+                                                                child:
+                                                                    const Text(
+                                                                  'Eliminar',
                                                                   style: TextStyle(
                                                                       fontSize:
                                                                           18,
