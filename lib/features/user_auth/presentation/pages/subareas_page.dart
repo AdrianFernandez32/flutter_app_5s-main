@@ -226,14 +226,14 @@ class _SubareasPageState extends State<SubareasPage> {
                         Navigator.of(context).pop(); // Cierra el loading
                         if (fullAuditResp.statusCode == 200) {
                           final auditData = json.decode(fullAuditResp.body);
-                          // Navigate to QuestionnairePage with auditData
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => QuestionnairePage(
-                                auditData: auditData,
-                              ),
-                            ),
+                          // Navigate to SSelectionPage with auditData
+                          context.pushNamed(
+                            'SSelection',
+                            extra: {
+                              'auditData': auditData,
+                              'subareaId': int.parse(subareaId.toString()),
+                              'subareaName': subareaName,
+                            },
                           );
                         } else {
                           _showErrorDialog(
@@ -292,13 +292,13 @@ class _SubareasPageState extends State<SubareasPage> {
                             final auditData = json.decode(body);
                             if (auditData != null &&
                                 auditData is Map<String, dynamic>) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => QuestionnairePage(
-                                    auditData: auditData,
-                                  ),
-                                ),
+                              context.pushNamed(
+                                'SSelection',
+                                extra: {
+                                  'auditData': auditData,
+                                  'subareaId': int.parse(subareaId.toString()),
+                                  'subareaName': subareaName,
+                                },
                               );
                             } else {
                               _showErrorDialog(context,
@@ -331,13 +331,14 @@ class _SubareasPageState extends State<SubareasPage> {
                                 if (fullAuditResp.statusCode == 200) {
                                   final auditData =
                                       json.decode(fullAuditResp.body);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => QuestionnairePage(
-                                        auditData: auditData,
-                                      ),
-                                    ),
+                                  context.pushNamed(
+                                    'SSelection',
+                                    extra: {
+                                      'auditData': auditData,
+                                      'subareaId':
+                                          int.parse(subareaId.toString()),
+                                      'subareaName': subareaName,
+                                    },
                                   );
                                 } else {
                                   _showErrorDialog(context,
