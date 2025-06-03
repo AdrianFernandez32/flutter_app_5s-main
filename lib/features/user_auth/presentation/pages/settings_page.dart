@@ -279,6 +279,7 @@ class _SettingsPageState extends State<SettingsPage> {
               isExpanded: _showTutorials,
               onTap: () => setState(() => _showTutorials = !_showTutorials),
             ),
+            //Hola
             if (_showTutorials) ...[
               _buildMenuItem(Icons.help_outline, 'FAQ'),
               _buildMenuItem(Icons.assignment, 'Crear Cuestionarios'),
