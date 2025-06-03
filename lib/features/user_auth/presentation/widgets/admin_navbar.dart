@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 // To use it, just add it to the end of a Stack
 // Recommend to use Stack in all of the Scaffolds to use this component correctly
@@ -33,6 +34,7 @@ class AdminNavBar extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           selectedFontSize: 0,
           unselectedFontSize: 0,
+          onTap: (index) => _handleNavigation(context, index),
           items: const [
             BottomNavigationBarItem(
                 icon: Padding(
@@ -64,5 +66,25 @@ class AdminNavBar extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleNavigation(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.goNamed('AdminDashboard');
+        break;
+      case 1:
+        context.goNamed('AccessesListPage');
+        break;
+      case 2:
+        context.goNamed('CreateOrganization');
+        break;
+      case 3:
+        context.goNamed('AreaMenu');
+        break;
+      case 4:
+        context.goNamed('Calificar 5s');
+        break;
+    }
   }
 }

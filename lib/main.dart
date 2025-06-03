@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_5s/features/admin_auth/presentation/questionnaires_admin_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/add_subareas.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/admin_dashboard.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/areas_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/five_s_menu.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/admin_pages/questions_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/areas_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audit_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/audits_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/create_organization_page.dart';
-import 'package:flutter_app_5s/features/admin_auth/presentation/five_s_menu.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/grading_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/inicio_admin.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
@@ -183,23 +183,26 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       name: "FiveSMenu",
-      path: '/fiveS/:departmentId',
+      path: '/fiveS',
       builder: (context, state) {
-        final departmentId = state.pathParameters['departmentId']!;
-        return FiveSMenu(departmentId: departmentId);
+        final idProvider = Provider.of<AdminIdProvider>(context, listen: false);
+        final subareaId = idProvider.subareaId;
+        final subareaName = state.extra as String? ?? 'Subárea';
+
+        if (subareaId == null) {
+          return const Center(child: Text('No se ha seleccionado una subárea'));
+        }
+
+        return FiveSMenu(
+          subareaId: subareaId,
+          subareaName: subareaName,
+        );
       },
     ),
     GoRoute(
-      name: "QuestionnaireAdminMenu",
-      path: '/subareas/:departmentId/5s/:fiveSId',
-      builder: (context, state) {
-        final departmentId = state.pathParameters['departmentId']!;
-        final fiveSId = state.pathParameters['fiveSId']!;
-        return QuestionnairesAdminMenu(
-          departmentId: departmentId,
-          fiveSId: fiveSId,
-        );
-      },
+      name: "QuestionsPage",
+      path: '/questions',
+      builder: (context, state) => AdminQuestionsPage(),
     ),
   ],
 );
