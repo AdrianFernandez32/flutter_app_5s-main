@@ -18,18 +18,19 @@ class UserBasicInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(240, 222, 229, 1),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 50,
-            backgroundColor: Color.fromRGBO(134, 75, 111, 1),
-            child: Icon(
+            backgroundColor: colorScheme.secondary,
+            child: const Icon(
               Icons.person,
               size: 50,
               color: Colors.white,
@@ -38,26 +39,26 @@ class UserBasicInfo extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             username ?? 'Sin nombre',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(79, 67, 73, 1),
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             rol ?? 'Sin rol',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
-              color: Color.fromRGBO(79, 67, 73, 1),
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             '${area ?? 'Sin área'} - ${zone ?? 'Sin zona'}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Color.fromRGBO(79, 67, 73, 1),
+              color: colorScheme.onSurface,
             ),
           ),
         ],
@@ -76,6 +77,7 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     const color = Color.fromRGBO(140, 140, 140, 1);
 
     // Datos simulados de un fetch
@@ -87,7 +89,6 @@ class SettingsPageState extends State<SettingsPage> {
       "area": "Embotellado"
     };
 
-    final colorScheme = Theme.of(context).colorScheme;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -111,7 +112,7 @@ class SettingsPageState extends State<SettingsPage> {
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(10),
             child: Container(
-              color: const Color.fromRGBO(140, 140, 140, 1),
+              color: colorScheme.secondary.withOpacity(0.5),
               height: 2,
             ),
           ),
@@ -155,10 +156,11 @@ class SettingsPageState extends State<SettingsPage> {
                           child: Container(
                         padding: const EdgeInsets.only(
                             top: 12, bottom: 12, left: 20, right: 20),
-                        decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                            color: Color.fromRGBO(240, 222, 229, 1)),
-                        child: const Column(
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
+                            color: colorScheme.surface),
+                        child: Column(
                           children: [
                             Row(
                               children: [
@@ -168,30 +170,30 @@ class SettingsPageState extends State<SettingsPage> {
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
-                                        color: Color.fromRGBO(79, 67, 73, 1)),
+                                        color: colorScheme.onSurface),
                                   ),
                                 ),
-                                _SwitchExample(),
+                                const _SwitchExample(),
                               ],
                             ),
-                            Divider(),
+                            const Divider(),
                             Row(
                               children: [
-                                Expanded(
+                                const Expanded(
                                   child: SizedBox(),
                                 ),
                                 Icon(
                                   Icons.attach_file,
-                                  color: Color.fromRGBO(134, 75, 111, 1),
+                                  color: colorScheme.secondary,
                                 ),
                                 Text(
                                   "Terminos de Privacidad",
                                   style: TextStyle(
-                                      color: Color.fromRGBO(134, 75, 111, 1),
+                                      color: colorScheme.secondary,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16),
                                 ),
-                                Expanded(
+                                const Expanded(
                                   child: SizedBox(),
                                 )
                               ],
@@ -222,10 +224,10 @@ class SettingsPageState extends State<SettingsPage> {
                         );
                       }
                     },
-                    child: const Text(
+                    child: Text(
                       "Cerrar Sesión",
                       style: TextStyle(
-                          color: Color.fromRGBO(134, 75, 111, 1),
+                          color: colorScheme.secondary,
                           fontWeight: FontWeight.bold,
                           fontSize: 20),
                     ),

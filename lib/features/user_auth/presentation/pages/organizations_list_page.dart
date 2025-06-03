@@ -298,6 +298,51 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
                                 ),
                                 child: ListTile(
                                   onTap: () => _handleOrganizationTap(org),
+                                  leading: org['logoUrl'] != null &&
+                                          org['logoUrl'].toString().isNotEmpty
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.network(
+                                            org['logoUrl'],
+                                            width: 48,
+                                            height: 48,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                width: 48,
+                                                height: 48,
+                                                decoration: BoxDecoration(
+                                                  color: colorScheme.secondary
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Icon(
+                                                  Icons.business,
+                                                  color: colorScheme.secondary,
+                                                  size: 24,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      : Container(
+                                          width: 48,
+                                          height: 48,
+                                          decoration: BoxDecoration(
+                                            color: colorScheme.secondary
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            Icons.business,
+                                            color: colorScheme.secondary,
+                                            size: 24,
+                                          ),
+                                        ),
                                   title: Text(
                                     org['name'] ?? 'Sin nombre',
                                     style: TextStyle(
