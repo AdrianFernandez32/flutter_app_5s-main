@@ -297,7 +297,9 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildFAQItem(
                 0,
                 '¿Qué hago si no veo mis áreas o usuarios?',
-                'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.',
+                'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.\n\n'
+                    'Correo:\n'
+                    'auris.apoyo@gmail.com',
               ),
               _buildFAQItem(
                 1,
