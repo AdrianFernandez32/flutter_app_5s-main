@@ -8,8 +8,17 @@ import 'package:go_router/go_router.dart';
 
 class QuestionnairePage extends StatefulWidget {
   final Map<String, dynamic> auditData;
-  const QuestionnairePage({Key? key, required this.auditData})
-      : super(key: key);
+  final String selectedS;
+  final int subareaId;
+  final String subareaName;
+
+  const QuestionnairePage({
+    Key? key,
+    required this.auditData,
+    required this.selectedS,
+    required this.subareaId,
+    required this.subareaName,
+  }) : super(key: key);
 
   // Método estático para arreglar encoding
   static String fixEncodingStatic(String text) {
@@ -24,177 +33,115 @@ class QuestionnairePage extends StatefulWidget {
   State<QuestionnairePage> createState() => _QuestionnairePageState();
 }
 
-class _QuestionnairePageState extends State<QuestionnairePage>
-    with TickerProviderStateMixin {
-  Map<String, List<Map<String, dynamic>>> sCategoriesMap = {};
-  List<String> sOrder = [];
-  int currentSIndex = 0;
+class _QuestionnairePageState extends State<QuestionnairePage> {
+  List<Map<String, dynamic>> visualQuestions = [];
   int currentQuestionIndex = 0;
-  TabController? _questionTabController;
-
-  // Mapa para guardar respuestas: questionId -> { 'score': int, 'comment': String, 'itemId': int }
-  Map<int, Map<String, dynamic>> respuestas = {};
+  Map<String, Map<String, dynamic>> respuestas = {}; // key: questionId_itemId
+  bool _isSaving = false;
+  bool _hasUnsavedChanges = false;
 
   @override
   void initState() {
     super.initState();
-    // Agrupa las preguntas por scategory
+    _expandQuestionsForItems();
+  }
+
+  void _expandQuestionsForItems() {
     final auditCategories =
         widget.auditData['auditCategories'] as List<dynamic>? ?? [];
-    for (var cat in auditCategories) {
-      final sCat = cat['scategory'] ?? 'S1';
-      if (!sCategoriesMap.containsKey(sCat)) {
-        sCategoriesMap[sCat] = [];
-      }
-      final questions = cat['auditQuestions'] as List<dynamic>? ?? [];
-      for (var q in questions) {
-        sCategoriesMap[sCat]!.add({
-          'category': cat,
-          'question': q,
-        });
-        // Precargar respuestas previas si existen
-        final questionId =
-            q['id'] is int ? q['id'] : int.tryParse(q['id'].toString()) ?? 0;
-        if (q['items'] != null) {
-          for (var item in q['items']) {
+    final filteredCategories = auditCategories
+        .where((cat) => cat['scategory'] == widget.selectedS)
+        .toList();
+    visualQuestions = [];
+    for (var cat in filteredCategories) {
+      final qs = cat['auditQuestions'] as List<dynamic>? ?? [];
+      for (var q in qs) {
+        final items = q['items'] as List<dynamic>? ?? [];
+        if (items.isEmpty) {
+          visualQuestions.add({
+            'category': cat,
+            'question': q,
+            'item': null,
+          });
+          // Precargar respuesta si existe
+          final questionId =
+              q['id'] is int ? q['id'] : int.tryParse(q['id'].toString()) ?? 0;
+          if (q['auditAnswer'] != null) {
+            respuestas['${questionId}_'] = {
+              'score': q['auditAnswer']['score'],
+              'comment': q['auditAnswer']['notes'],
+            };
+          }
+        } else {
+          for (var item in items) {
+            visualQuestions.add({
+              'category': cat,
+              'question': q,
+              'item': item,
+            });
+            final questionId = q['id'] is int
+                ? q['id']
+                : int.tryParse(q['id'].toString()) ?? 0;
+            final itemId = item['itemId'] ?? item['id'] ?? '';
             if (item['auditAnswer'] != null) {
-              respuestas[questionId] = {
+              respuestas['${questionId}_$itemId'] = {
                 'score': item['auditAnswer']['score'],
                 'comment': item['auditAnswer']['notes'],
               };
-              break; // Solo toma la primera respuesta encontrada por pregunta
             }
           }
         }
       }
     }
-    sOrder = sCategoriesMap.keys.toList()..sort();
-    _initQuestionTabController();
+    setState(() {});
   }
 
-  void _initQuestionTabController() {
-    final questions = sCategoriesMap[sOrder[currentSIndex]] ?? [];
-    _questionTabController?.dispose();
-    _questionTabController =
-        TabController(length: questions.length, vsync: this);
-    _questionTabController!.addListener(() {
-      setState(() {
-        currentQuestionIndex = _questionTabController!.index;
-      });
+  void _onChanged(int questionId, dynamic itemId, int? score, String? comment) {
+    setState(() {
+      respuestas['${questionId}_${itemId ?? ''}'] = {
+        'score': score,
+        'comment': comment,
+      };
+      _hasUnsavedChanges = true;
     });
-    currentQuestionIndex = 0;
   }
 
-  @override
-  void dispose() {
-    _questionTabController?.dispose();
-    super.dispose();
-  }
-
-  void goToPreviousS() {
-    if (currentSIndex > 0) {
-      setState(() {
-        currentSIndex--;
-        _initQuestionTabController();
-      });
-    }
-  }
-
-  void goToNextS() {
-    if (currentSIndex < sOrder.length - 1) {
-      setState(() {
-        currentSIndex++;
-        _initQuestionTabController();
-      });
-    }
-  }
-
-  String fixEncoding(String text) {
+  Future<void> _saveAnswers() async {
+    setState(() => _isSaving = true);
     try {
-      return utf8.decode(latin1.encode(text));
-    } catch (_) {
-      return text;
-    }
-  }
-
-  Future<void> onGuardarPressed() async {
-    final bool? confirmar = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar guardado'),
-          content:
-              const Text('¿Estás seguro de que deseas guardar esta auditoría?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancelar'),
-              onPressed: () => Navigator.of(context).pop(false),
-            ),
-            TextButton(
-              child: const Text('Guardar'),
-              onPressed: () => Navigator.of(context).pop(true),
-            ),
-          ],
-        );
-      },
-    );
-    if (confirmar == true) {
-      await guardarAuditoria();
-    }
-  }
-
-  Future<void> finalizarAuditoria() async {
-    await guardarAuditoria(completar: true);
-  }
-
-  Future<void> guardarAuditoria({bool completar = false}) async {
-    final authService = AuthService();
-    final accessToken = authService.accessToken;
-    if (accessToken == null || accessToken.isEmpty) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No has iniciado sesión.')),
-      );
-      return;
-    }
-
-    // Construir el payload para /audit/answer/batch
-    final List<Map<String, dynamic>> payload = [];
-    for (final entry in respuestas.entries) {
-      final questionId = entry.key;
-      final respuesta = entry.value;
-
-      // Obtener la pregunta actual y sus items
-      final currentCategory =
-          sCategoriesMap[sOrder[currentSIndex]]?[currentQuestionIndex];
-      final currentQuestion = currentCategory?['question'];
-      final items = currentQuestion?['items'] as List<dynamic>? ?? [];
-
-      // Si hay items, crear una respuesta por cada item
-      if (items.isNotEmpty) {
-        for (var item in items) {
+      final authService = AuthService();
+      final accessToken = authService.accessToken;
+      if (accessToken == null || accessToken.isEmpty) {
+        throw Exception('No has iniciado sesión.');
+      }
+      final List<Map<String, dynamic>> payload = [];
+      for (final entry in respuestas.entries) {
+        final key = entry.key;
+        final respuesta = entry.value;
+        if (respuesta['score'] == null &&
+            (respuesta['comment'] == null || respuesta['comment'].isEmpty)) {
+          continue;
+        }
+        final parts = key.split('_');
+        final questionId = int.tryParse(parts[0]) ?? 0;
+        final itemId = parts.length > 1 && parts[1].isNotEmpty
+            ? int.tryParse(parts[1])
+            : null;
+        if (itemId != null) {
           payload.add({
             'questionId': questionId,
             'score': respuesta['score'],
             'notes': respuesta['comment'] ?? '',
-            'itemId': item['itemId'],
+            'itemId': itemId,
+          });
+        } else {
+          payload.add({
+            'questionId': questionId,
+            'score': respuesta['score'],
+            'notes': respuesta['comment'] ?? '',
           });
         }
-      } else {
-        // Si no hay items, enviar solo la respuesta de la pregunta
-        payload.add({
-          'questionId': questionId,
-          'score': respuesta['score'],
-          'notes': respuesta['comment'] ?? '',
-        });
       }
-    }
-
-    print('Payload a enviar:');
-    print(payload);
-
-    try {
       final response = await http.post(
         Uri.parse('https://djnxv2fqbiqog.cloudfront.net/audit/answer/batch'),
         headers: {
@@ -203,233 +150,311 @@ class _QuestionnairePageState extends State<QuestionnairePage>
         },
         body: jsonEncode(payload),
       );
-
       if (!mounted) return;
-
       if (response.statusCode == 201) {
-        if (completar) {
-          // Ahora cerrar la auditoría
-          final auditId = widget.auditData['id'];
-          final closeResponse = await http.get(
-            Uri.parse(
-                'https://djnxv2fqbiqog.cloudfront.net/audit/complete/$auditId'),
-            headers: {
-              'Authorization': 'Bearer $accessToken',
-            },
-          );
-          if (closeResponse.statusCode == 200) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content:
-                      Text('Auditoría guardada y completada exitosamente')),
-            );
-            // Espera 500ms antes de navegar para evitar overlays bloqueados
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                context.goNamed('Menu');
-              }
-            });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(
-                      'Guardado OK, pero error al completar auditoría: ${closeResponse.statusCode}')),
-            );
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text(
-                    'Respuestas guardadas. Puedes continuar la auditoría después.')),
-          );
-        }
-      } else {
-        print('Error al guardar: ${response.statusCode}');
-        print('Respuesta: ${response.body}');
+        setState(() {
+          _hasUnsavedChanges = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: ${response.statusCode}')),
+          const SnackBar(content: Text('Respuestas guardadas correctamente')),
         );
+      } else {
+        throw Exception('Error al guardar: ${response.statusCode}');
       }
     } catch (e) {
-      if (!mounted) return;
-      print('Error al guardar: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al guardar: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    if (!_hasUnsavedChanges) return true;
+    final shouldLeave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cambios sin guardar'),
+        content: const Text('Tienes cambios sin guardar. ¿Qué deseas hacer?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Salir sin guardar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _saveAnswers();
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Guardar y salir'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+    return shouldLeave ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (sOrder.isEmpty) {
+    if (visualQuestions.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('Cuestionario')),
         body:
             const Center(child: Text('No hay preguntas en este cuestionario.')),
       );
     }
-    final currentS = sOrder[currentSIndex];
-    final questions = sCategoriesMap[currentS]!;
-    final currentCat = questions[currentQuestionIndex]['category'];
-    final currentQ = questions[currentQuestionIndex]['question'];
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 40,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+    final currentQWrap = visualQuestions[currentQuestionIndex];
+    final currentCat = currentQWrap['category'];
+    final currentQ = currentQWrap['question'];
+    final item = currentQWrap['item'];
+    final questionId = currentQ['id'] is int
+        ? currentQ['id']
+        : int.tryParse(currentQ['id'].toString()) ?? 0;
+    final itemId = item != null ? (item['itemId'] ?? item['id'] ?? '') : null;
+    final respuesta = respuestas['${questionId}_${itemId ?? ''}'] ??
+        {'score': null, 'comment': ''};
+    String? itemName;
+    if (item != null) {
+      itemName = item['item']?.toString() ??
+          item['name']?.toString() ??
+          item['description']?.toString() ??
+          item['label']?.toString() ??
+          item['itemName']?.toString() ??
+          item['itemId']?.toString();
+    }
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 40,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () async {
+              final canLeave = await _onWillPop();
+              if (canLeave) Navigator.pop(context);
+            },
+          ),
+          title: const SizedBox.shrink(),
+          automaticallyImplyLeading: false,
         ),
-        title: const SizedBox.shrink(),
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
-        children: [
-          // Texto grande del S actual con fondo blanco
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.only(top: 12, bottom: 0),
-            child: Center(
-              child: Text(
-                currentS,
-                style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87),
-                textAlign: TextAlign.center,
+        body: Column(
+          children: [
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.only(top: 12, bottom: 0),
+              child: Center(
+                child: Column(
+                  children: [
+                    Text(
+                      widget.selectedS,
+                      style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      _getSDescription(widget.selectedS),
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          // Header dinámico
-          Container(
-            color: Colors.white,
-            padding:
-                const EdgeInsets.only(top: 8, bottom: 4, left: 16, right: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  QuestionnairePage.fixEncodingStatic(currentCat['name'] ?? ''),
-                  style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  QuestionnairePage.fixEncodingStatic(
-                      currentCat['description'] ?? ''),
-                  style: const TextStyle(fontSize: 15, color: Colors.black54),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-          TabBar(
-            controller: _questionTabController,
-            isScrollable: true,
-            indicatorColor: const Color.fromRGBO(134, 75, 111, 1),
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
-            tabs: List.generate(
-                questions.length, (qIdx) => Tab(text: 'Pregunta ${qIdx + 1}')),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _questionTabController,
-              children: List.generate(questions.length, (qIdx) {
-                final q = questions[qIdx]['question'];
-                final questionId = q['id'] is int
-                    ? q['id']
-                    : int.tryParse(q['id'].toString()) ?? 0;
-                final respuesta =
-                    respuestas[questionId] ?? {'score': null, 'comment': ''};
-                // Obtener el nombre del primer item si existe
-                String? itemName;
-                if (q['items'] != null &&
-                    q['items'] is List &&
-                    q['items'].isNotEmpty) {
-                  final item = q['items'][0];
-                  itemName = item['item']?.toString() ??
-                      item['name']?.toString() ??
-                      item['description']?.toString() ??
-                      item['label']?.toString() ??
-                      item['itemName']?.toString() ??
-                      item['itemId']?.toString();
-                }
-                return SingleChildScrollView(
-                  child: _QuestionView(
-                    question:
-                        QuestionnairePage.fixEncodingStatic(q['question']),
-                    itemName: itemName,
-                    questionId: questionId,
-                    score: respuesta['score'],
-                    comment: respuesta['comment'],
-                    onChanged: (score, comment) {
-                      setState(() {
-                        respuestas[questionId] = {
-                          'score': score,
-                          'comment': comment,
-                        };
-                      });
-                    },
+            Container(
+              color: Colors.white,
+              padding:
+                  const EdgeInsets.only(top: 8, bottom: 4, left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    QuestionnairePage.fixEncodingStatic(
+                        currentCat['name'] ?? ''),
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
-                );
-              }),
+                  const SizedBox(height: 4),
+                  Text(
+                    QuestionnairePage.fixEncodingStatic(
+                        currentCat['description'] ?? ''),
+                    style: const TextStyle(fontSize: 15, color: Colors.black54),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Botón Anterior S
-              IconButton(
-                onPressed: currentSIndex > 0 ? goToPreviousS : null,
-                icon: const Icon(Icons.arrow_back, size: 32),
-                color: const Color(0xFF3887C2),
-                tooltip: 'Anterior S',
-              ),
-              // Botón Guardar
-              ElevatedButton(
-                onPressed: onGuardarPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(12),
-                  minimumSize: const Size(48, 48),
+            Expanded(
+              child: SingleChildScrollView(
+                child: _QuestionView(
+                  question:
+                      QuestionnairePage.fixEncodingStatic(currentQ['question']),
+                  itemName: itemName,
+                  questionId: questionId,
+                  itemId: itemId,
+                  score: respuesta['score'],
+                  comment: respuesta['comment'],
+                  onChanged: (score, comment) =>
+                      _onChanged(questionId, itemId, score, comment),
                 ),
-                child: const Icon(Icons.save, size: 28),
               ),
-              // Botón Finalizar auditoría
-              ElevatedButton(
-                onPressed: finalizarAuditoria,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(12),
-                  minimumSize: const Size(48, 48),
-                ),
-                child: const Icon(Icons.check_circle, size: 28),
+            ),
+          ],
+        ),
+        bottomNavigationBar: SafeArea(
+          minimum: const EdgeInsets.only(bottom: 12),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1487D4),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.13),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              // Botón Siguiente S
-              IconButton(
-                onPressed: currentSIndex < sOrder.length - 1 ? goToNextS : null,
-                icon: const Icon(Icons.arrow_forward, size: 32),
-                color: const Color(0xFF3887C2),
-                tooltip: 'Siguiente S',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: currentQuestionIndex > 0
+                          ? () {
+                              setState(() {
+                                currentQuestionIndex--;
+                              });
+                            }
+                          : null,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: const [
+                            Icon(Icons.arrow_back,
+                                color: Colors.white, size: 24),
+                            SizedBox(width: 6),
+                            Text(
+                              'Anterior',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(28),
+                      onTap: _isSaving ? null : _saveAnswers,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.13),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(14),
+                        child: _isSaving
+                            ? const SizedBox(
+                                width: 26,
+                                height: 26,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Color(0xFF1487D4),
+                                ),
+                              )
+                            : const Icon(Icons.save,
+                                size: 30, color: Color(0xFF1487D4)),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: currentQuestionIndex < visualQuestions.length - 1
+                          ? () {
+                              setState(() {
+                                currentQuestionIndex++;
+                              });
+                            }
+                          : null,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: const [
+                            Text(
+                              'Siguiente',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Icon(Icons.arrow_forward,
+                                color: Colors.white, size: 24),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  String _getSDescription(String s) {
+    switch (s) {
+      case 'S1':
+        return 'SEIRI';
+      case 'S2':
+        return 'SEITON';
+      case 'S3':
+        return 'SEISO';
+      case 'S4':
+        return 'SEIKETSU';
+      case 'S5':
+        return 'SHITSUKE';
+      default:
+        return '';
+    }
   }
 }
 
@@ -437,19 +462,21 @@ class _QuestionView extends StatefulWidget {
   final String? question;
   final String? itemName;
   final int questionId;
+  final dynamic itemId;
   final int? score;
   final String? comment;
   final void Function(int? score, String? comment) onChanged;
 
-  const _QuestionView(
-      {Key? key,
-      this.question,
-      this.itemName,
-      required this.questionId,
-      this.score,
-      this.comment,
-      required this.onChanged})
-      : super(key: key);
+  const _QuestionView({
+    Key? key,
+    this.question,
+    this.itemName,
+    required this.questionId,
+    this.itemId,
+    this.score,
+    this.comment,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
   State<_QuestionView> createState() => _QuestionViewState();

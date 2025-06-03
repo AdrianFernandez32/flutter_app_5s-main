@@ -25,6 +25,7 @@ import "package:provider/provider.dart";
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/accesses_list_page.dart';
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
 import 'package:flutter_app_5s/utils/global_states/admin_id_provider.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/s_selection_page.dart';
 
 void main() async {
   // await Supabase.initialize(
@@ -94,6 +95,8 @@ final GoRouter _router = GoRouter(
           auditDate: auditDate,
           area: area,
           color: color,
+          historicAudits: const [],
+          selectedAudit: null,
         );
       },
     ),
@@ -137,20 +140,34 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/SSelection',
+      name: 'SSelection',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return SSelectionPage(
+          auditData: extra['auditData'],
+          subareaId: extra['subareaId'],
+          subareaName: extra['subareaName'],
+        );
+      },
+    ),
+    GoRoute(
       path: '/cuestionario',
       name: 'Cuestionario',
-      builder: (context, state) => QuestionnairePage(
-        auditData: const {
-          'auditCategories': [
-            {
-              'name': 'Demo',
-              'auditQuestions': [
-                {'id': 1, 'question': 'Demo question?'}
-              ]
-            }
-          ]
-        },
-      ),
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>?;
+        if (data == null) {
+          return const Scaffold(
+            body: Center(child: Text('Faltan datos para el cuestionario.')),
+          );
+        }
+        return QuestionnairePage(
+          auditData: data['auditData'] as Map<String, dynamic>,
+          selectedS: data['selectedS'] as String,
+          subareaId: data['subareaId'] as int,
+          subareaName: data['subareaName'] as String,
+        );
+      },
     ),
     GoRoute(
       path: '/gestionaccesos/:userId',
