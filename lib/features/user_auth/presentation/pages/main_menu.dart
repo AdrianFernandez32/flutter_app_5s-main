@@ -100,11 +100,6 @@ class _MainMenuState extends State<MainMenu> {
                     icon: Icons.settings_outlined,
                     goToNamed: 'Settings',
                   ),
-                  _Button(
-                    title: 'Accesos',
-                    icon: Icons.person_outline,
-                    goToNamed: 'AccessesListPage',
-                  ),
                   SizedBox(
                     height: 10,
                   ),

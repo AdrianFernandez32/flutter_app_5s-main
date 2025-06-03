@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/subareas_page.dart';
 import 'package:flutter_app_5s/auth/auth_service.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/area_audits_page.dart';
 
 class ZonesPage extends StatefulWidget {
   final bool modoHistorico;
@@ -133,91 +134,59 @@ class AuditWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(214, 231, 239, 1),
+        borderRadius: BorderRadius.circular(32),
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => SubareasPage(
-                orgId: 2,
+              builder: (context) => AreaAuditsPage(
                 areaId: int.tryParse(areaID ?? '') ?? 0,
                 areaName: area ?? '',
-                modoHistorico: modoHistorico,
+                color: const Color(0xFF1487D4),
               ),
             ),
           );
         },
-        child: Stack(
+        child: Row(
           children: [
             Container(
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                color: color,
+                color: Color(0xFF1487D4),
+                shape: BoxShape.circle,
               ),
-              height: 80,
-              margin: const EdgeInsets.only(left: 15),
-              child: Row(
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(width: 75),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Expanded(child: SizedBox()),
-                        Text(
-                          area ?? "",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          zone ?? "",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: textColor,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Expanded(child: SizedBox()),
-                      ],
+                  Text(
+                    area ?? '',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.black54,
+                  Text(
+                    zone ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.blueGrey,
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubareasPage(
-                            orgId: 2,
-                            areaId: int.tryParse(areaID ?? '') ?? 0,
-                            areaName: area ?? '',
-                            modoHistorico: modoHistorico,
-                          ),
-                        ),
-                      );
-                    },
-                    iconSize: 50.0,
                   ),
                 ],
               ),
             ),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: CircleAvatar(
-                radius: 40,
-                backgroundImage: AssetImage(
-                  "lib/assets/images/vino.jpg",
-                ),
-              ),
-            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.blue, size: 32),
           ],
         ),
       ),

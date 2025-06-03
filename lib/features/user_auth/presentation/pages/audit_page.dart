@@ -258,11 +258,18 @@ class AuditPageState extends State<AuditPage> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(214, 231, 239, 1),
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     children: [
-                      Icon(icon, size: 48, color: Colors.black87),
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1487D4),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 24),
                       Expanded(
                         child: Column(
@@ -334,7 +341,33 @@ class AuditPageState extends State<AuditPage> {
                     children: [
                       const SizedBox(width: 16),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final zonas = _areasList
+                              .map((a) => a["zona"] as String)
+                              .toSet()
+                              .toList();
+                          if (zonas.isEmpty) return;
+                          final selectedZona = await showDialog<String>(
+                            context: context,
+                            builder: (context) => SimpleDialog(
+                              title: const Text('Selecciona una zona'),
+                              children: zonas
+                                  .map((zona) => SimpleDialogOption(
+                                        child: Text(zona),
+                                        onPressed: () =>
+                                            Navigator.pop(context, zona),
+                                      ))
+                                  .toList(),
+                            ),
+                          );
+                          if (selectedZona != null) {
+                            setState(() {
+                              _filteredAreasList = _areasList
+                                  .where((area) => area["zona"] == selectedZona)
+                                  .toList();
+                            });
+                          }
+                        },
                         icon: const Icon(Icons.filter_list),
                         label: const Text('Zona'),
                         style: ElevatedButton.styleFrom(
@@ -347,7 +380,16 @@ class AuditPageState extends State<AuditPage> {
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() {
+                            _filteredAreasList =
+                                List<Map<String, dynamic>>.from(
+                                    _filteredAreasList)
+                                  ..sort((a, b) => a["area"]
+                                      .toString()
+                                      .compareTo(b["area"].toString()));
+                          });
+                        },
                         icon: const Icon(Icons.sort_by_alpha),
                         label: const Text('A-Z'),
                         style: ElevatedButton.styleFrom(

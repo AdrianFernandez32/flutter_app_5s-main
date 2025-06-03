@@ -382,19 +382,32 @@ class _SubareasPageState extends State<SubareasPage> {
                   ),
                   child: Row(
                     children: [
-                      Icon(icon, size: 40, color: Colors.black87),
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1487D4),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 24),
                       Expanded(
-                        child: Text(
-                          subareas[i]['name'],
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              subareas[i]['name'],
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const Icon(Icons.arrow_forward_ios,
-                          color: Colors.blue, size: 28),
+                          color: Colors.blue, size: 32),
                     ],
                   ),
                 ),

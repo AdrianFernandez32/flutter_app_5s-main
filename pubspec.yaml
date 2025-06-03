@@ -44,6 +44,9 @@ dependencies:
   flutter_dotenv: ^5.0.2
   auth0_flutter: ^1.10.0
   percent_indicator: ^4.2.5
+  syncfusion_flutter_charts: ^29.2.8
+  open_file: ^3.5.10
+  share_plus: ^11.0.0
 
 dev_dependencies:
   flutter_test:

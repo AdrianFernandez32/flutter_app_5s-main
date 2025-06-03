@@ -95,6 +95,8 @@ final GoRouter _router = GoRouter(
           auditDate: auditDate,
           area: area,
           color: color,
+          historicAudits: const [],
+          selectedAudit: null,
         );
       },
     ),

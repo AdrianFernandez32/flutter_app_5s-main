@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app_5s/features/user_auth/presentation/pages/subareas_page.dart';
 import 'package:flutter_app_5s/auth/auth_service.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/area_audits_page.dart';
 
 class AreasPage extends StatefulWidget {
   const AreasPage({Key? key}) : super(key: key);
@@ -151,10 +152,11 @@ class AreasPageState extends State<AreasPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SubareasPage(
-                        orgId: int.parse(orgId),
+                      builder: (context) => AreaAuditsPage(
                         areaId: int.parse(responseList[i]["id"]),
                         areaName: responseList[i]["area"],
+                        color: Color(
+                            0xFF1487D4), // mismo color que el círculo/avatar
                       ),
                     ),
                   );
@@ -169,7 +171,14 @@ class AreasPageState extends State<AreasPage> {
                   ),
                   child: Row(
                     children: [
-                      Icon(icon, size: 48, color: Colors.black87),
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1487D4),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 24),
                       Expanded(
                         child: Column(
@@ -241,7 +250,7 @@ class AreasPageState extends State<AreasPage> {
                     children: [
                       const SizedBox(width: 16),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: null,
                         icon: const Icon(Icons.filter_list),
                         label: const Text('Zona'),
                         style: ElevatedButton.styleFrom(
@@ -254,7 +263,7 @@ class AreasPageState extends State<AreasPage> {
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: null,
                         icon: const Icon(Icons.sort_by_alpha),
                         label: const Text('A-Z'),
                         style: ElevatedButton.styleFrom(
