@@ -199,6 +199,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _showTutorials = false;
   bool _showFAQ = false;
+  int? _expandedQuestionIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -292,9 +293,26 @@ class _SettingsPageState extends State<SettingsPage> {
               onTap: () => setState(() => _showFAQ = !_showFAQ),
             ),
             if (_showFAQ) ...[
-              _buildMenuItem(Icons.help, 'Pregunta 1'),
-              _buildMenuItem(Icons.help, 'Pregunta 2'),
-              _buildMenuItem(Icons.help, 'Pregunta 3'),
+              _buildFAQItem(
+                0,
+                '¿Qué hago si no veo mis áreas o usuarios?',
+                'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.',
+              ),
+              _buildFAQItem(
+                1,
+                '¿Qué significan las 5S en la app?',
+                'Las 5S representan las fases del método japonés: Seiri, Seiton, Seiso, Seiketsu, Shitsuke. '
+                    'Cada S tiene un grupo de preguntas dentro del cuestionario.',
+              ),
+              _buildFAQItem(
+                2,
+                '¿Cómo puedo crear una nueva organización en la app?',
+                'Solo los usuarios con permisos de Administrador pueden crear organizaciones. Para hacerlo:\n\n'
+                    '1. Dirígete al panel principal de administración.\n\n'
+                    '2. Selecciona la opción "Crear Organización".\n\n'
+                    '3. Ingresa el nombre, una descripción opcional y elige una paleta de colores y una foto de perfil que identifique visualmente a la organización.\n\n'
+                    '4. Guarda los cambios. Luego podrás añadir departamentos, usuarios y cuestionarios específicos para esa organización.',
+              ),
               const SizedBox(height: 16),
             ],
             const SizedBox(height: 24),
@@ -320,6 +338,47 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFAQItem(int index, String question, String answer) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        title: Text(
+          question,
+          style: const TextStyle(fontWeight: FontWeight.w500),
+        ),
+        trailing: Icon(
+          _expandedQuestionIndex == index
+              ? Icons.expand_less
+              : Icons.expand_more,
+          color: Colors.blue,
+        ),
+        initiallyExpanded: _expandedQuestionIndex == index,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _expandedQuestionIndex = expanded ? index : null;
+          });
+        },
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(answer, style: const TextStyle(color: Colors.black87)),
+          ),
+        ],
       ),
     );
   }
