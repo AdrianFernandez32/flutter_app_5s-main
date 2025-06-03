@@ -75,6 +75,11 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const AdminAccessPage(),
     ),
     GoRoute(
+      path: '/admin_dashboard',
+      name: 'AdminDashboard',
+      builder: (context, state) => const AdminDashboardPage(),
+    ),
+    GoRoute(
       path: '/inicio_admin',
       name: 'InicioAdmin',
       builder: (context, state) => const InicioAdminPage(),
