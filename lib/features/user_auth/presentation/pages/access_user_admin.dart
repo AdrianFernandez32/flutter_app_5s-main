@@ -11,12 +11,14 @@ class AccessesPageUsuario extends StatefulWidget {
   @override
   AccessesPageUsuarioState createState() => AccessesPageUsuarioState();
 }
+
 class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
   // State variables for user and departments
   String userName = '';
   String userEmail = '';
   List<Map<String, String>> departments = [];
   bool isLoading = true;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
@@ -25,36 +27,73 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
   }
 
   Future<void> _fetchUserData() async {
-    setState(() { isLoading = true; });
+    setState(() {
+      isLoading = true;
+    });
     try {
       final authService = AuthService();
       final accessToken = authService.accessToken;
-      if (accessToken == null) {
-        setState(() { isLoading = false; });
+      final orgId = authService.organizationId;
+      if (accessToken == null || orgId == null) {
+        setState(() {
+          isLoading = false;
+        });
         return;
       }
-      final response = await http.get(
-        Uri.parse('https://djnxv2fqbiqog.cloudfront.net/user-roles/${widget.userId}'),
+
+      // Primero obtenemos los datos del usuario
+      final usersResponse = await http.get(
+        Uri.parse('https://djnxv2fqbiqog.cloudfront.net/org/$orgId/users'),
         headers: {
           'Authorization': 'Bearer $accessToken',
         },
       );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+
+      if (usersResponse.statusCode == 200) {
+        final usersData = jsonDecode(usersResponse.body) as List;
+        // Encontramos el usuario específico
+        userData = usersData.firstWhere(
+          (user) => user['id'] == widget.userId,
+          orElse: () => null,
+        );
+
+        if (userData != null) {
+          setState(() {
+            userName = userData!['name'] ?? 'Sin nombre';
+            userEmail = userData!['email'] ?? 'Sin email';
+          });
+        }
+      }
+
+      // Luego obtenemos los roles del usuario
+      final rolesResponse = await http.get(
+        Uri.parse(
+            'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/users/${widget.userId}/roles'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+      if (rolesResponse.statusCode == 200) {
+        final data = jsonDecode(rolesResponse.body);
         setState(() {
-          userName = data['name'] ?? '';
-          userEmail = data['email'] ?? '';
-          departments = (data['departments'] as List?)?.map((d) => {
-            'name': d['department'] ?? '',
-            'role': d['role'] ?? '',
-          }).toList().cast<Map<String, String>>() ?? [];
+          departments = (data as List?)
+                  ?.map((d) => {
+                        'name': (d['roleName'] ?? '').toString(),
+                        'role': (d['roleName'] ?? '').toString(),
+                      })
+                  .toList() ??
+              [];
           isLoading = false;
         });
       } else {
-        setState(() { isLoading = false; });
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() { isLoading = false; });
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -86,12 +125,14 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                       height: 140,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: colorScheme.secondary, width: 6),
+                        border:
+                            Border.all(color: colorScheme.secondary, width: 6),
                       ),
                       child: const CircleAvatar(
                         radius: 64,
                         backgroundColor: Color(0xFFEDEDED),
-                        backgroundImage: AssetImage('lib/assets/images/perfil_fake.jpg'),
+                        backgroundImage:
+                            AssetImage('lib/assets/images/perfil_fake.jpg'),
                       ),
                     ),
                   ),
@@ -118,14 +159,16 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                   ),
                   if (departments.isEmpty)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 24.0),
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 24, horizontal: 12),
                         child: const Center(
                           child: Text(
                             'Este usuario no tiene permisos asignados',
@@ -140,17 +183,21 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                     )
                   else
                     ...departments.map((dept) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 6.0, horizontal: 16.0),
                           child: Card(
                             color: Colors.grey[200],
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
                             child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 8),
                               title: Center(
                                 child: Text(
-                                  dept['name']?.isNotEmpty == true ? dept['name']! : 'Sin departamento',
+                                  dept['name']?.isNotEmpty == true
+                                      ? dept['name']!
+                                      : 'Sin departamento',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
@@ -168,231 +215,656 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                                 ),
                               ),
                               trailing: IconButton(
-                                icon: const Icon(Icons.edit, size: 20, color: Colors.black87),
+                                icon: const Icon(Icons.edit,
+                                    size: 20, color: Colors.black87),
                                 onPressed: () {
                                   showDialog(
                                     context: context,
                                     builder: (context) {
-                                      String? selectedDepartment = dept['name'];
-                                      String? selectedRole = dept['role'];
-                                      final List<String> departmentOptions = departments.map((d) => d['name']!).toList();
-                                      final List<String> roleOptions = ['Viewer', 'Auditor', 'Admin'];
+                                      // Datos actuales del permiso
+                                      int? selectedRoleId;
+                                      if (dept['role']?.toLowerCase() ==
+                                          'auditor') {
+                                        selectedRoleId = 2;
+                                      } else if (dept['role']?.toLowerCase() ==
+                                          'editor') {
+                                        selectedRoleId = 3;
+                                      }
+
+                                      // No obtenemos el userRoleId del dept, lo obtendremos de la respuesta del API
+                                      int? userRoleId;
+                                      final int? currentSubareaId =
+                                          dept['allowedSubareaId'] is int
+                                              ? dept['allowedSubareaId'] as int?
+                                              : int.tryParse(
+                                                  dept['allowedSubareaId']
+                                                          ?.toString() ??
+                                                      '');
+                                      int? areaId = dept['areaId'] is int
+                                          ? dept['areaId'] as int?
+                                          : int.tryParse(
+                                              dept['areaId']?.toString() ?? '');
+                                      String areaName = dept['areaName'] ??
+                                          dept['areaId']?.toString() ??
+                                          'Área';
+                                      int? selectedSubareaId = currentSubareaId;
+                                      List<Map<String, dynamic>> subareas = [];
+                                      bool loadingSubareas = true;
+                                      bool loadingRoles = true;
+                                      Map<String, dynamic>? currentRole;
+
+                                      final authService = AuthService();
+                                      final orgId = authService.organizationId;
+
+                                      // Fetch subareas for the area
+                                      Future<void> fetchSubareas(
+                                          int areaId) async {
+                                        if (orgId == null) return;
+                                        loadingSubareas = true;
+                                        subareas = [];
+                                        try {
+                                          final response = await http.get(
+                                            Uri.parse(
+                                                'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area/$areaId/subarea'),
+                                            headers: {
+                                              'Authorization':
+                                                  'Bearer ${authService.accessToken}',
+                                            },
+                                          );
+                                          if (response.statusCode == 200) {
+                                            final data =
+                                                jsonDecode(response.body);
+                                            subareas = (data as List)
+                                                .map((s) => {
+                                                      'id': s['id'],
+                                                      'name': s['name'],
+                                                    })
+                                                .toList();
+
+                                            // Si no hay subárea seleccionada, seleccionar la primera
+                                            if (selectedSubareaId == null &&
+                                                subareas.isNotEmpty) {
+                                              selectedSubareaId =
+                                                  subareas.first['id'] as int?;
+                                            }
+                                          }
+                                        } catch (e) {
+                                          print(
+                                              'Debug - error fetching subareas: $e');
+                                        }
+                                        loadingSubareas = false;
+                                      }
+
+                                      // Fetch all roles for the organization
+                                      Future<void> fetchRoles() async {
+                                        if (orgId == null) return;
+                                        loadingRoles = true;
+                                        try {
+                                          final response = await http.get(
+                                            Uri.parse(
+                                                'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/users/${widget.userId}/roles'),
+                                            headers: {
+                                              'Authorization':
+                                                  'Bearer ${authService.accessToken}',
+                                            },
+                                          );
+                                          if (response.statusCode == 200) {
+                                            final data =
+                                                jsonDecode(response.body)
+                                                    as List;
+                                            print('Debug - dept: $dept');
+                                            print('Debug - roles data: $data');
+
+                                            // Find the specific role we're editing by matching roleName and roleId
+                                            currentRole = data.firstWhere(
+                                              (role) {
+                                                final roleName =
+                                                    role['roleName']
+                                                        ?.toString()
+                                                        .toLowerCase();
+                                                final roleId = role['roleId'];
+                                                print(
+                                                    'Debug - comparing roleName: $roleName with dept role: ${dept['role']?.toString().toLowerCase()}');
+                                                print(
+                                                    'Debug - comparing roleId: $roleId with selectedRoleId: $selectedRoleId');
+                                                return roleName ==
+                                                        dept['role']
+                                                            ?.toString()
+                                                            .toLowerCase() &&
+                                                    roleId == selectedRoleId;
+                                              },
+                                              orElse: () => null,
+                                            );
+
+                                            print(
+                                                'Debug - found role: $currentRole');
+
+                                            if (currentRole != null) {
+                                              // Update the UI with the found role data
+                                              userRoleId = currentRole!['id'];
+                                              selectedRoleId =
+                                                  currentRole!['roleId'];
+                                              selectedSubareaId = currentRole![
+                                                  'allowedSubareaId'];
+                                              areaId = currentRole!['areaId'];
+
+                                              // Obtener el nombre del área
+                                              try {
+                                                final areaResponse =
+                                                    await http.get(
+                                                  Uri.parse(
+                                                      'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area/$areaId'),
+                                                  headers: {
+                                                    'Authorization':
+                                                        'Bearer ${authService.accessToken}',
+                                                  },
+                                                );
+                                                if (areaResponse.statusCode ==
+                                                    200) {
+                                                  final areaData = jsonDecode(
+                                                      areaResponse.body);
+                                                  areaName = areaData['name'] ??
+                                                      'Área';
+                                                }
+                                              } catch (e) {
+                                                print(
+                                                    'Debug - error fetching area: $e');
+                                              }
+
+                                              // Obtener las subáreas para el área actual
+                                              if (areaId != null) {
+                                                await fetchSubareas(areaId!);
+                                              }
+
+                                              setState(
+                                                  () {}); // Actualizar el UI con los nuevos datos
+                                            }
+                                          }
+                                        } catch (e) {
+                                          print(
+                                              'Debug - error fetching roles: $e');
+                                        }
+                                        loadingRoles = false;
+                                      }
+
                                       return StatefulBuilder(
                                         builder: (context, setState) {
+                                          // Fetch roles and subareas only once
+                                          if (loadingRoles) {
+                                            fetchRoles().then((_) {
+                                              final currentAreaId = areaId;
+                                              if (currentAreaId != null) {
+                                                fetchSubareas(currentAreaId)
+                                                    .then(
+                                                        (_) => setState(() {}));
+                                              }
+                                              setState(() {});
+                                            });
+                                          }
                                           return Dialog(
                                             backgroundColor: Colors.transparent,
-                                            insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                                            insetPadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 24),
                                             child: Container(
-                                              margin: const EdgeInsets.only(top: 60),
-                                              padding: const EdgeInsets.fromLTRB(20, 40, 20, 24),
+                                              margin: const EdgeInsets.only(
+                                                  top: 60),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 40, 20, 24),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(28),
+                                                borderRadius:
+                                                    BorderRadius.circular(28),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.black.withOpacity(0.08),
+                                                    color: Colors.black
+                                                        .withOpacity(0.08),
                                                     blurRadius: 16,
                                                     offset: const Offset(0, 8),
                                                   ),
                                                 ],
                                               ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    'Editar acceso',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 20,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 24),
-                                                  Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Text(
-                                                      'Departamento',
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      'Editar acceso',
                                                       style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 20,
+                                                        color: Colors.black,
                                                       ),
                                                     ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.grey.shade400, width: 1.2),
-                                                      borderRadius: BorderRadius.circular(12),
-                                                    ),
-                                                    child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<String>(
-                                                        isExpanded: true,
-                                                        value: selectedDepartment,
-                                                        hint: const Padding(
-                                                          padding: EdgeInsets.symmetric(horizontal: 12),
-                                                          child: Text(
-                                                            'Selecciona un departamento',
-                                                            style: TextStyle(
-                                                              color: Colors.grey,
-                                                              fontWeight: FontWeight.bold,
+                                                    const SizedBox(height: 24),
+                                                    if (loadingRoles)
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator())
+                                                    else if (currentRole ==
+                                                        null)
+                                                      const Center(
+                                                        child: Text(
+                                                          'No se encontró el rol',
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    else ...[
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          'Área',
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .blueAccent,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Container(
+                                                        width: double.infinity,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 12,
+                                                                horizontal: 16),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Colors.grey[200],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                        child: Text(
+                                                          areaName,
+                                                          style: const TextStyle(
                                                               fontSize: 18,
-                                                            ),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 18),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          'Rol',
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .blueAccent,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 16,
                                                           ),
                                                         ),
-                                                        icon: const Padding(
-                                                          padding: EdgeInsets.only(right: 8),
-                                                          child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color: Colors.grey
+                                                                  .shade400,
+                                                              width: 1.2),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
                                                         ),
-                                                        items: departmentOptions.map((dep) => DropdownMenuItem(
-                                                          value: dep,
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                            child: Text(
-                                                              dep,
-                                                              style: const TextStyle(
-                                                                color: Colors.grey,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 18,
+                                                        child:
+                                                            DropdownButtonHideUnderline(
+                                                          child: DropdownButton<
+                                                              int>(
+                                                            isExpanded: true,
+                                                            value:
+                                                                selectedRoleId,
+                                                            hint: const Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          12),
+                                                              child: Text(
+                                                                'Selecciona un rol',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 18,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        )).toList(),
-                                                        onChanged: (value) {
-                                                          setState(() => selectedDepartment = value);
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 18),
-                                                  Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Text(
-                                                      'Rol',
-                                                      style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.grey.shade400, width: 1.2),
-                                                      borderRadius: BorderRadius.circular(12),
-                                                    ),
-                                                    child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<String>(
-                                                        isExpanded: true,
-                                                        value: selectedRole,
-                                                        hint: const Padding(
-                                                          padding: EdgeInsets.symmetric(horizontal: 12),
-                                                          child: Text(
-                                                            'Selecciona un rol',
-                                                            style: TextStyle(
-                                                              color: Colors.grey,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 18,
+                                                            icon: const Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      right: 8),
+                                                              child: Icon(
+                                                                  Icons
+                                                                      .keyboard_arrow_down_rounded,
+                                                                  color: Colors
+                                                                      .blue,
+                                                                  size: 32),
                                                             ),
-                                                          ),
-                                                        ),
-                                                        icon: const Padding(
-                                                          padding: EdgeInsets.only(right: 8),
-                                                          child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
-                                                        ),
-                                                        items: roleOptions.map((role) => DropdownMenuItem(
-                                                          value: role,
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                            child: Text(
-                                                              role,
-                                                              style: const TextStyle(
-                                                                color: Colors.grey,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 18,
+                                                            items: const [
+                                                              DropdownMenuItem(
+                                                                value: 2,
+                                                                child: Padding(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              12),
+                                                                  child: Text(
+                                                                      'Auditor',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              18)),
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ),
-                                                        )).toList(),
-                                                        onChanged: (value) {
-                                                          setState(() => selectedRole = value);
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 28),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                    children: [
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                          child: ElevatedButton(
-                                                            onPressed: () {
-                                                              // Aquí iría la lógica para editar el acceso
-                                                              Navigator.of(context).pop();
+                                                              DropdownMenuItem(
+                                                                value: 3,
+                                                                child: Padding(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              12),
+                                                                  child: Text(
+                                                                      'Editor',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              18)),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                            onChanged: (value) {
+                                                              setState(() =>
+                                                                  selectedRoleId =
+                                                                      value);
                                                             },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.blue,
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(18),
-                                                              ),
-                                                              padding: const EdgeInsets.symmetric(vertical: 12),
-                                                            ),
-                                                            child: const Text(
-                                                              'Editar',
-                                                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                          child: ElevatedButton(
-                                                            onPressed: () {
-                                                              // Aquí iría la lógica para eliminar el acceso
-                                                              Navigator.of(context).pop();
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.blue,
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(18),
-                                                              ),
-                                                              padding: const EdgeInsets.symmetric(vertical: 12),
-                                                            ),
-                                                            child: const Text(
-                                                              'Eliminar',
-                                                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                                                            ),
+                                                      const SizedBox(
+                                                          height: 18),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          'Subárea',
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .blueAccent,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 16,
                                                           ),
                                                         ),
                                                       ),
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                          child: ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.of(context).pop();
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.blue,
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(18),
+                                                      const SizedBox(height: 4),
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color: Colors.grey
+                                                                  .shade400,
+                                                              width: 1.2),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                        child:
+                                                            DropdownButtonHideUnderline(
+                                                          child: DropdownButton<
+                                                              int>(
+                                                            isExpanded: true,
+                                                            value:
+                                                                selectedSubareaId,
+                                                            hint: const Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          12),
+                                                              child: Text(
+                                                                'Selecciona una subárea',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 18,
+                                                                ),
                                                               ),
-                                                              padding: const EdgeInsets.symmetric(vertical: 12),
                                                             ),
-                                                            child: const Text(
-                                                              'Cancelar',
-                                                              style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                                                            icon: const Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      right: 8),
+                                                              child: Icon(
+                                                                  Icons
+                                                                      .keyboard_arrow_down_rounded,
+                                                                  color: Colors
+                                                                      .blue,
+                                                                  size: 32),
                                                             ),
+                                                            items: subareas
+                                                                .map((sub) =>
+                                                                    DropdownMenuItem(
+                                                                      value: sub[
+                                                                              'id']
+                                                                          as int?,
+                                                                      child:
+                                                                          Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                12),
+                                                                        child: Text(
+                                                                            sub['name'] ??
+                                                                                '',
+                                                                            style:
+                                                                                const TextStyle(fontSize: 18)),
+                                                                      ),
+                                                                    ))
+                                                                .toList(),
+                                                            onChanged: (value) {
+                                                              setState(() =>
+                                                                  selectedSubareaId =
+                                                                      value);
+                                                            },
                                                           ),
                                                         ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 28),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          Expanded(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          8),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  final accessToken =
+                                                                      authService
+                                                                          .accessToken;
+                                                                  if (selectedRoleId == null ||
+                                                                      selectedSubareaId ==
+                                                                          null ||
+                                                                      orgId ==
+                                                                          null ||
+                                                                      userRoleId ==
+                                                                          null) {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      const SnackBar(
+                                                                          content:
+                                                                              Text('Completa todos los campos.')),
+                                                                    );
+                                                                    return;
+                                                                  }
+                                                                  final body = {
+                                                                    'roleId':
+                                                                        selectedRoleId,
+                                                                    'allowedSubareaId':
+                                                                        selectedSubareaId,
+                                                                  };
+                                                                  print('PUT body: ' +
+                                                                      body.toString());
+                                                                  try {
+                                                                    final response =
+                                                                        await http
+                                                                            .put(
+                                                                      Uri.parse(
+                                                                          'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/users/${widget.userId}/roles/$userRoleId'),
+                                                                      headers: {
+                                                                        'Authorization':
+                                                                            'Bearer $accessToken',
+                                                                        'Content-Type':
+                                                                            'application/json',
+                                                                      },
+                                                                      body: jsonEncode(
+                                                                          body),
+                                                                    );
+                                                                    if (response.statusCode ==
+                                                                            200 ||
+                                                                        response.statusCode ==
+                                                                            201) {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                      await _fetchUserData();
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        const SnackBar(
+                                                                            content:
+                                                                                Text('Rol editado correctamente.')),
+                                                                      );
+                                                                    } else {
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        SnackBar(
+                                                                            content:
+                                                                                Text('Error al editar rol: \\${response.statusCode}')),
+                                                                      );
+                                                                    }
+                                                                  } catch (e) {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                          content:
+                                                                              Text('Error de red: $e')),
+                                                                    );
+                                                                  }
+                                                                },
+                                                                style: ElevatedButton
+                                                                    .styleFrom(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .blue,
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            18),
+                                                                  ),
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          12),
+                                                                ),
+                                                                child:
+                                                                    const Text(
+                                                                  'Editar',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          18,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          8),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                style: ElevatedButton
+                                                                    .styleFrom(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .blue,
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            18),
+                                                                  ),
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          12),
+                                                                ),
+                                                                child:
+                                                                    const Text(
+                                                                  'Cancelar',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          18,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           );
@@ -414,15 +886,77 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
           showDialog(
             context: context,
             builder: (context) {
-              String? selectedDepartment;
-              String? selectedRole;
-              final List<String> departmentOptions = departments.map((d) => d['name']!).toList();
-              final List<String> roleOptions = ['Viewer', 'Auditor', 'Admin'];
+              int? selectedRoleId;
+              int? selectedAreaId;
+              int? selectedSubareaId;
+              List<Map<String, dynamic>> areas = [];
+              List<Map<String, dynamic>> subareas = [];
+              bool loadingAreas = true;
+              bool loadingSubareas = false;
+
+              final authService = AuthService();
+              final orgId = authService.organizationId;
+
+              // Fetch areas when modal opens
+              Future<void> fetchAreas() async {
+                if (orgId == null) return;
+                try {
+                  final response = await http.get(
+                    Uri.parse(
+                        'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area'),
+                    headers: {
+                      'Authorization': 'Bearer ${authService.accessToken}',
+                    },
+                  );
+                  if (response.statusCode == 200) {
+                    final data = jsonDecode(response.body);
+                    areas = (data as List)
+                        .map((a) => {
+                              'id': a['id'],
+                              'name': a['name'],
+                            })
+                        .toList();
+                  }
+                } catch (_) {}
+                loadingAreas = false;
+              }
+
+              // Fetch subareas when area is selected
+              Future<void> fetchSubareas(int areaId) async {
+                if (orgId == null) return;
+                loadingSubareas = true;
+                subareas = [];
+                try {
+                  final response = await http.get(
+                    Uri.parse(
+                        'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/area/$areaId/subarea'),
+                    headers: {
+                      'Authorization': 'Bearer ${authService.accessToken}',
+                    },
+                  );
+                  if (response.statusCode == 200) {
+                    final data = jsonDecode(response.body);
+                    subareas = (data as List)
+                        .map((s) => {
+                              'id': s['id'],
+                              'name': s['name'],
+                            })
+                        .toList();
+                  }
+                } catch (_) {}
+                loadingSubareas = false;
+              }
+
               return StatefulBuilder(
                 builder: (context, setState) {
+                  // Fetch areas only once
+                  if (loadingAreas) {
+                    fetchAreas().then((_) => setState(() {}));
+                  }
                   return Dialog(
                     backgroundColor: Colors.transparent,
-                    insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                    insetPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 24),
                     child: Container(
                       margin: const EdgeInsets.only(top: 60),
                       padding: const EdgeInsets.fromLTRB(20, 40, 20, 24),
@@ -437,181 +971,335 @@ class AccessesPageUsuarioState extends State<AccessesPageUsuario> {
                           ),
                         ],
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Nuevo acceso',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Departamento',
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Nuevo acceso',
                               style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.black,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400, width: 1.2),
-                              borderRadius: BorderRadius.circular(12),
+                            const SizedBox(height: 24),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Rol',
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                isExpanded: true,
-                                value: selectedDepartment,
-                                hint: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: Text(
-                                    'Selecciona un departamento',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                                icon: const Padding(
-                                  padding: EdgeInsets.only(right: 8),
-                                  child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
-                                ),
-                                items: departmentOptions.map((dep) => DropdownMenuItem(
-                                  value: dep,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                            const SizedBox(height: 4),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.grey.shade400, width: 1.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  isExpanded: true,
+                                  value: selectedRoleId,
+                                  hint: const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 12),
                                     child: Text(
-                                      dep,
-                                      style: const TextStyle(
+                                      'Selecciona un rol',
+                                      style: TextStyle(
                                         color: Colors.grey,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
                                       ),
                                     ),
                                   ),
-                                )).toList(),
-                                onChanged: (value) {
-                                  setState(() => selectedDepartment = value);
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Rol',
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400, width: 1.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                isExpanded: true,
-                                value: selectedRole,
-                                hint: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: Text(
-                                    'Selecciona un rol',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
+                                  icon: const Padding(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        color: Colors.blue,
+                                        size: 32),
                                   ),
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 2,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        child: Text('Auditor',
+                                            style: TextStyle(fontSize: 18)),
+                                      ),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 3,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        child: Text('Editor',
+                                            style: TextStyle(fontSize: 18)),
+                                      ),
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() => selectedRoleId = value);
+                                  },
                                 ),
-                                icon: const Padding(
-                                  padding: EdgeInsets.only(right: 8),
-                                  child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 32),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Área',
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
                                 ),
-                                items: roleOptions.map((role) => DropdownMenuItem(
-                                  value: role,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.grey.shade400, width: 1.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  isExpanded: true,
+                                  value: selectedAreaId,
+                                  hint: const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 12),
                                     child: Text(
-                                      role,
-                                      style: const TextStyle(
+                                      'Selecciona un área',
+                                      style: TextStyle(
                                         color: Colors.grey,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
                                       ),
                                     ),
                                   ),
-                                )).toList(),
-                                onChanged: (value) {
-                                  setState(() => selectedRole = value);
-                                },
+                                  icon: const Padding(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        color: Colors.blue,
+                                        size: 32),
+                                  ),
+                                  items: areas
+                                      .map((area) => DropdownMenuItem(
+                                            value: area['id'] as int?,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
+                                              child: Text(area['name'] ?? '',
+                                                  style: const TextStyle(
+                                                      fontSize: 18)),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedAreaId = value;
+                                      selectedSubareaId = null;
+                                      loadingSubareas = true;
+                                    });
+                                    if (value != null) {
+                                      fetchSubareas(value)
+                                          .then((_) => setState(() {}));
+                                    }
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 28),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // Aquí iría la lógica para registrar el acceso
-                                      Navigator.of(context).pop();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(18),
+                            const SizedBox(height: 18),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Subárea',
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.grey.shade400, width: 1.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  isExpanded: true,
+                                  value: selectedSubareaId,
+                                  hint: const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 12),
+                                    child: Text(
+                                      'Selecciona una subárea',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
                                     ),
-                                    child: const Text(
-                                      'Registrar',
-                                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                                  ),
+                                  icon: const Padding(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        color: Colors.blue,
+                                        size: 32),
+                                  ),
+                                  items: subareas
+                                      .map((sub) => DropdownMenuItem(
+                                            value: sub['id'] as int?,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
+                                              child: Text(sub['name'] ?? '',
+                                                  style: const TextStyle(
+                                                      fontSize: 18)),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    setState(() => selectedSubareaId = value);
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 28),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        final accessToken =
+                                            authService.accessToken;
+                                        if (selectedRoleId == null ||
+                                            selectedAreaId == null ||
+                                            selectedSubareaId == null ||
+                                            accessToken == null ||
+                                            orgId == null) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Completa todos los campos.')),
+                                          );
+                                          return;
+                                        }
+                                        final body = {
+                                          'roleId': selectedRoleId,
+                                          'allowedSubareaId': selectedSubareaId,
+                                        };
+                                        print('POST body: ' + body.toString());
+                                        try {
+                                          final response = await http.post(
+                                            Uri.parse(
+                                                'https://djnxv2fqbiqog.cloudfront.net/org/$orgId/users/${widget.userId}/roles'),
+                                            headers: {
+                                              'Authorization':
+                                                  'Bearer $accessToken',
+                                              'Content-Type':
+                                                  'application/json',
+                                            },
+                                            body: jsonEncode(body),
+                                          );
+                                          if (response.statusCode == 200 ||
+                                              response.statusCode == 201) {
+                                            Navigator.of(context).pop();
+                                            await _fetchUserData();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Rol agregado correctamente.')),
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      'Error al agregar rol: \\${response.statusCode}')),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content:
+                                                    Text('Error de red: $e')),
+                                          );
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                      ),
+                                      child: const Text(
+                                        'Registrar',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(18),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                    child: const Text(
-                                      'Cancelar',
-                                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                                      child: const Text(
+                                        'Cancelar',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
