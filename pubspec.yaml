@@ -77,6 +77,8 @@ flutter:
     - lib/assets/images/perfil_fake.jpg
     - lib/assets/images/vino.jpg
     - lib/assets/images/app_logo.png
+    - lib/assets/images/AURISLOGO-AZUL.png
+    - lib/assets/images/AURISISOTIPO-AZUL.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
