@@ -296,6 +296,7 @@ class _SettingsPageState extends State<SettingsPage> {
             if (_showFAQ) ...[
               _buildFAQItem(
                 0,
+                //Se agrego el correo por si acaso
                 '¿Qué hago si no veo mis áreas o usuarios?',
                 'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.\n\n'
                     'Correo:\n'
