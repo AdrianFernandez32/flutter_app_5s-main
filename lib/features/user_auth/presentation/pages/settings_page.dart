@@ -250,8 +250,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(20),
@@ -270,8 +272,126 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+            _buildSectionHeader(
+              icon: Icons.play_circle_outline,
+              title: 'Tutoriales',
+              isExpanded: _showTutorials,
+              onTap: () => setState(() => _showTutorials = !_showTutorials),
+            ),
+            if (_showTutorials) ...[
+              _buildMenuItem(Icons.help_outline, 'FAQ'),
+              _buildMenuItem(Icons.assignment, 'Crear Cuestionarios'),
+              _buildMenuItem(Icons.assessment, 'Hacer Auditorías'),
+              _buildMenuItem(Icons.people_alt, 'Asignar Usuarios a Áreas'),
+              const SizedBox(height: 16),
+            ],
+            _buildSectionHeader(
+              icon: Icons.question_answer,
+              title: 'FAQ',
+              isExpanded: _showFAQ,
+              onTap: () => setState(() => _showFAQ = !_showFAQ),
+            ),
+            if (_showFAQ) ...[
+              _buildMenuItem(Icons.help, 'Pregunta 1'),
+              _buildMenuItem(Icons.help, 'Pregunta 2'),
+              _buildMenuItem(Icons.help, 'Pregunta 3'),
+              const SizedBox(height: 16),
+            ],
+            const SizedBox(height: 24),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.blue[800],
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.blue[800]!),
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  'Cerrar Sesión',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required bool isExpanded,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(top: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.blue[800], size: 28),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more,
+              color: Colors.blue[800],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(IconData icon, String title) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue[600]),
+        title: Text(title),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.blue,
+        ),
+        onTap: () {},
       ),
     );
   }
