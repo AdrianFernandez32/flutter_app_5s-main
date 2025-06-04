@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/main_menu.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/organizations_list_page.dart';
+import 'package:flutter_app_5s/features/user_auth/presentation/pages/acceso_admin.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.goNamed('Menu'),
         ),
       ),
       body: SingleChildScrollView(
@@ -104,8 +108,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8, horizontal: 16),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(20),
@@ -124,7 +128,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-
             _buildSectionHeader(
               icon: Icons.play_circle_outline,
               title: 'Tutoriales',
@@ -153,15 +156,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content:
-                          Text('El manual de FAQ no está disponible actualmente'),
+                      content: Text(
+                          'El manual de FAQ no está disponible actualmente'),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 16),
             ],
-
             _buildSectionHeader(
               icon: Icons.question_answer,
               title: 'FAQ',
@@ -183,13 +185,35 @@ class _SettingsPageState extends State<SettingsPage> {
                 2,
                 '¿Cómo puedo crear una nueva organización en la app?',
                 'Solo los usuarios con permisos de Administrador pueden crear organizaciones. Para hacerlo:\n\n'
-                '1. Dirígete al panel principal de administración.\n'
-                '2. Selecciona la opción "Crear Organización".\n'
-                '3. Ingresa el nombre, descripción, paleta de colores y una imagen de perfil.\n'
-                '4. Guarda los cambios y asigna usuarios y cuestionarios.',
+                    '1. Dirígete al panel principal de administración.\n'
+                    '2. Selecciona la opción "Crear Organización".\n'
+                    '3. Ingresa el nombre, descripción, paleta de colores y una imagen de perfil.\n'
+                    '4. Guarda los cambios y asigna usuarios y cuestionarios.',
               ),
               const SizedBox(height: 16),
             ],
+            const SizedBox(height: 32),
+            Center(
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.logout),
+                label: const Text('Cerrar sesión'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  textStyle: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () async {
+                  // Si tienes AuthService, limpia la sesión aquí
+                  // AuthService().logout();
+                  context.goNamed('AdminAccessPage');
+                },
+              ),
+            ),
           ],
         ),
       ),
