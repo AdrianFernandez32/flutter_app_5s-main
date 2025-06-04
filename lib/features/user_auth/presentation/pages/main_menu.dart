@@ -46,9 +46,10 @@ class _MainMenuState extends State<MainMenu> {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              'https://phantom-marca-us.uecdn.es/67214b3666019836c0f2b41c2c48c1b3/resize/828/f/jpg/assets/multimedia/imagenes/2025/03/04/17410644450708.jpg'),
                           radius: 30,
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.person,
+                              size: 36, color: colorScheme.secondary),
                         ),
                         const SizedBox(width: 16),
                         const Column(
