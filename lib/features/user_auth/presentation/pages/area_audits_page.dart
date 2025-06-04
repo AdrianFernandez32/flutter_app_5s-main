@@ -201,6 +201,11 @@ class _AreaAuditsPageState extends State<AreaAuditsPage> {
                                   : 0.0;
                               // Asegura que el areaId esté presente para la navegación de regreso
                               fullAudit['areaId'] = widget.areaId;
+                              // Asegura que createdAt esté presente en fullAudit
+                              if (fullAudit['createdAt'] == null &&
+                                  audit['createdAt'] != null) {
+                                fullAudit['createdAt'] = audit['createdAt'];
+                              }
                             }
                             // Filtrar las últimas 6 auditorías de la misma subárea
                             final subareaAudits = audits
