@@ -167,7 +167,6 @@ class AuditViewExample extends StatelessWidget {
                   child: const TabBar(
                     tabs: [
                       Tab(text: "Radial"),
-                      Tab(text: "Histograma"),
                     ],
                   ),
                 ),
@@ -197,9 +196,14 @@ class AuditViewState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Tomar las últimas 6 auditorías (incluyendo la seleccionada)
-    final audits = (historicAudits.length > 6)
-        ? historicAudits.sublist(historicAudits.length - 6)
-        : historicAudits;
+    List<dynamic> audits;
+    if (historicAudits.isEmpty && selectedAudit != null) {
+      audits = [selectedAudit];
+    } else if (historicAudits.length > 6) {
+      audits = historicAudits.sublist(historicAudits.length - 6);
+    } else {
+      audits = historicAudits;
+    }
     return Column(
       children: [
         SizedBox(
@@ -209,13 +213,6 @@ class AuditViewState extends StatelessWidget {
               AspectRatio(
                 aspectRatio: 1.5,
                 child: RadarChartWidget(
-                  audits: audits,
-                  selectedAudit: selectedAudit,
-                ),
-              ),
-              AspectRatio(
-                aspectRatio: 1.5,
-                child: BarChartWidget(
                   audits: audits,
                   selectedAudit: selectedAudit,
                 ),

@@ -35,23 +35,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _openPdf(String pdfName) async {
     try {
-      final pdfPath = 'assets/docs/$pdfName';
-
-      // Cargar el PDF desde assets
-      final byteData = await rootBundle.load(pdfPath);
-
-      // Obtener directorio temporal
+      final byteData = await rootBundle.load('assets/docs/$pdfName');
       final tempDir = await getTemporaryDirectory();
       final tempPath = '${tempDir.path}/$pdfName';
-
-      // Guardar archivo temporalmente
       final file = File(tempPath);
       await file.writeAsBytes(byteData.buffer.asUint8List());
-
-      // Abrir el archivo
       final result = await OpenFile.open(tempPath);
 
-      // El código aquí cambia: result.type es un int, 0 significa éxito
       if (result.type != 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No se pudo abrir el PDF')),
@@ -115,9 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 16,
-                    ),
+                        vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(20),
@@ -136,6 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+
             _buildSectionHeader(
               icon: Icons.play_circle_outline,
               title: 'Tutoriales',
@@ -164,15 +153,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text(
-                        'El manual de FAQ no está disponible actualmente',
-                      ),
+                      content:
+                          Text('El manual de FAQ no está disponible actualmente'),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 16),
             ],
+
             _buildSectionHeader(
               icon: Icons.question_answer,
               title: 'FAQ',
@@ -183,48 +172,24 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildFAQItem(
                 0,
                 '¿Qué hago si no veo mis áreas o usuarios?',
-                'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.\n\n'
-                    'Correo:\n'
-                    'auris.apoyo@gmail.com',
+                'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.\n\nCorreo: auris.apoyo@gmail.com',
               ),
               _buildFAQItem(
                 1,
                 '¿Qué significan las 5S en la app?',
-                'Las 5S representan las fases del método japonés: Seiri, Seiton, Seiso, Seiketsu, Shitsuke. '
-                    'Cada S tiene un grupo de preguntas dentro del cuestionario.',
+                'Las 5S representan las fases del método japonés: Seiri, Seiton, Seiso, Seiketsu, Shitsuke. Cada S tiene un grupo de preguntas dentro del cuestionario.',
               ),
               _buildFAQItem(
                 2,
                 '¿Cómo puedo crear una nueva organización en la app?',
                 'Solo los usuarios con permisos de Administrador pueden crear organizaciones. Para hacerlo:\n\n'
-                    '1. Dirígete al panel principal de administración.\n\n'
-                    '2. Selecciona la opción "Crear Organización".\n\n'
-                    '3. Ingresa el nombre, una descripción opcional y elige una paleta de colores y una foto de perfil que identifique visualmente a la organización.\n\n'
-                    '4. Guarda los cambios. Luego podrás añadir departamentos, usuarios y cuestionarios específicos para esa organización.',
+                '1. Dirígete al panel principal de administración.\n'
+                '2. Selecciona la opción "Crear Organización".\n'
+                '3. Ingresa el nombre, descripción, paleta de colores y una imagen de perfil.\n'
+                '4. Guarda los cambios y asigna usuarios y cuestionarios.',
               ),
               const SizedBox(height: 16),
             ],
-            const SizedBox(height: 24),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.blue[800],
-                  backgroundColor: Colors.white,
-                  side: BorderSide(color: Colors.blue[800]!),
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 2,
-                ),
-                child: const Text(
-                  'Cerrar Sesión',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),

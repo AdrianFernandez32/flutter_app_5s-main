@@ -16,11 +16,14 @@ class AuthService {
         'dev-aodesvgtpd08tn2z.us.auth0.com',
         'XVv0JTHH67GBp0dtZ6jsJzHJqEj88SlD',
       );
+      final returnToUrl =
+          'com.example.flutterapp5s://dev-aodesvgtpd08tn2z.us.auth0.com/android/com.example.flutterapp5s/callback';
+      print('Auth0 logout returnTo URL: ' + returnToUrl);
       await auth0
           .webAuthentication(
               // scheme: 'com.example.flutterapp5s'
               )
-          .logout();
+          .logout(returnTo: returnToUrl);
       // Limpiar los datos de la sesión
       accessToken = null;
       idToken = null;
