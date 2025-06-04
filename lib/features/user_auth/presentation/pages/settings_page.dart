@@ -1,289 +1,311 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_app_5s/auth/auth_service.dart';
+import 'package:flutter/services.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
-class UserBasicInfo extends StatelessWidget {
-  final String? username;
-  final String? area;
-  final String? rol;
-  final String? zone;
+void main() {
+  runApp(const MyApp());
+}
 
-  const UserBasicInfo({
-    Key? key,
-    this.username,
-    this.area,
-    this.rol,
-    this.zone,
-  }) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: colorScheme.secondary,
-            child: const Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            username ?? 'Sin nombre',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            rol ?? 'Sin rol',
-            style: TextStyle(
-              fontSize: 18,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${area ?? 'Sin área'} - ${zone ?? 'Sin zona'}',
-            style: TextStyle(
-              fontSize: 16,
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
+    return MaterialApp(
+      title: 'Ajustes',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const SettingsPage(),
     );
   }
 }
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
-  SettingsPageState createState() => SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends State<SettingsPage> {
+  bool _showTutorials = false;
+  bool _showFAQ = false;
+  int? _expandedQuestionIndex;
+
+  Future<void> _openPdf(String pdfName) async {
+    try {
+      final byteData = await rootBundle.load('assets/docs/$pdfName');
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = '${tempDir.path}/$pdfName';
+      final file = File(tempPath);
+      await file.writeAsBytes(byteData.buffer.asUint8List());
+      final result = await OpenFile.open(tempPath);
+
+      if (result.type != 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo abrir el PDF')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al abrir el documento: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    const color = Color.fromRGBO(140, 140, 140, 1);
-
-    // Datos simulados de un fetch
-    const Map<String, String> response = {
-      "id": "1",
-      "username": "Carlos Trasviña",
-      "rol": "Jefe de Área",
-      "zone": "Zona Operativa",
-      "area": "Embotellado"
-    };
-
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 80,
-          backgroundColor: colorScheme.secondary,
-          title: const Text(
-            "Ajustes",
-            style: TextStyle(color: Colors.white, fontSize: 32),
-          ),
-          leading: IconButton(
-            onPressed: () {
-              context.goNamed("Menu");
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-              size: 33,
-            ),
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(10),
-            child: Container(
-              color: colorScheme.secondary.withOpacity(0.5),
-              height: 2,
-            ),
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      appBar: AppBar(
+        title: const Text(
+          'Ajustes',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
-        body: TabBarView(children: [
-          // General
-          SingleChildScrollView(
-            child: Column(children: [
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.only(top: 12, bottom: 12),
-                  child: UserBasicInfo(
-                    username: response["username"],
-                    area: response["area"],
-                    rol: response["rol"],
-                    zone: response["zone"],
+        centerTitle: true,
+        backgroundColor: Colors.blue[800],
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.blue,
+                    child: Icon(Icons.person, size: 40, color: Colors.white),
                   ),
-                ),
-              ),
-              const TabBar(indicatorSize: TabBarIndicatorSize.tab, tabs: [
-                Tab(
-                  text: "General",
-                ),
-                Tab(
-                  text: "Tutoriales",
-                ),
-                Tab(
-                  text: "FAQ",
-                ),
-              ]),
-              // Notificaciones y Terminos de Privacidad
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.only(top: 12, bottom: 12),
-                  child: Row(
-                    children: [
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                          child: Container(
-                        padding: const EdgeInsets.only(
-                            top: 12, bottom: 12, left: 20, right: 20),
-                        decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                            color: colorScheme.surface),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "Notificaciones",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color: colorScheme.onSurface),
-                                  ),
-                                ),
-                                const _SwitchExample(),
-                              ],
-                            ),
-                            const Divider(),
-                            Row(
-                              children: [
-                                const Expanded(
-                                  child: SizedBox(),
-                                ),
-                                Icon(
-                                  Icons.attach_file,
-                                  color: colorScheme.secondary,
-                                ),
-                                Text(
-                                  "Terminos de Privacidad",
-                                  style: TextStyle(
-                                      color: colorScheme.secondary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16),
-                                ),
-                                const Expanded(
-                                  child: SizedBox(),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      )),
-                      const SizedBox(
-                        width: 20,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
-                child: Center(
-                  child: TextButton(
-                    onPressed: () async {
-                      try {
-                        await authService.logout();
-                        if (!mounted) return;
-                        context.goNamed("AdminAccessPage");
-                      } catch (e) {
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error al cerrar sesión: $e')),
-                        );
-                      }
-                    },
-                    child: Text(
-                      "Cerrar Sesión",
-                      style: TextStyle(
-                          color: colorScheme.secondary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Carlos Trasviña',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
-              )
-            ]),
-          ),
-
-          // Tutoriales
-          const SingleChildScrollView(
-            child: Column(
-              children: [
-                Text("Tutoriales"),
-              ],
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Jefe de Área',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Zona Operativa Embotellado',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Divider(thickness: 1, color: Colors.grey),
+                ],
+              ),
             ),
-          ),
 
-          // FAQ
-
-          const SingleChildScrollView(
-            child: Column(
-              children: [
-                Text("Preguntas Frecuentes"),
-              ],
+            _buildSectionHeader(
+              icon: Icons.play_circle_outline,
+              title: 'Tutoriales',
+              isExpanded: _showTutorials,
+              onTap: () => setState(() => _showTutorials = !_showTutorials),
             ),
-          )
-        ]),
+            if (_showTutorials) ...[
+              _buildMenuItem(
+                Icons.assignment,
+                'Crear Cuestionarios',
+                onTap: () => _openPdf('Crear_Cuestionarios(AURIS).pdf'),
+              ),
+              _buildMenuItem(
+                Icons.assessment,
+                'Hacer Auditorías',
+                onTap: () => _openPdf('Hacer_Auditorias(AURIS).pdf'),
+              ),
+              _buildMenuItem(
+                Icons.people_alt,
+                'Asignar Usuarios a Áreas',
+                onTap: () => _openPdf('Asignar_Usuario(AURIS).pdf'),
+              ),
+              _buildMenuItem(
+                Icons.help_outline,
+                'FAQ',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('El manual de FAQ no está disponible actualmente'),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            _buildSectionHeader(
+              icon: Icons.question_answer,
+              title: 'FAQ',
+              isExpanded: _showFAQ,
+              onTap: () => setState(() => _showFAQ = !_showFAQ),
+            ),
+            if (_showFAQ) ...[
+              _buildFAQItem(
+                0,
+                '¿Qué hago si no veo mis áreas o usuarios?',
+                'Verifica tu rol y permisos. Si el problema continúa, contacta al administrador del sistema.\n\nCorreo: auris.apoyo@gmail.com',
+              ),
+              _buildFAQItem(
+                1,
+                '¿Qué significan las 5S en la app?',
+                'Las 5S representan las fases del método japonés: Seiri, Seiton, Seiso, Seiketsu, Shitsuke. Cada S tiene un grupo de preguntas dentro del cuestionario.',
+              ),
+              _buildFAQItem(
+                2,
+                '¿Cómo puedo crear una nueva organización en la app?',
+                'Solo los usuarios con permisos de Administrador pueden crear organizaciones. Para hacerlo:\n\n'
+                '1. Dirígete al panel principal de administración.\n'
+                '2. Selecciona la opción "Crear Organización".\n'
+                '3. Ingresa el nombre, descripción, paleta de colores y una imagen de perfil.\n'
+                '4. Guarda los cambios y asigna usuarios y cuestionarios.',
+              ),
+              const SizedBox(height: 16),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(IconData icon, String title, {VoidCallback? onTap}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue[600]),
+        title: Text(title),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.blue,
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildFAQItem(int index, String question, String answer) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        title: Text(
+          question,
+          style: const TextStyle(fontWeight: FontWeight.w500),
+        ),
+        trailing: Icon(
+          _expandedQuestionIndex == index
+              ? Icons.expand_less
+              : Icons.expand_more,
+          color: Colors.blue,
+        ),
+        initiallyExpanded: _expandedQuestionIndex == index,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _expandedQuestionIndex = expanded ? index : null;
+          });
+        },
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(answer, style: const TextStyle(color: Colors.black87)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required bool isExpanded,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(top: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.blue[800], size: 28),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more,
+              color: Colors.blue[800],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-class _SwitchExample extends StatefulWidget {
-  const _SwitchExample({super.key});
-
-  @override
-  State<_SwitchExample> createState() => _SwitchExampleState();
-}
-
-class _SwitchExampleState extends State<_SwitchExample> {
-  bool light = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return Switch(
-      // This bool value toggles the switch.
-      value: light,
-      activeColor: const Color.fromRGBO(134, 75, 111, 1),
-      onChanged: (bool value) {
-        // This is called when the user toggles the switch.
-        setState(() {
-          light = value;
-        });
-      },
-    );
-  }
-}
-//Se modifica
