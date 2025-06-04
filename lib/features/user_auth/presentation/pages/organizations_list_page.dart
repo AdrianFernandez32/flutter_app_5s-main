@@ -270,6 +270,25 @@ class _OrganizationsListPageState extends State<OrganizationsListPage> {
             const Text('Organizaciones', style: TextStyle(color: Colors.white)),
         backgroundColor: colorScheme.secondary,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              try {
+                final authService = AuthService();
+                await authService.logout();
+                if (!mounted) return;
+                context.goNamed('AdminAccessPage');
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error al cerrar sesión: $e')),
+                );
+              }
+            },
+          ),
+        ],
       ),
       backgroundColor: colorScheme.background,
       body: Column(
