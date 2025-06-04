@@ -22,14 +22,10 @@ class InicioAdminPage extends StatelessWidget {
             child: Container(
               height: 120,
               alignment: Alignment.center,
-              child: const Text(
-                'Logo',
-                style: TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF151946),
-                  letterSpacing: 1.2,
-                ),
+              child: Image.asset(
+                'lib/assets/images/AURISLOGO-AZUL.png',
+                height: 100,
+                fit: BoxFit.contain,
               ),
             ),
           ),

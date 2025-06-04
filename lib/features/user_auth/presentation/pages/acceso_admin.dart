@@ -40,8 +40,9 @@ class _AdminAccessPageState extends State<AdminAccessPage> {
           const SizedBox(height: 150),
           const CircleAvatar(
             radius: 90,
-            backgroundColor: Colors.blueAccent,
-            backgroundImage: AssetImage('assets/profile_placeholder.png'),
+            backgroundColor: Colors.transparent,
+            backgroundImage:
+                AssetImage('lib/assets/images/AURISISOTIPO-AZUL.png'),
           ),
           const SizedBox(height: 15),
           const Text(
